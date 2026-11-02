@@ -64,12 +64,15 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 0 — scaffold complete, awaiting remote setup and deploy verification.
+- **Phase:** Phase 0 complete. Entering Phase 1 (Public blog shell).
 - **Done:** Product PRD, Technical PRD, Design Spec, approved design mockup,
   scaffold (Next.js 16 + TypeScript 5.9 + Tailwind CSS v4), initial folder
-  structure with .gitkeep placeholders, production build & lint verified.
-- **Next:** Push to GitHub, link to Vercel, attach custom domain with HTTPS,
-  verify auto-redeploy on push to main (Phase 0 check).
+  structure with .gitkeep placeholders, production build & lint verified,
+  remote GitHub repo linked, live deployment verified on Vercel over HTTPS
+  (https://personal-blog-omega-flax.vercel.app/).
+- **Next:** Phase 1 — Public blog shell (layout, typography, design tokens,
+  light/dark theme toggle, markdown post pipeline, seeded posts, Home, Blog,
+  Post [slug], Writing, About pages, responsive, SEO basics).
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -103,3 +106,4 @@ update to the "Current status" section below.
 The running "why we chose X" log lives in `technical-prd.md` §9 and
 `design-spec.md` §7. Add new decisions there as they're made, one line each.
 - [2026-11-02] Chose **Tailwind CSS v4 with `@tailwindcss/postcss`** — standard PostCSS integration prevents child-process IPC crashes in Turbopack on Windows. Tokens defined in CSS (`@theme`).
+- [2026-11-02] **Deferred custom domain purchase** — deployed initially to Vercel default URL (`personal-blog-omega-flax.vercel.app`) with HTTPS; custom domain will be mapped via DNS once acquired (IONOS/other).
