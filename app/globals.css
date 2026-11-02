@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens go here in Phase 1 using @theme and CSS custom properties.
+ * Tailwind v4 — no tailwind.config.ts; configuration lives in CSS.
+ * Dark mode will respond to both prefers-color-scheme and [data-theme].
+ */

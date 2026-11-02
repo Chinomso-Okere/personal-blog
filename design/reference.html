@@ -1,0 +1,574 @@
+<title>Warm Editorial Blog</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+    /* Layout: single centred reading column, warm-editorial identity; light = warm paper, dark = warm charcoal with an amber-shifted accent. */
+    :root {
+        --bg: #F5F1E8;
+        /* warm paper */
+        --surface: #FFFFFF;
+        /* cards, code caption */
+        --fg: #211B12;
+        /* warm ink */
+        --muted: #867B67;
+        /* meta, captions */
+        --border: #E4DBCB;
+        --accent: #9C3B1B;
+        /* clay */
+        --accent-ink: #9C3B1B;
+        /* link/eyebrow colour */
+        --code-bg: #2A2317;
+        /* dark code block even in light mode */
+        --code-fg: #EADFC9;
+        --band: #F5F1E8;
+        --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+        --ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    }
+
+    @media (prefers-color-scheme:dark) {
+        :root:not([data-theme="light"]) {
+            --bg: #191510;
+            /* warm deep charcoal, not cold black */
+            --surface: #221C14;
+            --fg: #ECE3D2;
+            /* warm off-white */
+            --muted: #A79B84;
+            --border: #332A1E;
+            --accent: #E08A4C;
+            /* accent brightens to amber-clay on dark */
+            --accent-ink: #E59A5E;
+            --code-bg: #120E09;
+            --code-fg: #E7DDC8;
+            --band: #191510;
+            color-scheme: dark;
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --bg: #191510;
+        --surface: #221C14;
+        --fg: #ECE3D2;
+        --muted: #A79B84;
+        --border: #332A1E;
+        --accent: #E08A4C;
+        --accent-ink: #E59A5E;
+        --code-bg: #120E09;
+        --code-fg: #E7DDC8;
+        --band: #191510;
+        color-scheme: dark;
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    html,
+    body {
+        margin: 0
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--display);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0 0 auto;
+        height: env(safe-area-inset-top, 0px);
+        background: var(--band);
+        z-index: 20
+    }
+
+    a {
+        color: inherit
+    }
+
+    /* ---- header ---- */
+    .masthead {
+        position: sticky;
+        top: env(safe-area-inset-top, 0px);
+        z-index: 15;
+        background: color-mix(in srgb, var(--band) 88%, transparent);
+        backdrop-filter: saturate(1.1) blur(8px);
+        border-bottom: 1px solid var(--border)
+    }
+
+    .masthead__in {
+        max-width: 960px;
+        margin-inline: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding-left: max(20px, env(safe-area-inset-left, 0px));
+        padding-right: max(20px, env(safe-area-inset-right, 0px));
+        padding-block: 16px
+    }
+
+    .brand {
+        font-family: var(--display);
+        font-weight: 500;
+        font-size: 19px;
+        letter-spacing: .01em
+    }
+
+    .nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-family: var(--ui);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .11em;
+        color: var(--muted);
+        font-weight: 500;
+        flex-wrap: wrap
+    }
+
+    .nav a {
+        text-decoration: none
+    }
+
+    .nav a:hover {
+        color: var(--accent-ink)
+    }
+
+    .nav .ext::after {
+        content: "↗";
+        font-size: 9px;
+        margin-left: 3px;
+        vertical-align: super;
+        opacity: .7
+    }
+
+    .toggle {
+        font-family: var(--ui);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 12px;
+        cursor: pointer
+    }
+
+    .toggle:hover {
+        color: var(--accent-ink);
+        border-color: var(--accent)
+    }
+
+    /* ---- article ---- */
+    main {
+        max-width: 960px;
+        margin-inline: auto;
+        padding-left: max(20px, env(safe-area-inset-left, 0px));
+        padding-right: max(20px, env(safe-area-inset-right, 0px))
+    }
+
+    .article {
+        max-width: 680px;
+        margin-inline: auto;
+        padding-block: 48px 8px
+    }
+
+    .eyebrow {
+        font-family: var(--ui);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--accent-ink)
+    }
+
+    .article h1 {
+        font-size: clamp(30px, 6vw, 46px);
+        line-height: 1.1;
+        font-weight: 500;
+        letter-spacing: -.015em;
+        margin: 14px 0 16px;
+        text-wrap: balance
+    }
+
+    .meta {
+        font-family: var(--ui);
+        font-size: 13px;
+        color: var(--muted);
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-weight: 500;
+        align-items: center
+    }
+
+    .meta .dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--muted);
+        opacity: .6
+    }
+
+    .rule {
+        height: 1px;
+        background: var(--border);
+        margin: 26px 0
+    }
+
+    .article p {
+        font-size: 18px;
+        line-height: 1.64;
+        margin: 18px 0
+    }
+
+    .article p.lead {
+        font-size: 20px;
+        line-height: 1.55;
+        color: var(--fg)
+    }
+
+    .article p.lead::first-letter {
+        font-size: 1em
+    }
+
+    .pull {
+        margin: 30px 0;
+        padding-left: 22px;
+        border-left: 2px solid var(--accent);
+        font-style: italic;
+        font-size: 23px;
+        line-height: 1.38;
+        font-weight: 500;
+        color: var(--fg)
+    }
+
+    figure {
+        margin: 28px 0
+    }
+
+    figure.code {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border)
+    }
+
+    figure.code .cap {
+        font-family: var(--ui);
+        font-size: 11px;
+        letter-spacing: .04em;
+        color: var(--muted);
+        background: var(--surface);
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--border)
+    }
+
+    figure.code pre {
+        margin: 0;
+        background: var(--code-bg);
+        color: var(--code-fg);
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px 18px;
+        overflow-x: auto
+    }
+
+    .k {
+        color: #E0A05A
+    }
+
+    .s {
+        color: #B8C08A
+    }
+
+    .f {
+        color: #ECD9AC
+    }
+
+    .c {
+        color: #8C8066;
+        font-style: italic
+    }
+
+    .n {
+        color: #DD9A72
+    }
+
+    figure.fig {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border)
+    }
+
+    .fig__img {
+        aspect-ratio: 16/8;
+        max-width: 100%;
+        background:
+            radial-gradient(120% 140% at 15% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+            repeating-linear-gradient(135deg, var(--surface) 0 14px, color-mix(in srgb, var(--surface) 70%, var(--border)) 14px 28px);
+        display: flex;
+        align-items: center;
+        justify-content: center
+    }
+
+    .fig__img span {
+        font-family: var(--ui);
+        font-size: 12px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--muted)
+    }
+
+    figcaption {
+        font-family: var(--ui);
+        font-size: 12.5px;
+        color: var(--muted);
+        padding: 10px 2px;
+        line-height: 1.45
+    }
+
+    /* ---- more posts ---- */
+    .more {
+        max-width: 680px;
+        margin: 44px auto 0;
+        padding-top: 30px;
+        border-top: 1px solid var(--border)
+    }
+
+    .more h2 {
+        font-family: var(--ui);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .11em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 20px
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px
+    }
+
+    .card {
+        display: block;
+        text-decoration: none
+    }
+
+    .card .ey {
+        font-family: var(--ui);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--accent-ink)
+    }
+
+    .card h3 {
+        font-family: var(--display);
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 1.2;
+        margin: 8px 0 6px;
+        letter-spacing: -.01em
+    }
+
+    .card:hover h3 {
+        color: var(--accent-ink)
+    }
+
+    .card p {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.5;
+        margin: 0;
+        font-family: var(--ui)
+    }
+
+    /* ---- footer ---- */
+    footer {
+        border-top: 1px solid var(--border);
+        margin-top: 60px;
+        background: var(--band)
+    }
+
+    .foot {
+        max-width: 960px;
+        margin-inline: auto;
+        padding-left: max(20px, env(safe-area-inset-left, 0px));
+        padding-right: max(20px, env(safe-area-inset-right, 0px));
+        padding-block: 34px 44px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-family: var(--ui);
+        font-size: 13px;
+        color: var(--muted)
+    }
+
+    .foot__bio {
+        max-width: 44ch;
+        line-height: 1.55
+    }
+
+    .foot__bio b {
+        color: var(--fg);
+        font-weight: 600
+    }
+
+    .foot__links {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap
+    }
+
+    .foot__links a {
+        text-decoration: none
+    }
+
+    .foot__links a:hover {
+        color: var(--accent-ink)
+    }
+
+    @media (max-width:560px) {
+        .cards {
+            grid-template-columns: 1fr
+        }
+
+        .article {
+            padding-block: 34px 4px
+        }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+        * {
+            transition: none !important
+        }
+    }
+</style>
+
+<header class="masthead">
+    <div class="masthead__in">
+        <div class="brand">Nonso Okere</div>
+        <nav class="nav">
+            <a href="#">Blog</a>
+            <a href="#">Writing</a>
+            <a href="#" class="ext">Portfolio</a>
+            <a href="#">About</a>
+            <button class="toggle" id="themeBtn" type="button" aria-label="Switch theme">Dark</button>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <article class="article">
+        <div class="eyebrow">AI Engineering</div>
+        <h1>Why a panel of narrow agents beats one clever prompt</h1>
+        <div class="meta"><span>14 October 2026</span><span class="dot"></span><span>6 min read</span></div>
+        <div class="rule"></div>
+
+        <p class="lead">The instinct is to write one long prompt that weighs every criterion at once. It demos
+            beautifully and then quietly fails in production.</p>
+        <p>The model averages across concerns it should hold apart, and you lose any clear line on why a decision came
+            out the way it did. For a system that has to be defended — to a reviewer, an auditor, or a user — that
+            opacity is the whole problem, not a detail.</p>
+
+        <blockquote class="pull">A single model asked to do everything hedges. A panel of narrow reviewers commits.
+        </blockquote>
+
+        <p>Splitting the work across one agent per rubric buys two things. Each reviewer stays inside a single frame of
+            judgement, so its reasoning doesn't bleed across criteria. And every score arrives with its own trace, which
+            means a decision can be read back line by line.</p>
+
+        <figure class="code">
+            <div class="cap">evaluate.py</div>
+            <pre><span class="c"># one reviewer per rubric, then a consensus pass</span>
+<span class="k">def</span> <span class="f">evaluate</span>(application):
+    reviewers = [
+        <span class="f">Agent</span>(<span class="s">"eligibility"</span>, rubric=ELIGIBILITY),
+        <span class="f">Agent</span>(<span class="s">"evidence"</span>,     rubric=EVIDENCE),
+        <span class="f">Agent</span>(<span class="s">"impact"</span>,       rubric=IMPACT),
+    ]
+    scores = [r.<span class="f">assess</span>(application) <span class="k">for</span> r <span class="k">in</span> reviewers]
+    <span class="k">return</span> <span class="f">panel_consensus</span>(scores, threshold=<span class="n">0.66</span>)</pre>
+        </figure>
+
+        <p>When the panel disagrees, the disagreement is the signal worth reading. A split between the evidence and
+            impact reviewers tells you exactly where the case is thin — something a single blended score would have
+            smoothed away.</p>
+
+        <figure class="fig">
+            <div class="fig__img"><span>Figure — image sits here</span></div>
+            <figcaption>Images drop in at any point in a post — this is where one would illustrate the paragraph above.
+            </figcaption>
+        </figure>
+
+        <p>None of this is free. You pay in orchestration and in tokens. But for any decision you'll have to stand
+            behind, a trail of narrow judgements beats one confident paragraph you can't take apart.</p>
+    </article>
+
+    <section class="more">
+        <h2>More from the blog</h2>
+        <div class="cards">
+            <a class="card" href="#">
+                <div class="ey">RAG</div>
+                <h3>The retrieval step is where most RAG systems lose</h3>
+                <p>Why your answer quality is capped long before the model sees a single token.</p>
+            </a>
+            <a class="card" href="#">
+                <div class="ey">Voice Agents</div>
+                <h3>What a real phone call demands that a chatbot never does</h3>
+                <p>Latency, interruption, and the uncanny cost of a half-second pause.</p>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="foot">
+        <div class="foot__bio"><b>Nonso Okere</b> — writing on AI engineering, agents and the craft of shipping them.
+            Founder of Silverpath AI.</div>
+        <nav class="foot__links">
+            <a href="#">LinkedIn</a>
+            <a href="#">GitHub</a>
+            <a href="#">Email</a>
+            <a href="#">© 2026</a>
+        </nav>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        var btn = document.getElementById('themeBtn');
+        var root = document.documentElement;
+        function current() {
+            var set = root.getAttribute('data-theme');
+            if (set) return set;
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        function sync() { btn.textContent = current() === 'dark' ? 'Light' : 'Dark'; }
+        try { var saved = localStorage.getItem('blogTheme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) { }
+        sync();
+        btn.addEventListener('click', function () {
+            var next = current() === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('blogTheme', next); } catch (e) { }
+            sync();
+        });
+    })();
+</script>
