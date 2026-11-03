@@ -64,11 +64,12 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 1 in progress (Checkpoint a complete, awaiting user review).
+- **Phase:** Phase 1 in progress (Checkpoint b complete, awaiting user review).
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 Checkpoint (a): design tokens (light & dark mode), Google Fonts (Newsreader with opsz axis, Inter, JetBrains Mono), @layer base & @layer components in globals.css, header with nav and external link hints, footer with bio from lib/site.ts, client theme toggle with zero layout shift and aria-labels, site-wide noindex and robots.ts, lib/site.ts configuration.
-- **Next:** Phase 1 Checkpoint (b) — Markdown pipeline with unified/remark/rehype + Shiki, seeded sample posts, blog list page, dynamic post page [slug].
+  - Phase 1 Checkpoint (b): Markdown pipeline with unified/remark/rehype + Shiki (warm-editorial theme), strict HTML/protocol sanitization with rehype-sanitize, frontmatter validation, formatting-showcase sample posts, blog listing page (/blog), dynamic post page (/blog/[slug]) with SSG and dynamicParams=false, custom 404 page, and home page recent posts feed.
+- **Next:** Phase 1 Checkpoint (c) — Writing page, About page, SEO.
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -91,9 +92,17 @@ Everything that must change before the site goes public:
 - [ ] Remove `robots: { index: false, follow: false }` from root metadata in `app/layout.tsx`
 - [ ] Remove the disallow rule in `app/robots.ts` (allow search indexing)
 - [ ] Delete all sample posts in `content/posts/`
-- [ ] Replace all placeholders in `lib/site.ts` (portfolio URL, GitHub profile, LinkedIn URL, email, bio)
-- [ ] Replace placeholder Home and About copy with real text
+- [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
+- [ ] Replace placeholder About copy with real text
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables
+
+## Checkpoint (c) notes
+
+The Writing page lists three research papers. Only the Persona-Driven Feedback Agents paper has a link (https://doi.org/10.1109/AAIML67890.2026.11498196). The other two show their titles with 'Link coming soon'.
+
+## Phase 4 notes
+
+Frontmatter dates must always be written as quoted strings (YYYY-MM-DD); the publish route must enforce this and validate the slug with the same pattern as lib/posts.ts.
 
 ## Dead ends (approaches that failed — do not retry)
 

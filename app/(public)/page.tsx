@@ -1,23 +1,47 @@
+import Link from "next/link";
+import { siteConfig } from "@/lib/site";
+import { getRecentPosts } from "@/lib/posts";
+import { PostCard } from "@/components/PostCard";
+
 export default function HomePage() {
+  const recentPosts = getRecentPosts(2);
+
   return (
     <div className="site-container py-12 md:py-16">
       <div className="article-col">
-        <span className="font-[family-name:var(--font-ui)] text-[12px] font-semibold tracking-[0.1em] uppercase text-[var(--accent-ink)]">
-          [Placeholder Eyebrow]
-        </span>
-        <h1 className="font-[family-name:var(--font-display)] text-[clamp(32px,5vw,44px)] font-medium leading-[1.15] tracking-[-0.015em] my-4 text-[var(--fg)] text-balance">
-          [Placeholder Heading — Home page intro to be supplied by author]
+        <h1 className="font-[family-name:var(--font-display)] text-[clamp(30px,6vw,46px)] font-medium leading-[1.1] tracking-[-0.015em] mb-6 text-[var(--fg)] text-balance">
+          {siteConfig.tagline}
         </h1>
         <p className="font-[family-name:var(--font-display)] text-[20px] leading-[1.55] text-[var(--fg)] my-4">
-          [Placeholder Lead — This is placeholder copy for the introductory
-          statement. Real biographical and technical context will be placed here
-          during review.]
+          I&apos;m Chinomso Okere MBCS, a business analyst and applied AI
+          researcher based in Scotland. This is where I write at length about
+          what actually works in AI, and what is only a good demo: evaluating
+          multi-agent systems, building voice agents, and getting AI into real
+          organisations. Expect evidence over hype, including the limitations.
         </p>
-        <p className="font-[family-name:var(--font-display)] text-[18px] leading-[1.64] text-[var(--fg)] my-4">
-          [Placeholder Body — Checkpoint (a) establishes the design tokens,
-          typography scale, masthead navigation, footer, and theme toggle. Recent
-          blog post cards will be wired in Checkpoint (b).]
-        </p>
+
+        {recentPosts.length > 0 && (
+          <section className="mt-16 pt-10 border-t border-[var(--border)]">
+            <div className="flex items-baseline justify-between mb-8">
+              <h2 className="font-[family-name:var(--font-ui)] text-[12px] font-semibold tracking-[0.11em] uppercase text-[var(--muted)]">
+                Recent Writing
+              </h2>
+              <Link
+                href="/blog"
+                className="font-[family-name:var(--font-ui)] text-[12px] uppercase tracking-[0.08em] font-medium text-[var(--muted)] hover:text-[var(--accent-ink)] transition-colors"
+              >
+                All posts →
+              </Link>
+            </div>
+            <div className="space-y-8">
+              {recentPosts.map((post) => (
+                <article key={post.slug} className="border-b border-[var(--border)] pb-8 last:border-b-0">
+                  <PostCard post={post} headingLevel="h3" />
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

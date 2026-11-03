@@ -88,6 +88,17 @@ The serif carries the content (headlines **and** body — this is what makes it 
 | Caption | Inter | 12.5px | 400 | 1.45 | `--muted` |
 | Code | JetBrains Mono | 13px | 400 | 1.7 | — |
 
+### Post Content Typography (In-article elements)
+| Element | Face | Size | Weight | Line height | Notes |
+|---|---|---|---|---|---|
+| Section heading (h2) | Newsreader | 28px | 500 | 1.2 | `letter-spacing:-.01em`; margin `44px 0 12px` |
+| Sub-heading (h3) | Newsreader | 22px | 500 | 1.25 | margin `32px 0 10px` |
+| Lists (ul, ol) | Newsreader | 18px | 400 | 1.64 | `padding-left:1.4em`; `6px` between items |
+| In-body links | Newsreader | inherit | inherit | inherit | 1px underline in `--accent-ink`, `text-underline-offset: 3px`, hover `--accent-ink` |
+| Inline code | JetBrains Mono | 0.88em | 400 | inherit | `--surface` background, 1px `--border`, radius `4px`, padding `1px 5px` |
+| Strong & emphasis | Newsreader | inherit | 600 (strong) / italic (em) | inherit | — |
+| Divider (hr) | — | 1px | — | — | hairline in `--border`, margin `32px 0` |
+
 ---
 
 ## 3. Layout, spacing, radius

@@ -176,6 +176,7 @@ MVP = Phases 0–5. Phase 6 is the next tier.
 - [2026-11-02] Chose **a dark code block in both themes** — keeps code legible and reads as deliberate.
 - [2026-11-02] Chose **hairline borders over shadows** for separating elements — quieter, more editorial.
 - [2026-11-02] Darkened light-mode --muted to #6F6553 for WCAG AA contrast on small text.
+- [2026-11-03] Defined explicit article styling for in-post headings (h2/h3), lists, in-body links, and inline code using design tokens.
 
 ## 10. Accounts & secrets to have ready (human task, before Phase 3–4)
 

@@ -13,15 +13,17 @@ export function Header() {
         <nav className="nav" aria-label="Main navigation">
           <Link href="/blog">Blog</Link>
           <Link href="/writing">Writing</Link>
-          <a
-            href={siteConfig.links.portfolio}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Portfolio
-            <ExternalArrow />
-            <span className="sr-only"> (opens in new tab)</span>
-          </a>
+          {siteConfig.links.portfolio && (
+            <a
+              href={siteConfig.links.portfolio}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Portfolio
+              <ExternalArrow />
+              <span className="sr-only"> (opens in new tab)</span>
+            </a>
+          )}
           <Link href="/about">About</Link>
           <ThemeToggle />
         </nav>

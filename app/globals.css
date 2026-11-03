@@ -183,7 +183,6 @@
     color: var(--accent-ink);
   }
 
-
   /* Theme toggle button */
   .toggle {
     font-family: var(--ui);
@@ -221,6 +220,289 @@
   .article-col {
     max-width: 680px;
     margin-inline: auto;
+  }
+
+  /* Article typography & layout from reference.html */
+  .article {
+    max-width: 680px;
+    margin-inline: auto;
+    padding-block: 48px 8px;
+  }
+
+  .eyebrow {
+    font-family: var(--ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .article h1 {
+    font-family: var(--display);
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin: 14px 0 16px;
+    text-wrap: balance;
+    color: var(--fg);
+  }
+
+  .meta {
+    font-family: var(--ui);
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-weight: 500;
+    align-items: center;
+  }
+
+  .meta .dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.6;
+  }
+
+  .rule {
+    height: 1px;
+    background: var(--border);
+    margin: 26px 0;
+  }
+
+  /* Post body paragraphs & lead */
+  .article p {
+    font-size: 18px;
+    line-height: 1.64;
+    margin: 18px 0;
+    color: var(--fg);
+  }
+
+  .article p.lead {
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--fg);
+  }
+
+  /* Headings inside post body */
+  .article h2 {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 44px 0 12px;
+    color: var(--fg);
+  }
+
+  .article h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 32px 0 10px;
+    color: var(--fg);
+  }
+
+  /* Lists inside post body */
+  .article ul,
+  .article ol {
+    font-size: 18px;
+    line-height: 1.64;
+    padding-left: 1.4em;
+    margin: 18px 0;
+    color: var(--fg);
+  }
+
+  .article ul {
+    list-style-type: disc;
+  }
+
+  .article ol {
+    list-style-type: decimal;
+  }
+
+  .article li {
+    margin-block: 6px;
+  }
+
+  /* In-body links */
+  .article a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-ink);
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+  }
+
+  .article a:hover {
+    color: var(--accent-ink);
+  }
+
+  /* Inline code */
+  .article :not(pre) > code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--fg);
+  }
+
+  /* Strong, emphasis, and hr */
+  .article strong {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .article em {
+    font-style: italic;
+  }
+
+  .article hr {
+    height: 1px;
+    border: none;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* Pull quotes */
+  .pull {
+    margin: 30px 0;
+    padding-left: 22px;
+    border-left: 2px solid var(--accent);
+    font-style: italic;
+    font-size: 23px;
+    line-height: 1.38;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .pull p {
+    font-size: inherit;
+    line-height: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  /* Code block figure matching reference.html */
+  figure.code {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  figure.code .cap {
+    font-family: var(--ui);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  figure.code pre {
+    margin: 0;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 16px 18px;
+    overflow-x: auto;
+  }
+
+  /* Cards grid (More from blog / Post listings) */
+  .more {
+    max-width: 680px;
+    margin: 44px auto 0;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+
+  .more h2 {
+    font-family: var(--ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  .card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .card .ey {
+    font-family: var(--ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .card h2,
+  .card h3,
+  .card .card-title {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.2;
+    margin: 8px 0 6px;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    transition: color 0.15s ease;
+  }
+
+  .card:hover h2,
+  .card:hover h3,
+  .card:hover .card-title {
+    color: var(--accent-ink);
+  }
+
+  .card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+    font-family: var(--ui);
+  }
+
+  .card .card-meta {
+    font-family: var(--ui);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Responsive breakdown */
+  @media (max-width: 560px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+    .article {
+      padding-block: 34px 4px;
+    }
   }
 
   /* Footer styling */
