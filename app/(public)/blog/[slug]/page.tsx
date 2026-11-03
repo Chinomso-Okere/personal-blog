@@ -4,6 +4,7 @@ import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import { renderMarkdown } from "@/lib/markdown";
 import { formatDate } from "@/lib/format";
 import { PostCard } from "@/components/PostCard";
+import { siteConfig } from "@/lib/site";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -33,6 +34,16 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.description,
+      publishedTime: post.date,
+      siteName: siteConfig.name,
+    },
   };
 }
 

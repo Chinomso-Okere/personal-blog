@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Blog",
   description:
     "Long-form articles on evaluating AI agents, voice systems, and production engineering.",
+  alternates: {
+    canonical: "/blog",
+  },
+  openGraph: {
+    title: "Blog",
+    description:
+      "Long-form articles on evaluating AI agents, voice systems, and production engineering.",
+    siteName: siteConfig.name,
+  },
 };
 
 export default function BlogPage() {

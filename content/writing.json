@@ -1,2 +1,29 @@
-[]
-
+[
+  {
+    "title": "Persona-Driven Feedback Agents for High-Stakes Documents: A Multi-Perspective Evaluation of Global Talent Visa Submissions",
+    "type": "paper",
+    "venue": "IEEE AAIML 2026 (International Conference on Advances in Artificial Intelligence and Machine Learning), pp. 367–372",
+    "year": 2026,
+    "status": "published",
+    "note": "Co-authored research prototype: persona-based AI agents assess high-stakes application documents. Evaluated on 20 synthetic applications; no real-world outcome validation.",
+    "url": "https://doi.org/10.1109/AAIML67890.2026.11498196"
+  },
+  {
+    "title": "Adversarial Causal Deliberation among Autonomous Agents for Reliable Consumer Behaviour Explanation",
+    "type": "paper",
+    "venue": "ICSRS 2026, Rome",
+    "year": 2026,
+    "status": "accepted",
+    "note": "Co-authored simulation study: agents with competing roles must challenge a causal claim before it is accepted. Accepted, not yet published.",
+    "url": ""
+  },
+  {
+    "title": "CausalAgentBench: Reliability-Aware Benchmarking of Causal Reasoning, Coordination and Explainability in Multi-Agent Consumer Intelligence",
+    "type": "paper",
+    "venue": "ICSRS 2026, Rome",
+    "year": 2026,
+    "status": "accepted",
+    "note": "Co-authored benchmark that scores the handoffs between components of a causal analytics pipeline, including corrupted inputs and abstention. Accepted, not yet published.",
+    "url": ""
+  }
+]

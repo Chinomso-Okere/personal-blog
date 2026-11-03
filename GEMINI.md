@@ -64,12 +64,13 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 1 in progress (Checkpoint b complete, awaiting user review).
+- **Phase:** Phase 1 Checkpoint (c) built, awaiting review.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 Checkpoint (a): design tokens (light & dark mode), Google Fonts (Newsreader with opsz axis, Inter, JetBrains Mono), @layer base & @layer components in globals.css, header with nav and external link hints, footer with bio from lib/site.ts, client theme toggle with zero layout shift and aria-labels, site-wide noindex and robots.ts, lib/site.ts configuration.
   - Phase 1 Checkpoint (b): Markdown pipeline with unified/remark/rehype + Shiki (warm-editorial theme), strict HTML/protocol sanitization with rehype-sanitize, frontmatter validation, formatting-showcase sample posts, blog listing page (/blog), dynamic post page (/blog/[slug]) with SSG and dynamicParams=false, custom 404 page, and home page recent posts feed.
-- **Next:** Phase 1 Checkpoint (c) — Writing page, About page, SEO.
+  - Phase 1 Checkpoint (c): Writing page (/writing) backed by content/writing.json and typed validator, About page (/about) backed by content/about.md with conditional photo check, SEO basics (title template in layout, per-page canonicals, OpenGraph metadata, and sitemap.ts).
+- **Next:** Phase 1 visual review and approval; then Phase 2.
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -89,12 +90,15 @@ update to the "Current status" section below.
 ## Pre-launch checklist
 
 Everything that must change before the site goes public:
-- [ ] Remove `robots: { index: false, follow: false }` from root metadata in `app/layout.tsx`
-- [ ] Remove the disallow rule in `app/robots.ts` (allow search indexing)
-- [ ] Delete all sample posts in `content/posts/`
-- [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
-- [ ] Replace placeholder About copy with real text
+- [ ] Remove site-wide noindex from root metadata in `app/layout.tsx`
+- [ ] Change `app/robots.ts` to allow search indexing and add the sitemap line
+- [ ] Delete both [Sample post] files in `content/posts/`
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables
+- [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
+- [ ] Add the About photo at public/images/chinomso-okere.jpg
+- [ ] Add the ICSRS paper URLs to content/writing.json when proceedings are published
+- [ ] Confirm the CausalAgentBench title matches the camera-ready version
+- [ ] Confirm the AAIML DOI resolves
 
 ## Checkpoint (c) notes
 

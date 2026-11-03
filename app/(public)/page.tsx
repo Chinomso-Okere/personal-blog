@@ -1,7 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { getRecentPosts } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
+
+export const metadata: Metadata = {
+  description: siteConfig.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+};
 
 export default function HomePage() {
   const recentPosts = getRecentPosts(2);

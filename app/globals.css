@@ -260,7 +260,8 @@
     align-items: center;
   }
 
-  .meta .dot {
+  .meta .dot,
+  .card-meta .dot {
     width: 3px;
     height: 3px;
     border-radius: 50%;
@@ -450,7 +451,7 @@
     text-decoration: none;
   }
 
-  .card .ey {
+  .ey {
     font-family: var(--ui);
     font-size: 11px;
     font-weight: 600;
@@ -486,7 +487,7 @@
     font-family: var(--ui);
   }
 
-  .card .card-meta {
+  .card-meta {
     font-family: var(--ui);
     font-size: 12px;
     color: var(--muted);
