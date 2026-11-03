@@ -30,7 +30,7 @@ Define every colour as a CSS custom property on `:root` (light values), then red
 | `--bg` | `#F5F1E8` | page background (warm paper) |
 | `--surface` | `#FFFFFF` | cards, code caption bar |
 | `--fg` | `#211B12` | primary text (warm ink) |
-| `--muted` | `#867B67` | meta, captions, nav |
+| `--muted` | `#6F6553` | meta, captions, nav |
 | `--border` | `#E4DBCB` | rules, dividers, card edges |
 | `--accent` | `#9C3B1B` | clay — pullquote rule, borders |
 | `--accent-ink` | `#9C3B1B` | eyebrows, link hover |

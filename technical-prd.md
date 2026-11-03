@@ -175,6 +175,7 @@ MVP = Phases 0–5. Phase 6 is the next tier.
 - [2026-11-02] Chose **serif for body as well as headlines** (Newsreader) — the editorial reading feel depends on it.
 - [2026-11-02] Chose **a dark code block in both themes** — keeps code legible and reads as deliberate.
 - [2026-11-02] Chose **hairline borders over shadows** for separating elements — quieter, more editorial.
+- [2026-11-02] Darkened light-mode --muted to #6F6553 for WCAG AA contrast on small text.
 
 ## 10. Accounts & secrets to have ready (human task, before Phase 3–4)
 

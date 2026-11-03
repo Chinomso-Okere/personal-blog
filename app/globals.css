@@ -1,7 +1,267 @@
 @import "tailwindcss";
 
-/*
- * Design tokens go here in Phase 1 using @theme and CSS custom properties.
- * Tailwind v4 — no tailwind.config.ts; configuration lives in CSS.
- * Dark mode will respond to both prefers-color-scheme and [data-theme].
- */
+:root {
+  --bg: #F5F1E8;
+  --surface: #FFFFFF;
+  --fg: #211B12;
+  --muted: #6F6553;
+  --border: #E4DBCB;
+  --accent: #9C3B1B;
+  --accent-ink: #9C3B1B;
+  --code-bg: #2A2317;
+  --code-fg: #EADFC9;
+  --band: #F5F1E8;
+  --display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --ui: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #191510;
+    --surface: #221C14;
+    --fg: #ECE3D2;
+    --muted: #A79B84;
+    --border: #332A1E;
+    --accent: #E08A4C;
+    --accent-ink: #E59A5E;
+    --code-bg: #120E09;
+    --code-fg: #E7DDC8;
+    --band: #191510;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #191510;
+  --surface: #221C14;
+  --fg: #ECE3D2;
+  --muted: #A79B84;
+  --border: #332A1E;
+  --accent: #E08A4C;
+  --accent-ink: #E59A5E;
+  --code-bg: #120E09;
+  --code-fg: #E7DDC8;
+  --band: #191510;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #F5F1E8;
+  --surface: #FFFFFF;
+  --fg: #211B12;
+  --muted: #6F6553;
+  --border: #E4DBCB;
+  --accent: #9C3B1B;
+  --accent-ink: #9C3B1B;
+  --code-bg: #2A2317;
+  --code-fg: #EADFC9;
+  --band: #F5F1E8;
+  color-scheme: light;
+}
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --color-band: var(--band);
+  --font-display: var(--display);
+  --font-ui: var(--ui);
+  --font-mono: var(--mono);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--display);
+    font-optical-sizing: auto;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Paint safe-area-inset-top band */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--band);
+    z-index: 20;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Visible keyboard focus state */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Masthead styling */
+  .masthead {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 15;
+    background: color-mix(in srgb, var(--band) 88%, transparent);
+    backdrop-filter: saturate(1.1) blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .masthead__in {
+    max-width: 960px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-block: 16px;
+  }
+
+  .brand {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 19px;
+    letter-spacing: 0.01em;
+  }
+
+  .brand:hover {
+    color: var(--accent-ink);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--ui);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--muted);
+    font-weight: 500;
+    flex-wrap: wrap;
+  }
+
+  .nav a:hover {
+    color: var(--accent-ink);
+  }
+
+
+  /* Theme toggle button */
+  .toggle {
+    font-family: var(--ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 68px;
+    height: 28px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .toggle:hover {
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+
+  /* Layout containers */
+  .site-container {
+    max-width: 960px;
+    margin-inline: auto;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+  }
+
+  .article-col {
+    max-width: 680px;
+    margin-inline: auto;
+  }
+
+  /* Footer styling */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+    background: var(--band);
+  }
+
+  .foot {
+    max-width: 960px;
+    margin-inline: auto;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-block: 34px 44px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-family: var(--ui);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .foot__bio {
+    max-width: 44ch;
+    line-height: 1.55;
+  }
+
+  .foot__bio b {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .foot__links {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .foot__links a:hover {
+    color: var(--accent-ink);
+  }
+}

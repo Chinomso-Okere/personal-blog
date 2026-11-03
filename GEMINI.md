@@ -64,15 +64,11 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 0 complete. Entering Phase 1 (Public blog shell).
-- **Done:** Product PRD, Technical PRD, Design Spec, approved design mockup,
-  scaffold (Next.js 16 + TypeScript 5.9 + Tailwind CSS v4), initial folder
-  structure with .gitkeep placeholders, production build & lint verified,
-  remote GitHub repo linked, live deployment verified on Vercel over HTTPS
-  (https://personal-blog-omega-flax.vercel.app/).
-- **Next:** Phase 1 — Public blog shell (layout, typography, design tokens,
-  light/dark theme toggle, markdown post pipeline, seeded posts, Home, Blog,
-  Post [slug], Writing, About pages, responsive, SEO basics).
+- **Phase:** Phase 1 in progress (Checkpoint a complete, awaiting user review).
+- **Done:**
+  - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
+  - Phase 1 Checkpoint (a): design tokens (light & dark mode), Google Fonts (Newsreader with opsz axis, Inter, JetBrains Mono), @layer base & @layer components in globals.css, header with nav and external link hints, footer with bio from lib/site.ts, client theme toggle with zero layout shift and aria-labels, site-wide noindex and robots.ts, lib/site.ts configuration.
+- **Next:** Phase 1 Checkpoint (b) — Markdown pipeline with unified/remark/rehype + Shiki, seeded sample posts, blog list page, dynamic post page [slug].
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -88,6 +84,16 @@ update to the "Current status" section below.
   No `tailwind.config.ts`. Design tokens live in CSS using `@theme` and CSS custom
   properties. Dark mode will respond to both `prefers-color-scheme: dark` and
   `[data-theme="dark"]`, per `design-spec.md`.
+
+## Pre-launch checklist
+
+Everything that must change before the site goes public:
+- [ ] Remove `robots: { index: false, follow: false }` from root metadata in `app/layout.tsx`
+- [ ] Remove the disallow rule in `app/robots.ts` (allow search indexing)
+- [ ] Delete all sample posts in `content/posts/`
+- [ ] Replace all placeholders in `lib/site.ts` (portfolio URL, GitHub profile, LinkedIn URL, email, bio)
+- [ ] Replace placeholder Home and About copy with real text
+- [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables
 
 ## Dead ends (approaches that failed — do not retry)
 
