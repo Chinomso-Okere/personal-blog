@@ -61,16 +61,17 @@ update to the "Current status" section below.
 - A monthly spend limit must be set on the Claude API key before any generation
   is wired up.
 - Validate and sanitise admin inputs, even though the admin area is single-user.
+- Every admin page and every mutating API route verifies the session itself; never rely on the guard file alone.
+- Never trust request headers for auth or routing decisions; use route groups and session checks.
+- Vercel environment variables take the UNescaped bcrypt hash (`.env.local` uses `\$` because Next.js expands `$` in local env files).
 
 ## Current status
 
-- **Phase:** Phase 1 Checkpoint (c) built, awaiting review.
+- **Phase:** Phase 2 in progress.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
-  - Phase 1 Checkpoint (a): design tokens (light & dark mode), Google Fonts (Newsreader with opsz axis, Inter, JetBrains Mono), @layer base & @layer components in globals.css, header with nav and external link hints, footer with bio from lib/site.ts, client theme toggle with zero layout shift and aria-labels, site-wide noindex and robots.ts, lib/site.ts configuration.
-  - Phase 1 Checkpoint (b): Markdown pipeline with unified/remark/rehype + Shiki (warm-editorial theme), strict HTML/protocol sanitization with rehype-sanitize, frontmatter validation, formatting-showcase sample posts, blog listing page (/blog), dynamic post page (/blog/[slug]) with SSG and dynamicParams=false, custom 404 page, and home page recent posts feed.
-  - Phase 1 Checkpoint (c): Writing page (/writing) backed by content/writing.json and typed validator, About page (/about) backed by content/about.md with conditional photo check, SEO basics (title template in layout, per-page canonicals, OpenGraph metadata, and sitemap.ts).
-- **Next:** Phase 1 visual review and approval; then Phase 2.
+  - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
+- **Next:** Phase 2 — Admin auth & shell.
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`

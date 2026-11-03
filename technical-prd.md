@@ -53,7 +53,7 @@ Lock exact versions at Phase 0 and record them in the context file (`GEMINI.md`)
 ├── lib/                      # claude.ts, github.ts, auth.ts, posts.ts
 ├── design/
 │   └── reference.html        # Approved design mockup (source of truth for styling)
-├── middleware.ts             # Protects /admin
+├── proxy.ts                  # Protects /admin and /api routes (Next.js 16)
 ├── .env.local                # Secrets (gitignored) — never committed
 └── GEMINI.md                 # Context file Antigravity reads (status, rules, decisions)
 ```
@@ -167,6 +167,7 @@ MVP = Phases 0–5. Phase 6 is the next tier.
 - [2026-11-02] Chose **markdown-tag images with an upload helper** over a rich-text editor for MVP — insert-anywhere control without building a complex editor. Rich editor deferred.
 - [2026-11-02] Chose **images stored in repo** over a CDN for MVP — simplest; revisit if image volume grows.
 - [2026-11-02] Chose **single-admin credentials + signed cookie** over Auth.js/OAuth — one user; keep it light but secure.
+- [2026-11-03] Chose **proxy.ts** over deprecated middleware.ts for route guard per Next.js 16 conventions.
 - [2026-11-02] Chose **`GEMINI.md`** as the context file (not `CLAUDE.md`) — Antigravity reads `GEMINI.md` in the repo root automatically.
 
 **Design** (full detail in `design-spec.md`)

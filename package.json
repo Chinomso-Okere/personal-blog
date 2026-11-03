@@ -10,10 +10,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:safety": "node scripts/test-safety.mjs"
+    "test:safety": "node scripts/test-safety.mjs",
+    "test:auth": "node scripts/test-auth.mjs"
   },
   "dependencies": {
+    "bcryptjs": "3.0.3",
     "gray-matter": "4.0.3",
+    "jose": "6.2.15",
     "next": "16.4.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
