@@ -35,7 +35,9 @@ export default async function ProtectedAdminLayout({
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 mx-auto w-full max-w-5xl px-6 py-8 md:py-12">
+        {children}
+      </main>
     </div>
   );
 }

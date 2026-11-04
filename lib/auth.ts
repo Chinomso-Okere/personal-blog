@@ -42,3 +42,27 @@ export async function getSession(): Promise<SessionPayload | null> {
   }
 }
 
+/**
+ * CSRF defense: Origin header must match host / x-forwarded-host.
+ * If Origin is absent, Sec-Fetch-Site must be "same-origin".
+ */
+export function checkOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      const host = request.headers.get("host");
+      const forwardedHost = request.headers.get("x-forwarded-host");
+      return (
+        originHost === host ||
+        (forwardedHost !== null && originHost === forwardedHost)
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  const secFetchSite = request.headers.get("sec-fetch-site");
+  return secFetchSite === "same-origin";
+}
+

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { signSession } from "@/lib/session";
-import { getSessionCookieOptions } from "@/lib/auth";
+import { getSessionCookieOptions, checkOrigin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -58,23 +58,6 @@ function recordFailedAttempt(ip: string): void {
 
 function clearRateLimit(ip: string): void {
   failedAttempts.delete(ip);
-}
-
-function checkOrigin(request: Request): boolean {
-  const origin = request.headers.get("origin");
-  if (origin) {
-    try {
-      const originHost = new URL(origin).host;
-      const host = request.headers.get("host");
-      const forwardedHost = request.headers.get("x-forwarded-host");
-      return originHost === host || (forwardedHost !== null && originHost === forwardedHost);
-    } catch {
-      return false;
-    }
-  }
-
-  const secFetchSite = request.headers.get("sec-fetch-site");
-  return secFetchSite === "same-origin";
 }
 
 export async function POST(request: Request) {

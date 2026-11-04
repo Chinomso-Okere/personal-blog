@@ -11,9 +11,11 @@
     "start": "next start",
     "lint": "eslint",
     "test:safety": "node scripts/test-safety.mjs",
-    "test:auth": "node scripts/test-auth.mjs"
+    "test:auth": "node scripts/test-auth.mjs",
+    "test:draft": "node scripts/test-draft.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.4.0",
     "bcryptjs": "3.0.3",
     "gray-matter": "4.0.3",
     "jose": "6.2.15",
@@ -24,6 +26,7 @@
     "rehype-stringify": "10.0.1",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",
+    "server-only": "0.0.1",
     "shiki": "4.6.0",
     "unified": "11.0.5"
   },
