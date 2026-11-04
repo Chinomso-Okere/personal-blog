@@ -66,12 +66,13 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 3 in progress (new direction: Post editor and preview).
+- **Phase:** Phase 4 in progress (Publish).
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
   - Phase 2: admin auth & shell (verified live on Vercel over HTTPS; the repo is now private). Features proxy.ts route guard, jose session tokens (HS256, 8h expiry, payload.admin verification), fail-closed rate-limited /api/login and /api/logout with Origin verification, route groups (protected) and login, scripts/hash-password.mjs (raw mode, no-echo, 16-char min, 72-byte max), and test:auth test suite.
-- **Next:** Phase 3 — Post editor and preview (`/admin/new`, `/api/parse`, `/api/preview`, `lib/frontmatter.ts`, `lib/post-input.ts`).
+  - Phase 3: Post editor and preview (`/admin/new`, `/api/parse`, `/api/preview`, `lib/frontmatter.ts`, `lib/post-input.ts`, `lib/reading-time.ts`, `components/PostEditor.tsx`, `test:post` suite).
+- **Next:** Phase 4 — Publish (`/api/publish`, `lib/github.ts`, `lib/publish.ts`, `test:publish`).
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -130,3 +131,4 @@ The running "why we chose X" log lives in `technical-prd.md` §9 and
 - [2026-11-02] **Deferred custom domain purchase** — deployed initially to Vercel default URL (`personal-blog-omega-flax.vercel.app`) with HTTPS; custom domain will be mapped via DNS once acquired (IONOS/other).
 - [2026-11-04] Dropped in-app AI drafting; posts are drafted outside (Claude Project / Gemini notebook) and pasted into an admin form. Simpler, no API key or spend, better drafting tools exist; code snapshot kept at tag phase-3-ai-drafting.
 - [2026-11-04] Dropped image upload; images are links only (https URLs or static repo assets).
+- [2026-11-04] Commit drafts with published: false to the repo via GitHub Contents API rather than client storage — versioned, portable, and allows unpublishing live posts.

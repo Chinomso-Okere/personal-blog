@@ -12,7 +12,8 @@
     "lint": "eslint",
     "test:safety": "node scripts/test-safety.mjs",
     "test:auth": "node scripts/test-auth.mjs",
-    "test:post": "node scripts/test-post.mjs"
+    "test:post": "node scripts/test-post.mjs",
+    "test:publish": "node scripts/test-publish.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",

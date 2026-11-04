@@ -161,6 +161,7 @@ Admin post listing, editing existing posts, unpublishing, deleting.
 - [2026-11-02] Chose **`GEMINI.md`** as the context file — Antigravity reads `GEMINI.md` in repo root automatically.
 - [2026-11-04] Dropped in-app AI drafting; posts are drafted outside (Claude Project / Gemini notebook) and pasted into an admin form. Simpler, no API key or spend, better drafting tools exist; code snapshot kept at tag phase-3-ai-drafting.
 - [2026-11-04] Dropped image upload; images are links only (https URLs or static repo assets).
+- [2026-11-04] Commit drafts with published: false to the repo via GitHub Contents API rather than client storage — versioned, portable, and allows unpublishing live posts.
 
 **Design** (full detail in `design-spec.md`)
 - [2026-11-02] Chose **Warm Editorial (Direction A)** as the base — reading-first, serif, warm paper; best fit for technical blog.

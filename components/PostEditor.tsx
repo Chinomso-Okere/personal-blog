@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ALLOWED_TAGS } from "@/lib/tags";
 import {
   generateSlug,
@@ -46,10 +46,107 @@ export function PostEditor() {
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [lastPreviewedFields, setLastPreviewedFields] = useState<string | null>(null);
 
+  // Publishing state
+  const [publishing, setPublishing] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<{
+    stage:
+      | "idle"
+      | "committing"
+      | "committed"
+      | "polling"
+      | "live"
+      | "timed_out"
+      | "saved_draft"
+      | "updated_live";
+    message: string;
+    link?: string;
+  }>({ stage: "idle", message: "" });
+  const [publishError, setPublishError] = useState<string | null>(null);
+
+  // Overwrite confirmation dialog state
+  const [overwriteConfirm, setOverwriteConfirm] = useState<{
+    slug: string;
+    existingPublished: boolean;
+  } | null>(null);
+
+  // Polling interval ref and cleanup
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function clearPollInterval() {
+    if (pollIntervalRef.current !== null) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+  }
+
+  // Clear polling interval on unmount
+  useEffect(() => {
+    return () => {
+      clearPollInterval();
+    };
+  }, []);
+
+  // Snapshot to clear dirty flag on commit
+  const [lastCommittedSerialized, setLastCommittedSerialized] = useState<string | null>(null);
+
+  // Current post fields object
+  const currentFields: PostInputFields = useMemo(
+    () => ({
+      title,
+      slug,
+      date,
+      description,
+      tags,
+      coverImage: coverImage.trim() || undefined,
+      coverImageAlt: coverImageAlt.trim() || undefined,
+      originalUrl: originalUrl.trim() || undefined,
+      body,
+      published,
+    }),
+    [
+      title,
+      slug,
+      date,
+      description,
+      tags,
+      coverImage,
+      coverImageAlt,
+      originalUrl,
+      body,
+      published,
+    ]
+  );
+
+  const currentSerialized = useMemo(
+    () => JSON.stringify(currentFields),
+    [currentFields]
+  );
+
   // Warn on tab closing if there are unsaved edits
   const isDirty = useMemo(() => {
-    return Boolean(title.trim() || body.trim() || description.trim() || pasteText.trim());
-  }, [title, body, description, pasteText]);
+    if (
+      !title.trim() &&
+      !body.trim() &&
+      !description.trim() &&
+      !pasteText.trim()
+    ) {
+      return false;
+    }
+    if (
+      lastCommittedSerialized &&
+      lastCommittedSerialized === currentSerialized
+    ) {
+      return false;
+    }
+    return true;
+  }, [
+    title,
+    body,
+    description,
+    pasteText,
+    lastCommittedSerialized,
+    currentSerialized,
+  ]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -133,25 +230,127 @@ export function PostEditor() {
     }
   }
 
-  // Current post fields object
-  const currentFields: PostInputFields = useMemo(() => ({
-    title,
-    slug,
-    date,
-    description,
-    tags,
-    coverImage: coverImage.trim() || undefined,
-    coverImageAlt: coverImageAlt.trim() || undefined,
-    originalUrl: originalUrl.trim() || undefined,
-    body,
-    published,
-  }), [title, slug, date, description, tags, coverImage, coverImageAlt, originalUrl, body, published]);
+  const isPreviewOutOfDate = Boolean(
+    previewHtml && lastPreviewedFields && lastPreviewedFields !== currentSerialized
+  );
+  const hasCurrentPreview = Boolean(
+    previewHtml && lastPreviewedFields === currentSerialized
+  );
 
-  // Compare against last previewed state
-  const currentSerialized = useMemo(() => JSON.stringify(currentFields), [currentFields]);
-  const isPreviewOutOfDate = useMemo(() => {
-    return Boolean(previewHtml && lastPreviewedFields && lastPreviewedFields !== currentSerialized);
-  }, [previewHtml, lastPreviewedFields, currentSerialized]);
+  async function pollForLive(postSlug: string) {
+    clearPollInterval();
+    setPublishStatus({
+      stage: "polling",
+      message: "Committed ✓. Vercel is deploying (about a minute)...",
+      link: `/blog/${postSlug}`,
+    });
+
+    const maxAttempts = 36;
+    let attempts = 0;
+
+    pollIntervalRef.current = setInterval(async () => {
+      attempts++;
+      try {
+        const res = await fetch(`/blog/${postSlug}?_=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (res.status === 200) {
+          clearPollInterval();
+          setPublishStatus({
+            stage: "live",
+            message: "Live ✓",
+            link: `/blog/${postSlug}`,
+          });
+          return;
+        }
+      } catch {
+        // Continue polling on error
+      }
+
+      if (attempts >= maxAttempts) {
+        clearPollInterval();
+        setPublishStatus({
+          stage: "timed_out",
+          message: "Still deploying. Check the link in a minute.",
+          link: `/blog/${postSlug}`,
+        });
+      }
+    }, 5000);
+  }
+
+  async function handlePublish(overwrite = false) {
+    if (
+      !validationResult.success ||
+      !body.trim() ||
+      publishing ||
+      !hasCurrentPreview
+    ) {
+      return;
+    }
+
+    clearPollInterval();
+    setPublishing(true);
+    setPublishError(null);
+    setOverwriteConfirm(null);
+    setPublishStatus({ stage: "committing", message: "Committing…" });
+
+    try {
+      const res = await fetch("/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fields: currentFields,
+          overwrite,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (res.status === 409 && data?.exists) {
+        setOverwriteConfirm({
+          slug: data.slug,
+          existingPublished: Boolean(data.existingPublished),
+        });
+        setPublishStatus({ stage: "idle", message: "" });
+        setPublishing(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setPublishError(data?.error || "Publishing failed.");
+        setPublishStatus({ stage: "idle", message: "" });
+        setPublishing(false);
+        return;
+      }
+
+      // Successful commit
+      setLastCommittedSerialized(currentSerialized);
+
+      if (!currentFields.published) {
+        setPublishStatus({
+          stage: "saved_draft",
+          message: "Saved as draft. Not public.",
+        });
+      } else if (data.wasPublished) {
+        setPublishStatus({
+          stage: "updated_live",
+          message:
+            "Committed ✓. The updated version goes live in about a minute.",
+          link: `/blog/${data.slug}`,
+        });
+      } else {
+        // New post or newly published: poll for live!
+        pollForLive(data.slug);
+      }
+    } catch {
+      setPublishError(
+        "An unexpected network error occurred while publishing."
+      );
+      setPublishStatus({ stage: "idle", message: "" });
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   // Request preview from /api/preview
   async function handlePreview() {
@@ -187,14 +386,10 @@ export function PostEditor() {
   }
 
   // Generate file representation
-  const generatedFileText = useMemo(() => {
-    return buildPostFile(currentFields);
-  }, [currentFields]);
+  const generatedFileText = buildPostFile(currentFields);
 
   // Form validation status
-  const validationResult = useMemo(() => {
-    return validatePostInput(currentFields);
-  }, [currentFields]);
+  const validationResult = validatePostInput(currentFields);
 
   const hasCheckMarker = body.includes("[CHECK:");
 
@@ -468,16 +663,46 @@ export function PostEditor() {
           </div>
         </fieldset>
 
-        {/* Preview Button & Validation Status */}
+        {/* Buttons & Validation Status */}
         <div className="pt-4 border-t border-[var(--border)] flex flex-wrap items-center gap-4">
           <button
             type="button"
             onClick={handlePreview}
             disabled={previewing || !body.trim()}
-            className="rounded-[6px] bg-[var(--fg)] px-5 py-2.5 text-[14px] font-medium font-[family-name:var(--font-ui)] text-[var(--bg)] hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 cursor-pointer"
+            className="rounded-[6px] border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-[14px] font-medium font-[family-name:var(--font-ui)] text-[var(--fg)] hover:bg-[var(--bg)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 cursor-pointer"
           >
             {previewing ? "Rendering preview..." : previewHtml ? "Update preview" : "Preview"}
           </button>
+
+          <button
+            type="button"
+            onClick={() => handlePublish(false)}
+            disabled={
+              !validationResult.success ||
+              !body.trim() ||
+              publishing ||
+              !hasCurrentPreview
+            }
+            className="rounded-[6px] bg-[var(--fg)] px-5 py-2.5 text-[14px] font-medium font-[family-name:var(--font-ui)] text-[var(--bg)] hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 cursor-pointer"
+          >
+            {publishing
+              ? "Saving…"
+              : published
+              ? "Publish post"
+              : "Save draft"}
+          </button>
+
+          {!previewHtml && (
+            <span className="text-[12px] font-[family-name:var(--font-ui)] text-[var(--muted)]">
+              Preview the post before publishing
+            </span>
+          )}
+
+          {isPreviewOutOfDate && (
+            <span className="text-[12px] font-[family-name:var(--font-ui)] text-[var(--accent-ink)]">
+              Update the preview before publishing
+            </span>
+          )}
 
           {validationResult.success ? (
             <span
@@ -501,6 +726,68 @@ export function PostEditor() {
             </span>
           )}
         </div>
+
+        {/* Overwrite Confirmation Panel */}
+        {overwriteConfirm && (
+          <div
+            role="alert"
+            className="rounded-[8px] border border-[var(--accent)] bg-[var(--bg)] p-4 space-y-3 font-[family-name:var(--font-ui)]"
+          >
+            <p className="text-[14px] font-medium text-[var(--fg)]">
+              A post with this slug already exists. Overwrite it?
+            </p>
+            {overwriteConfirm.existingPublished && !published && (
+              <p className="text-[13px] text-[var(--accent-ink)] font-semibold">
+                This will unpublish the live post.
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => handlePublish(true)}
+                className="rounded-[6px] bg-[var(--accent-ink)] text-[var(--bg)] px-4 py-1.5 text-[13px] font-medium hover:opacity-90 cursor-pointer"
+              >
+                Overwrite
+              </button>
+              <button
+                type="button"
+                onClick={() => setOverwriteConfirm(null)}
+                className="rounded-[6px] border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] px-4 py-1.5 text-[13px] font-medium hover:bg-[var(--bg)] cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Publish Status Feedback */}
+        {publishStatus.message && (
+          <div
+            role="status"
+            className="flex items-center gap-2 text-[14px] font-[family-name:var(--font-ui)] font-medium text-[var(--fg)]"
+          >
+            <span>{publishStatus.message}</span>
+            {publishStatus.link && (
+              <a
+                href={publishStatus.link}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[var(--accent-ink)] underline font-medium"
+              >
+                View post ↗
+              </a>
+            )}
+          </div>
+        )}
+
+        {publishError && (
+          <div
+            role="alert"
+            className="text-[14px] font-[family-name:var(--font-ui)] font-medium text-[var(--accent-ink)]"
+          >
+            {publishError}
+          </div>
+        )}
       </section>
 
       {/* Rendered Preview Section */}
