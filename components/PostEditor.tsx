@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import Link from "next/link";
 import { ALLOWED_TAGS } from "@/lib/tags";
 import {
   generateSlug,
@@ -11,22 +12,32 @@ import {
 import { calculateReadingTime } from "@/lib/reading-time";
 import { formatDate } from "@/lib/format";
 
-export function PostEditor() {
+interface PostEditorProps {
+  editSlug?: string;
+}
+
+export function PostEditor({ editSlug }: PostEditorProps = {}) {
+  const isEditMode = Boolean(editSlug);
+  const [loadingPost, setLoadingPost] = useState(isEditMode);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [wasInitiallyPublished, setWasInitiallyPublished] = useState(false);
+
   // Form fields
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState(editSlug || "");
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [date, setDate] = useState("");
 
-  // Set default date to local calendar date on mount (prevents UTC offset & hydration mismatch)
+  // Set default date to local calendar date on mount (only for new posts)
   useEffect(() => {
+    if (isEditMode) return;
     const now = new Date();
     const y = now.getFullYear();
     const m = String(now.getMonth() + 1).padStart(2, "0");
     const d = String(now.getDate()).padStart(2, "0");
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDate(`${y}-${m}-${d}`);
-  }, []);
+  }, [isEditMode]);
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [coverImage, setCoverImage] = useState("");
@@ -69,6 +80,9 @@ export function PostEditor() {
     existingPublished: boolean;
   } | null>(null);
 
+  // Snapshot to clear dirty flag on commit
+  const [lastCommittedSerialized, setLastCommittedSerialized] = useState<string | null>(null);
+
   // Polling interval ref and cleanup
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -86,8 +100,84 @@ export function PostEditor() {
     };
   }, []);
 
-  // Snapshot to clear dirty flag on commit
-  const [lastCommittedSerialized, setLastCommittedSerialized] = useState<string | null>(null);
+  // Fetch existing post in edit mode
+  useEffect(() => {
+    if (!editSlug) return;
+    const targetSlug = editSlug;
+    let active = true;
+
+    async function fetchPost() {
+      setLoadingPost(true);
+      setLoadError(null);
+
+      try {
+        const res = await fetch(`/api/posts/${encodeURIComponent(targetSlug)}`);
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          if (active) setLoadError(data?.error || "Failed to load post.");
+          return;
+        }
+
+        if (active && data?.fields) {
+          const f = data.fields;
+          setTitle(f.title || "");
+          setSlug(f.slug || editSlug);
+          setDate(f.date || "");
+          setDescription(f.description || "");
+          setTags(Array.isArray(f.tags) ? f.tags : []);
+          setCoverImage(f.coverImage || "");
+          setCoverImageAlt(f.coverImageAlt || "");
+          setOriginalUrl(f.originalUrl || "");
+          setBody(f.body || "");
+          setPublished(Boolean(f.published));
+          setWasInitiallyPublished(Boolean(f.published));
+
+          const loadedFields: PostInputFields = {
+            title: f.title || "",
+            slug: f.slug || editSlug,
+            date: f.date || "",
+            description: f.description || "",
+            tags: Array.isArray(f.tags) ? f.tags : [],
+            coverImage: f.coverImage?.trim() || undefined,
+            coverImageAlt: f.coverImageAlt?.trim() || undefined,
+            originalUrl: f.originalUrl?.trim() || undefined,
+            body: f.body || "",
+            published: Boolean(f.published),
+          };
+          const loadedSerialized = JSON.stringify(loadedFields);
+          setLastCommittedSerialized(loadedSerialized);
+
+          // Amendment 6: Render preview automatically once post has loaded
+          if (f.body && f.body.trim()) {
+            try {
+              const prevRes = await fetch("/api/preview", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ body: f.body }),
+              });
+              const prevData = await prevRes.json().catch(() => null);
+              if (active && prevRes.ok && prevData?.html) {
+                setPreviewHtml(prevData.html);
+                setLastPreviewedFields(loadedSerialized);
+              }
+            } catch {
+              // Ignore preview fetch failure on load
+            }
+          }
+        }
+      } catch {
+        if (active) setLoadError("Network error while loading post.");
+      } finally {
+        if (active) setLoadingPost(false);
+      }
+    }
+
+    fetchPost();
+    return () => {
+      active = false;
+    };
+  }, [editSlug]);
 
   // Current post fields object
   const currentFields: PostInputFields = useMemo(
@@ -158,16 +248,17 @@ export function PostEditor() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
 
-  // Auto-slug when title changes unless manually edited
+  // Auto-slug when title changes unless manually edited or in edit mode
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (!slugManuallyEdited) {
+    if (!isEditMode && !slugManuallyEdited) {
       setSlug(generateSlug(newTitle));
     }
   }
 
   function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (isEditMode) return;
     setSlugManuallyEdited(true);
     setSlug(e.target.value);
   }
@@ -393,48 +484,88 @@ export function PostEditor() {
 
   const hasCheckMarker = body.includes("[CHECK:");
 
+  if (loadingPost) {
+    return (
+      <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-12 text-center font-[family-name:var(--font-ui)] text-[14px] text-[var(--muted)]">
+        Loading post…
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div
+        role="alert"
+        className="rounded-[10px] border border-[var(--accent)] bg-[var(--bg)] p-6 text-center font-[family-name:var(--font-ui)] text-[14px] font-medium text-[var(--accent-ink)]"
+      >
+        {loadError}
+      </div>
+    );
+  }
+
+  function handleBackToAllPosts(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (isDirty) {
+      const ok = window.confirm("Discard unsaved changes?");
+      if (!ok) {
+        e.preventDefault();
+      }
+    }
+  }
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
+      <div>
+        <Link
+          href="/admin"
+          onClick={handleBackToAllPosts}
+          className="inline-flex items-center gap-1.5 font-[family-name:var(--font-ui)] text-[13px] text-[var(--muted)] hover:text-[var(--accent-ink)] transition-colors"
+        >
+          ← All posts
+        </Link>
+      </div>
+
       <div className="border-b border-[var(--border)] pb-4">
         <h1 className="font-[family-name:var(--font-display)] text-[28px] font-medium leading-[1.2] text-[var(--fg)]">
-          New Post
+          {isEditMode ? "Edit Post" : "New Post"}
         </h1>
       </div>
 
       {/* Paste a full post box */}
-      <section className="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-6">
-        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-medium text-[var(--fg)] mb-2">
-          Paste a full post
-        </h2>
-        <p className="font-[family-name:var(--font-ui)] text-[13px] text-[var(--muted)] mb-4">
-          Paste a draft with YAML front matter (<code>--- ... ---</code>) to auto-fill fields, or paste raw markdown to populate the body.
-        </p>
+      {!isEditMode && (
+        <section className="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-6">
+          <h2 className="font-[family-name:var(--font-display)] text-[18px] font-medium text-[var(--fg)] mb-2">
+            Paste a full post
+          </h2>
+          <p className="font-[family-name:var(--font-ui)] text-[13px] text-[var(--muted)] mb-4">
+            Paste a draft with YAML front matter (<code>--- ... ---</code>) to auto-fill fields, or paste raw markdown to populate the body.
+          </p>
 
-        <textarea
-          rows={5}
-          value={pasteText}
-          onChange={(e) => setPasteText(e.target.value)}
-          placeholder="---&#10;title: &quot;Post title&quot;&#10;date: &quot;2026-11-04&quot;&#10;description: &quot;Summary sentence.&quot;&#10;tags: [&quot;AI Evaluation&quot;]&#10;---&#10;&#10;Post body..."
-          className="w-full rounded-[6px] border border-[var(--border)] bg-[var(--bg)] p-3 font-[family-name:var(--font-jetbrains-mono)] text-[13px] text-[var(--fg)] placeholder:text-[var(--muted)] leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-        />
+          <textarea
+            rows={5}
+            value={pasteText}
+            onChange={(e) => setPasteText(e.target.value)}
+            placeholder="---&#10;title: &quot;Post title&quot;&#10;date: &quot;2026-11-04&quot;&#10;description: &quot;Summary sentence.&quot;&#10;tags: [&quot;AI Evaluation&quot;]&#10;---&#10;&#10;Post body..."
+            className="w-full rounded-[6px] border border-[var(--border)] bg-[var(--bg)] p-3 font-[family-name:var(--font-jetbrains-mono)] text-[13px] text-[var(--fg)] placeholder:text-[var(--muted)] leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+          />
 
-        {pasteError && (
-          <div role="alert" className="mt-2 text-[13px] font-medium text-[var(--accent-ink)] font-[family-name:var(--font-ui)]">
-            {pasteError}
+          {pasteError && (
+            <div role="alert" className="mt-2 text-[13px] font-medium text-[var(--accent-ink)] font-[family-name:var(--font-ui)]">
+              {pasteError}
+            </div>
+          )}
+
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={handleApplyPaste}
+              disabled={parsingPaste || !pasteText.trim()}
+              className="rounded-[6px] bg-[var(--fg)] px-4 py-2 text-[13px] font-medium font-[family-name:var(--font-ui)] text-[var(--bg)] hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 cursor-pointer"
+            >
+              {parsingPaste ? "Parsing..." : "Parse and populate"}
+            </button>
           </div>
-        )}
-
-        <div className="mt-3">
-          <button
-            type="button"
-            onClick={handleApplyPaste}
-            disabled={parsingPaste || !pasteText.trim()}
-            className="rounded-[6px] bg-[var(--fg)] px-4 py-2 text-[13px] font-medium font-[family-name:var(--font-ui)] text-[var(--bg)] hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 cursor-pointer"
-          >
-            {parsingPaste ? "Parsing..." : "Parse and populate"}
-          </button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Unresolved marker warning */}
       {hasCheckMarker && (
@@ -471,7 +602,7 @@ export function PostEditor() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <label htmlFor="postSlug" className="block font-[family-name:var(--font-ui)] text-[13px] font-medium text-[var(--fg)]">
-              Slug <span className="text-[var(--muted)] font-normal">(1–80 chars, lowercase hyphenated)</span>
+              Slug <span className="text-[var(--muted)] font-normal">{isEditMode ? "(locked)" : "(1–80 chars, lowercase hyphenated)"}</span>
             </label>
             <span className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--muted)]">
               Path: /blog/{slug || "..."}
@@ -483,10 +614,21 @@ export function PostEditor() {
             required
             maxLength={80}
             value={slug}
+            disabled={isEditMode}
+            readOnly={isEditMode}
             onChange={handleSlugChange}
             placeholder="evaluating-multi-agent-systems-in-practice"
-            className="w-full rounded-[6px] border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-[13px] font-[family-name:var(--font-mono)] text-[var(--fg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+            className={`w-full rounded-[6px] border border-[var(--border)] px-3 py-2 text-[13px] font-[family-name:var(--font-mono)] text-[var(--fg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] ${
+              isEditMode
+                ? "bg-[var(--surface)] opacity-70 cursor-not-allowed"
+                : "bg-[var(--bg)]"
+            }`}
           />
+          {isEditMode && (
+            <p className="mt-1 font-[family-name:var(--font-ui)] text-[12px] text-[var(--muted)]">
+              Slug cannot be changed after creation.
+            </p>
+          )}
         </div>
 
         {/* Date */}
@@ -661,6 +803,12 @@ export function PostEditor() {
               <span>Publish</span>
             </label>
           </div>
+
+          {isEditMode && wasInitiallyPublished && !published && (
+            <p className="mt-2 text-[13px] font-[family-name:var(--font-ui)] font-semibold text-[var(--accent-ink)]">
+              Note: Saving with Draft status will unpublish the live post.
+            </p>
+          )}
         </fieldset>
 
         {/* Buttons & Validation Status */}
@@ -676,7 +824,7 @@ export function PostEditor() {
 
           <button
             type="button"
-            onClick={() => handlePublish(false)}
+            onClick={() => handlePublish(isEditMode ? true : false)}
             disabled={
               !validationResult.success ||
               !body.trim() ||
@@ -687,6 +835,10 @@ export function PostEditor() {
           >
             {publishing
               ? "Saving…"
+              : isEditMode
+              ? published
+                ? "Update & publish"
+                : "Save draft"
               : published
               ? "Publish post"
               : "Save draft"}
@@ -764,7 +916,7 @@ export function PostEditor() {
         {publishStatus.message && (
           <div
             role="status"
-            className="flex items-center gap-2 text-[14px] font-[family-name:var(--font-ui)] font-medium text-[var(--fg)]"
+            className="flex flex-wrap items-center gap-3 text-[14px] font-[family-name:var(--font-ui)] font-medium text-[var(--fg)]"
           >
             <span>{publishStatus.message}</span>
             {publishStatus.link && (
@@ -777,6 +929,12 @@ export function PostEditor() {
                 View post ↗
               </a>
             )}
+            <Link
+              href="/admin"
+              className="text-[var(--muted)] hover:text-[var(--accent-ink)] underline transition-colors"
+            >
+              Back to all posts
+            </Link>
           </div>
         )}
 

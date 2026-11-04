@@ -101,6 +101,10 @@ at any point the author chooses.
 | `/api/parse` | POST | `{ text }` | Safe frontmatter parsing via `lib/frontmatter.ts`; returns parsed fields and body. |
 | `/api/preview` | POST | `{ body }` | Renders markdown body with `renderMarkdown` and returns sanitized HTML. |
 | `/api/publish` | POST | `{ fields }` | Validates post and commits markdown file to repo via GitHub API (Phase 4). |
+| `/api/posts` | GET | — | Lists posts live from GitHub via Contents API with bounded concurrency (Phase 5). |
+| `/api/posts/[slug]` | GET | — | Retrieves single post fields and SHA for editing (Phase 5). |
+| `/api/posts/[slug]` | PATCH | `{ published }` | Toggles publication status, validates front matter without tag dropping, commits update (Phase 5). |
+| `/api/posts/[slug]` | DELETE | — | Fetches file SHA and title server-side, commits file deletion via GitHub API (Phase 5). |
 
 All GitHub calls happen in server routes only. Keys never reach the browser.
 
@@ -162,6 +166,7 @@ Admin post listing, editing existing posts, unpublishing, deleting.
 - [2026-11-04] Dropped in-app AI drafting; posts are drafted outside (Claude Project / Gemini notebook) and pasted into an admin form. Simpler, no API key or spend, better drafting tools exist; code snapshot kept at tag phase-3-ai-drafting.
 - [2026-11-04] Dropped image upload; images are links only (https URLs or static repo assets).
 - [2026-11-04] Commit drafts with published: false to the repo via GitHub Contents API rather than client storage — versioned, portable, and allows unpublishing live posts.
+- [2026-11-04] Phase 5 manage posts: direct GitHub Contents API reads with bounded concurrency (5) and 100-file cap. Server fetches current SHA and title for deletion. Unpublish/publish round-trips body exactly without tag-filtering. Edit mode automatically generates preview on load.
 
 **Design** (full detail in `design-spec.md`)
 - [2026-11-02] Chose **Warm Editorial (Direction A)** as the base — reading-first, serif, warm paper; best fit for technical blog.

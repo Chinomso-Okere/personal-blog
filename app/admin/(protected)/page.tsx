@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { listPosts } from "@/lib/manage";
+import { AdminPostList } from "@/components/AdminPostList";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -12,21 +13,45 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  return (
-    <div className="space-y-6">
-      <p className="font-[family-name:var(--font-ui)] text-[16px] text-[var(--fg)]">
-        Signed in.
-      </p>
+  const token = process.env.GITHUB_TOKEN?.trim();
+  const owner = process.env.GITHUB_OWNER?.trim();
+  const repo = process.env.GITHUB_REPO?.trim();
+  const branch = process.env.GITHUB_BRANCH?.trim() || "main";
 
-      <div>
-        <Link
-          href="/admin/new"
-          className="inline-flex items-center gap-2 rounded-[6px] bg-[var(--fg)] px-4 py-2 text-[14px] font-medium font-[family-name:var(--font-ui)] text-[var(--bg)] hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-        >
-          New post →
-        </Link>
-      </div>
-    </div>
+  if (!token || !owner || !repo) {
+    return (
+      <AdminPostList
+        initialPosts={[]}
+        totalCount={0}
+        configError="GitHub integration is not configured. Set GITHUB_TOKEN, GITHUB_OWNER, and GITHUB_REPO."
+      />
+    );
+  }
+
+  let posts: import("@/lib/manage").PostListItem[] = [];
+  let totalCount = 0;
+  let configError: string | undefined;
+
+  try {
+    const result = await listPosts({
+      token,
+      owner,
+      repo,
+      branch,
+    });
+    posts = result.posts;
+    totalCount = result.totalCount;
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load posts from GitHub.";
+    configError = `Unable to list posts from GitHub: ${message}`;
+  }
+
+  return (
+    <AdminPostList
+      initialPosts={posts}
+      totalCount={totalCount}
+      configError={configError}
+    />
   );
 }
-

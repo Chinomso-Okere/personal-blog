@@ -31,7 +31,15 @@ export default async function ProtectedAdminLayout({
               Admin
             </span>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="font-[family-name:var(--font-ui)] text-[13px] text-[var(--muted)] hover:text-[var(--accent-ink)] transition-colors"
+            >
+              Posts
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
       </header>
 

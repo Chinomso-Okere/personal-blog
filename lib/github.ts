@@ -12,6 +12,30 @@ export interface ExistingFileInfo {
   published: boolean;
 }
 
+export interface RawFileInfo {
+  sha: string;
+  content: string;
+  decoded: string;
+}
+
+export interface DirectoryItem {
+  name: string;
+  path: string;
+  sha: string;
+  type: string;
+  size?: number;
+}
+
+export interface DeleteFileParams {
+  path: string;
+  sha: string;
+  message: string;
+}
+
+export interface DeleteFileResult {
+  commitSha: string;
+}
+
 export interface PutFileParams {
   path: string;
   content: string;
@@ -86,6 +110,7 @@ export async function getFileInfo(
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
     },
+    cache: "no-store",
     signal: AbortSignal.timeout(15_000),
   });
 
@@ -187,4 +212,154 @@ export async function putFile(
     commitSha,
     contentSha,
   };
+}
+
+/**
+ * Retrieves raw file SHA and decoded content from GitHub Contents API.
+ * Returns null if the file does not exist (404).
+ */
+export async function getFileRaw(
+  path: string,
+  env: GitHubEnv,
+  deps?: GitHubDeps
+): Promise<RawFileInfo | null> {
+  const fetchFn = deps?.customFetch || fetch;
+  const branch = env.branch || "main";
+  const url = `https://api.github.com/repos/${encodeURIComponent(
+    env.owner
+  )}/${encodeURIComponent(env.repo)}/contents/${path}?ref=${encodeURIComponent(
+    branch
+  )}`;
+
+  const res = await fetchFn(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${env.token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (res.status === 404) {
+    return null;
+  }
+
+  if (!res.ok) {
+    throw mapGitHubError(res.status, env.token);
+  }
+
+  const data = (await res.json()) as {
+    sha?: string;
+    content?: string;
+    encoding?: string;
+  };
+
+  if (!data || typeof data.sha !== "string" || typeof data.content !== "string") {
+    throw new Error("Invalid GitHub response: missing file SHA or content.");
+  }
+
+  const decoded = Buffer.from(
+    data.content.replace(/\r?\n/g, ""),
+    "base64"
+  ).toString("utf-8");
+
+  return {
+    sha: data.sha,
+    content: data.content,
+    decoded,
+  };
+}
+
+/**
+ * Lists items in a directory in the repo via GitHub Contents API.
+ * Returns empty array on 404.
+ */
+export async function listDirectory(
+  path: string,
+  env: GitHubEnv,
+  deps?: GitHubDeps
+): Promise<DirectoryItem[]> {
+  const fetchFn = deps?.customFetch || fetch;
+  const branch = env.branch || "main";
+  const url = `https://api.github.com/repos/${encodeURIComponent(
+    env.owner
+  )}/${encodeURIComponent(env.repo)}/contents/${path}?ref=${encodeURIComponent(
+    branch
+  )}`;
+
+  const res = await fetchFn(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${env.token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (res.status === 404) {
+    return [];
+  }
+
+  if (!res.ok) {
+    throw mapGitHubError(res.status, env.token);
+  }
+
+  const data = await res.json();
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data.map((item) => ({
+    name: String(item.name || ""),
+    path: String(item.path || ""),
+    sha: String(item.sha || ""),
+    type: String(item.type || ""),
+    size: typeof item.size === "number" ? item.size : undefined,
+  }));
+}
+
+/**
+ * Deletes a file in the repo via GitHub Contents API.
+ */
+export async function deleteFile(
+  params: DeleteFileParams,
+  env: GitHubEnv,
+  deps?: GitHubDeps
+): Promise<DeleteFileResult> {
+  const fetchFn = deps?.customFetch || fetch;
+  const branch = env.branch || "main";
+  const url = `https://api.github.com/repos/${encodeURIComponent(
+    env.owner
+  )}/${encodeURIComponent(env.repo)}/contents/${params.path}`;
+
+  const res = await fetchFn(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${env.token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: params.message,
+      sha: params.sha,
+      branch,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res.ok) {
+    throw mapGitHubError(res.status, env.token);
+  }
+
+  const data = (await res.json()) as {
+    commit?: { sha?: string };
+  };
+
+  const commitSha = data?.commit?.sha || "";
+  return { commitSha };
 }
