@@ -31,11 +31,13 @@ export async function generateMetadata({
     };
   }
 
+  const canonical = post.originalUrl || `/blog/${post.slug}`;
+
   return {
     title: post.title,
     description: post.description,
     alternates: {
-      canonical: `/blog/${post.slug}`,
+      canonical,
     },
     openGraph: {
       type: "article",
@@ -43,6 +45,7 @@ export async function generateMetadata({
       description: post.description,
       publishedTime: post.date,
       siteName: siteConfig.name,
+      ...(post.coverImage ? { images: [post.coverImage] } : {}),
     },
   };
 }
@@ -73,6 +76,17 @@ export default async function PostPage({ params }: PostPageProps) {
           <span>{post.readingTime}</span>
         </div>
         <div className="rule" aria-hidden="true"></div>
+
+        {post.coverImage && (
+          <figure className="my-7">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.coverImage}
+              alt={post.coverImageAlt || ""}
+              className="w-full h-auto rounded-[10px] border border-[var(--border)] my-0"
+            />
+          </figure>
+        )}
 
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </article>

@@ -5,9 +5,9 @@ Standing context for this project. Read this first, every session.
 ## What this is
 
 A personal, self-owned AI technical blog for Nonso Okere — a public reading-first
-website plus a private admin back-end where a source (topic / document / pasted
-transcript) is drafted into an on-brand blog post by the Claude API, reviewed,
-edited, and published. Part of a professional visibility push.
+website plus a private admin back-end where a post (drafted externally in a Claude
+Project or Gemini notebook) is pasted, edited, previewed, and published. Part of a
+professional visibility push.
 
 ## The planning documents (authoritative — read before building)
 
@@ -48,18 +48,17 @@ update to the "Current status" section below.
 
 ## Hard rules (never break these)
 
-- **No secret ever reaches client-side code or the repo.** The Claude API key,
-  GitHub token, admin password/hash, and session secret live only in
-  `.env.local` (local) and Vercel environment variables (hosted).
-- **All Claude API and GitHub API calls are server-side**, in `/api` routes only.
+- **No secret ever reaches client-side code or the repo.** The GitHub token,
+  admin password/hash, and session secret live only in `.env.local` (local) and
+  Vercel environment variables (hosted).
+- **All GitHub API calls are server-side**, in `/api` routes only.
 - `.env.local` and any secret file are in `.gitignore`. Confirm they do not
   appear in `git status` before the first commit.
 - **Least privilege:** the GitHub token is a fine-grained token scoped to this
   repo only, contents read/write — nothing more.
 - **Nothing auto-publishes.** A post goes live only on an explicit human Publish
   action, after review.
-- A monthly spend limit must be set on the Claude API key before any generation
-  is wired up.
+- **Parse front matter only through `lib/frontmatter.ts`; never call `gray-matter` directly.**
 - Validate and sanitise admin inputs, even though the admin area is single-user.
 - Every admin page and every mutating API route verifies the session itself; never rely on the guard file alone.
 - Never trust request headers for auth or routing decisions; use route groups and session checks.
@@ -67,12 +66,12 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 3 in progress.
+- **Phase:** Phase 3 in progress (new direction: Post editor and preview).
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
   - Phase 2: admin auth & shell (verified live on Vercel over HTTPS; the repo is now private). Features proxy.ts route guard, jose session tokens (HS256, 8h expiry, payload.admin verification), fail-closed rate-limited /api/login and /api/logout with Origin verification, route groups (protected) and login, scripts/hash-password.mjs (raw mode, no-echo, 16-char min, 72-byte max), and test:auth test suite.
-- **Next:** Phase 3 — AI drafting.
+- **Next:** Phase 3 — Post editor and preview (`/admin/new`, `/api/parse`, `/api/preview`, `lib/frontmatter.ts`, `lib/post-input.ts`).
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -129,3 +128,5 @@ The running "why we chose X" log lives in `technical-prd.md` §9 and
 `design-spec.md` §7. Add new decisions there as they're made, one line each.
 - [2026-11-02] Chose **Tailwind CSS v4 with `@tailwindcss/postcss`** — standard PostCSS integration prevents child-process IPC crashes in Turbopack on Windows. Tokens defined in CSS (`@theme`).
 - [2026-11-02] **Deferred custom domain purchase** — deployed initially to Vercel default URL (`personal-blog-omega-flax.vercel.app`) with HTTPS; custom domain will be mapped via DNS once acquired (IONOS/other).
+- [2026-11-04] Dropped in-app AI drafting; posts are drafted outside (Claude Project / Gemini notebook) and pasted into an admin form. Simpler, no API key or spend, better drafting tools exist; code snapshot kept at tag phase-3-ai-drafting.
+- [2026-11-04] Dropped image upload; images are links only (https URLs or static repo assets).

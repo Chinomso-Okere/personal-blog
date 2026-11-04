@@ -1,17 +1,16 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DraftEditor } from "@/components/DraftEditor";
+import { PostEditor } from "@/components/PostEditor";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function AdminDraftPage() {
-  // Defense in depth: Verify session directly in server component
+export default async function NewPostPage() {
   const session = await getSession();
   if (!session) {
     redirect("/admin/login");
   }
 
-  return <DraftEditor />;
+  return <PostEditor />;
 }
 
