@@ -4,7 +4,7 @@ slug: "sample-testing-the-paste-and-publish-form"
 date: "2026-11-04"
 description: "A throwaway post for checking that front matter, preview and validation behave as expected."
 tags: ["AI Evaluation","UK AI"]
-published: true
+published: false
 coverImage: "https://picsum.photos/id/1015/1200/600"
 coverImageAlt: "A placeholder landscape photograph"
 ---
