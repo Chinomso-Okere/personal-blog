@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getWritingEntries } from "@/lib/writing";
 import { ExternalArrow } from "@/components/ExternalArrow";
+import { Venue } from "@/components/Venue";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -52,7 +53,7 @@ export default function WritingPage() {
                 </p>
                 <h2 className="post-row__title">{entry.title}</h2>
                 <p className="post-row__venue">
-                  {entry.venue}
+                  <Venue text={entry.venue} />
                   {!entry.venue.includes(String(entry.year)) && `, ${entry.year}`}
                 </p>
                 <p className="post-row__desc">{entry.note}</p>

@@ -7,6 +7,8 @@ import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
 import { formatDate } from "@/lib/format";
 import { PostRow } from "@/components/PostRow";
 import { ExternalArrow } from "@/components/ExternalArrow";
+import { Venue } from "@/components/Venue";
+import { CoverImage } from "@/components/CoverImage";
 
 export const metadata: Metadata = {
   description: siteConfig.description,
@@ -105,8 +107,13 @@ export default function HomePage() {
                   className="feature__img"
                   tabIndex={-1}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={latest.coverImage} alt={latest.coverImageAlt || ""} />
+                  <CoverImage
+                    src={latest.coverImage}
+                    alt={latest.coverImageAlt || ""}
+                    // Deliberately ~2x the ~580px display width on desktop so
+                    // diagram text stays crisp (see CoverImage).
+                    sizes="(min-width: 901px) 1200px, 100vw"
+                  />
                 </Link>
               )}
               <div>
@@ -173,7 +180,9 @@ export default function HomePage() {
                         entry.title
                       )}
                     </h3>
-                    <p className="ledger__venue">{entry.venue}</p>
+                    <p className="ledger__venue">
+                      <Venue text={entry.venue} />
+                    </p>
                     <p className="ledger__note">{entry.note}</p>
                   </div>
                   <span

@@ -102,6 +102,27 @@
   }
 }
 
+/* Route cross-fade (React <ViewTransition> in the public layout). The page
+   root is not snapshotted, so the header stays put and only main fades. */
+:root {
+  view-transition-name: none;
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Smooth in-page jumps on the post page; off under reduced motion below. */
 html:has(.post) {
   scroll-behavior: smooth;
@@ -602,7 +623,7 @@ html:has(.post) {
   }
 
   /* In-body links */
-  .article a:not(.anchor) {
+  .article a:not(.anchor):not(.fig__open) {
     color: inherit;
     text-decoration: underline;
     text-decoration-color: var(--accent);
@@ -611,7 +632,7 @@ html:has(.post) {
     transition: color 0.2s ease;
   }
 
-  .article a:not(.anchor):hover {
+  .article a:not(.anchor):not(.fig__open):hover {
     color: var(--accent-ink);
   }
 
@@ -748,7 +769,7 @@ html:has(.post) {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-height: 44px;
+    min-height: 45px;
     padding: 4px 12px;
     border-bottom: 1px solid var(--code-line);
   }
@@ -797,30 +818,7 @@ html:has(.post) {
     }
   }
 
-  /* Cards grid (More from blog / Post listings) */
-  .more {
-    max-width: 680px;
-    margin: 44px auto 0;
-    padding-top: 30px;
-    border-top: 1px solid var(--border);
-  }
-
-  .more h2 {
-    font-family: var(--ui);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.11em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 20px;
-  }
-
-  .cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-  }
-
+  /* PostCard (Keep reading on the post page) */
   .card {
     display: block;
     text-decoration: none;
@@ -835,8 +833,6 @@ html:has(.post) {
     color: var(--accent-ink);
   }
 
-  .card h2,
-  .card h3,
   .card .card-title {
     font-family: var(--display);
     font-weight: 500;
@@ -849,8 +845,6 @@ html:has(.post) {
     transition: color 0.15s ease;
   }
 
-  .card:hover h2,
-  .card:hover h3,
   .card:hover .card-title {
     color: var(--accent-ink);
   }
@@ -873,11 +867,7 @@ html:has(.post) {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Responsive breakdown */
   @media (max-width: 560px) {
-    .cards {
-      grid-template-columns: 1fr;
-    }
     .article {
       padding-block: 34px 4px;
     }
@@ -1285,7 +1275,8 @@ html:has(.post) {
       column-gap: 56px;
     }
 
-    .post__cover-in {
+    /* The full-size link wraps the cover, so it is the grid item. */
+    .post__cover > .fig__open {
       grid-column: 2;
       margin-right: -176px;
     }
@@ -1946,6 +1937,78 @@ html:has(.post) {
     .feature:hover .feature__img img,
     .feature:hover .feature__arrow {
       transform: none;
+    }
+  }
+
+  /* Full-size image links (figures and post cover) */
+  .fig__open {
+    display: block;
+    color: inherit;
+  }
+
+  .fig__hint {
+    display: none;
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  /* About shares the Blog and Writing column; its text keeps the 680px measure. */
+  .page-col > .article {
+    max-width: 680px;
+    margin-inline: 0;
+    padding-top: clamp(40px, 5vw, 72px);
+  }
+
+  @media (max-width: 759px) {
+    .fig__hint {
+      display: inline-block;
+      margin-top: 10px;
+      font: 500 13px var(--ui);
+      color: var(--accent-ink);
+    }
+  }
+
+  /* Touch: stand-alone controls get a 44px target without loosening the
+     desktop layout. Inline body links are exempt. */
+  @media (pointer: coarse), (max-width: 759px) {
+    .foot__links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding-block: 0;
+    }
+
+    .toc--inline .toc__list a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding-block: 6px;
+    }
+
+    .text-link,
+    .sec-head__link,
+    .author__link,
+    .brand,
+    .copy {
+      position: relative;
+    }
+
+    /* Invisible hit area: grows the target to at least 44px tall. */
+    .text-link::after,
+    .sec-head__link::after,
+    .author__link::after,
+    .brand::after,
+    .copy::after {
+      content: "";
+      position: absolute;
+      left: -4px;
+      right: -4px;
+      top: 50%;
+      height: 44px;
+      min-height: 100%;
+      transform: translateY(-50%);
     }
   }
 

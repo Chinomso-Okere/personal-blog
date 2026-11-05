@@ -73,10 +73,10 @@ The header and the safe-area paint use `--bg` (they previously reused `--band`).
 | type / class | `#E3C58A` |
 | function / class name | `#F4EAD5` (weight 500) |
 | string | `#B8C08A` |
-| comment | `#8C8066` (italic) |
+| comment | `#988C72` (italic; was `#8C8066`, which measured 3.99:1 on the light-theme code background) |
 | number | `#DD9A72` |
 
-(Target values from the redesign; applied to the Shiki theme in Phase B.)
+(Applied to the Shiki theme in `lib/markdown.ts`. Every token measures at least 4.5:1 on both code backgrounds.)
 
 ---
 
@@ -160,8 +160,8 @@ Exact CSS for each is in the redesign mockups (`docs/redesign/mockup/`); for any
 - **Masthead (header):** frosted sticky bar, `top: env(safe-area-inset-top,0px)`, background `color-mix(in srgb, var(--bg) 86%, transparent)` with `backdrop-filter: saturate(1.4) blur(14px)`, hairline bottom border. Brand (name, Newsreader 25px 500) left; nav + theme toggle right. Nav links get an accent underline that scales in from the left (.25s) on hover/focus. Paint the safe-area band with `body::before` (in `--bg`) so nothing scrolls under the system bar. Nav: Blog · Writing · Portfolio · About. **Portfolio** is an external link with a `↗` marker, opens in a new tab.
 - **Theme toggle:** a switch (`role="switch"`, constant accessible name "Dark mode", `aria-checked` carries the state): a 38×22 track in `--tint` with an accent knob that slides 16px, plus a visible label showing the current theme ("Light" / "Dark"). Minimum height 44px. Persists choice in `localStorage.blogTheme` (wrapped in try/catch), defaults to the system theme.
 - **Article:** eyebrow (tag) → h1 → meta row (date · read time) → hairline rule → lead paragraph → body. Pullquote has a 2px `--accent` left rule and is italic.
-- **Code block:** a `figure` with a caption bar (filename, Inter, on `--surface`) above a `--code-bg` `<pre>`. Dark in **both** themes. Horizontal scroll inside the block only (`overflow-x:auto`). Syntax colours per §1.
-- **Image figure:** full-column image with a short Inter caption beneath. Images are optional and can appear at any point in the body (per the PRD). In the mockup this is a placeholder; real posts use `![alt](/images/name.png)`.
+- **Code block:** a `figure` (12px radius) on `--code-bg`, dark in **both** themes. A 45px bar above the `<pre>` holds the filename (JetBrains Mono 12.5px, `#A79B84`) when the fence has `title="..."`, and the Copy button on the right; untitled fences get an empty server-rendered `.copybar` so adding the button never shifts the layout. `--code-line` divider. Ligatures off in all code. Horizontal scroll inside the block only (`overflow-x:auto`). Syntax colours per §1.
+- **Image figure:** an image-only paragraph becomes a bordered, 16px-radius figure that breaks out 176px right at >=1100px. Each figure and the post cover link to the full-size file (new tab, `rel="noopener noreferrer"`, hidden "(opens full size in new tab)"); below 760px a visible "View full size" label appears. No visible caption (alt text is for screen readers). Real posts use `![alt](/images/name.png)`.
 - **"More from the blog" cards:** two-column grid (one column under ~560px), hairline-separated. Each: eyebrow + Newsreader title + one-line Inter description. Title shifts to `--accent-ink` on hover. No border, no shadow — separated by whitespace.
 - **Footer:** hairline top border, `--bg`. Left: one-line bio (bold name in `--fg`, rest `--muted`). Right: LinkedIn · GitHub · Email, with an accent underline on hover. A small © line (year + name) sits below.
 - **Writing page (per PRD):** reuse the eyebrow + Newsreader title + Inter meta pattern. Each entry: title, venue + year (meta style), one-line note, external link (`↗`). Same accent and spacing rules.
@@ -172,7 +172,8 @@ Exact CSS for each is in the redesign mockups (`docs/redesign/mockup/`); for any
 ## 5. Behaviour & accessibility
 
 - Respect `prefers-reduced-motion` — see Motion below.
-- Visible keyboard focus state on every link, button and the toggle.
+- Visible keyboard focus state on every link, button and the toggle (on the dark research band the ring uses `--band-accent`).
+- Touch targets: stand-alone controls (nav, toggle, footer links, text CTAs, mobile TOC links, Copy) are at least 44px under `(pointer: coarse)` or below 760px. Inline body links are exempt.
 - Hover states use `--accent-ink` for text, never a background fill.
 - `font-variant-numeric: tabular-nums` anywhere digits align in columns.
 - Keep contrast legible in both themes; the accent must stay readable on both backgrounds (the dark accent is deliberately lighter than the light one for this reason).
@@ -187,6 +188,7 @@ Every animation must help the reader do or understand something; otherwise drop 
 - **Hover:** nav underline sweep (.25s); cards lift 3px with the soft shadow (.3s); feature image scales 1.03 over 1.1s; index rows indent 12px with an accent hairline sweep (.6s); buttons lift 1px and fill accent, `scale(.98)` when pressed.
 - **State, not decoration:** reading-progress bar and TOC active section on the post page; code Copy button flips to "Copied" for ~1.6s.
 - **Reduced motion:** removes the rise, line reveal, hover transforms and sweeps; colour transitions and the toggle knob become near-instant; smooth scrolling and view transitions are disabled. Progress bar and TOC highlighting stay.
+- **Route cross-fade:** React `<ViewTransition>` around the public page content, .25s; the header is not part of the transition. Off under reduced motion.
 - No parallax, no scroll-jacking, no autoplay, no animation on admin pages.
 
 ---
@@ -205,3 +207,5 @@ Build Phase 1 to match `reference.html`: same tokens, same type scale, same comp
 - [2026-11-02] Chose **a dark code block in both themes** — keeps code legible and reads as deliberate.
 - [2026-11-02] Chose **hairline borders over shadows** for separating elements — quieter, more editorial.
 - [2026-11-05] Elevated the design: bigger type, 3-column post, functional motion. Surface warmed to `#FBF8F1`, new `--tint` and band tokens, dark accent unified to `#E59A5E`, one soft hover shadow replaces "no shadows", larger radii. `design/reference.html` superseded for the public site by `docs/redesign/mockup/`.
+- [2026-11-05] Redesign polish (Phase D): code comment colour `#8C8066` -> `#988C72` for AA; full-size links on figures and the cover instead of a lightbox (no JS, native pinch-zoom); 44px touch targets on coarse pointers only; route cross-fade via React `<ViewTransition>` (Next 16.4 needs no flag).
+- [2026-11-05] Local cover images (`/images/`) go through `next/image` at quality 90 with ~2x desktop variants (`sizes` deliberately overstated) because diagram text softened at 75 and at display-width variants; remote covers stay plain `<img>`. Body figures load lazily. "View full size" links keep pointing at the original files.

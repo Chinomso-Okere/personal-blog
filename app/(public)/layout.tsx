@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -13,7 +14,8 @@ export default function PublicLayout({
       </a>
       <Header />
       <main id="main" className="flex-1">
-        {children}
+        {/* Cross-fades page content on client navigation; header stays put. */}
+        <ViewTransition>{children}</ViewTransition>
       </main>
       <Footer />
     </div>

@@ -73,7 +73,7 @@ function getHighlighter(): Promise<Highlighter> {
             },
             {
               scope: ["comment", "punctuation.definition.comment"],
-              settings: { foreground: "#8C8066", fontStyle: "italic" },
+              settings: { foreground: "#988C72", fontStyle: "italic" },
             },
             {
               scope: ["constant.numeric", "constant.language"],
@@ -234,9 +234,30 @@ function hasClass(el: HastElement, name: string): boolean {
   return Array.isArray(cls) && cls.includes(name);
 }
 
+function isUntitledCodeFigure(el: HastElement): boolean {
+  if (el.tagName !== "figure" || !hasClass(el, "code")) return false;
+  const first = el.children.find((c) => c.type === "element") as
+    | HastElement
+    | undefined;
+  return !first || !hasClass(first, "cap");
+}
+
+// An empty bar rendered on the server so the Copy button (added client-side
+// by CodeCopy) never shifts the layout. Deliberately not .cap: that class means
+// "has a filename".
+function addCopyBar(el: HastElement) {
+  el.children.unshift({
+    type: "element",
+    tagName: "div",
+    properties: { className: ["copybar"] },
+    children: [],
+  });
+}
+
 // Runs AFTER rehype-sanitize. Everything it adds is generated here (slug IDs,
-// fixed anchor markup, a data flag, figure wrappers around already-sanitised
-// images), so the sanitiser schema stays unchanged.
+// fixed anchor markup, a data flag, figure wrappers and links around
+// already-sanitised images, empty copy bars), so the sanitiser schema stays
+// unchanged.
 function rehypePostEnhance(headings: Heading[]) {
   return (tree: HastRoot) => {
     const used = new Set<string>();
@@ -250,6 +271,10 @@ function rehypePostEnhance(headings: Heading[]) {
         const img = el.children.find(
           (c): c is HastElement => c.type === "element"
         )!;
+        // Body figures are below the fold; the cover is the LCP image instead.
+        img.properties = { ...img.properties, loading: "lazy", decoding: "async" };
+        // Diagrams are unreadable at phone width, so each figure links to the
+        // full-size file (src was already checked by the sanitiser).
         return {
           type: "element",
           tagName: "figure",
@@ -257,12 +282,41 @@ function rehypePostEnhance(headings: Heading[]) {
           children: [
             {
               type: "element",
-              tagName: "div",
-              properties: { className: ["fig__in"] },
-              children: [img],
+              tagName: "a",
+              properties: {
+                className: ["fig__open"],
+                href: String(img.properties?.src ?? ""),
+                target: "_blank",
+                rel: ["noopener", "noreferrer"],
+              },
+              children: [
+                {
+                  type: "element",
+                  tagName: "div",
+                  properties: { className: ["fig__in"] },
+                  children: [img],
+                },
+                {
+                  type: "element",
+                  tagName: "span",
+                  properties: { className: ["sr-only"] },
+                  children: [{ type: "text", value: " (opens full size in new tab)" }],
+                },
+                {
+                  type: "element",
+                  tagName: "span",
+                  properties: { className: ["fig__hint"], ariaHidden: "true" },
+                  children: [{ type: "text", value: "View full size ↗" }],
+                },
+              ],
             },
           ],
         } satisfies HastElement;
+      }
+
+      if (isUntitledCodeFigure(el)) {
+        addCopyBar(el);
+        return el;
       }
 
       if (el.tagName === "p" && hasClass(el, "lead")) {

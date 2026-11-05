@@ -79,7 +79,13 @@ update to the "Current status" section below.
   - Phase 5: Manage posts (`/admin`, `/admin/edit/[slug]`, `/api/posts`, `/api/posts/[slug]`, `lib/manage.ts`, `components/AdminPostList.tsx`, `test:manage` suite).
   - First post published: "My AI build playbook, part 1: the model is the easy part".
   - Self-hosted `/images/` covers allowed (alongside https cover URLs).
-- **Next:** Redesign under way, phases A to D (see `docs/redesign/PLAN.md`); each phase stops at its check for approval.
+  - Redesign ("elevated warm editorial", `docs/redesign/PLAN.md`), phases 0 and A to D, built and checked (5 Nov 2026):
+    - A: new tokens (warmer surface, `--tint`, band tokens, unified dark accent), frosted sticky header, switch-style theme toggle, skip link, footer, 1200px container.
+    - B: post page with 3-column layout, sticky TOC (closed disclosure on phones), reading progress, numbered h2s with anchors, drop cap, code blocks with Copy, figure breakouts, author card. Heading IDs are added after sanitising; schema fingerprint is asserted in `test:safety`.
+    - C: home (hero capped at 96px, Latest feature, dark research band from `writing.json`, "What I write about" from `about.md`, About strip), `/blog` rows, Writing and About restyled.
+    - D: contrast AA on every measured pair, full-size image links, 44px touch targets on coarse pointers, zero layout shift, route cross-fade, dead CSS removed. Lighthouse accessibility 100 on home and post.
+    - D follow-up: local `/images/` covers served through `next/image` (quality 90, ~2x variants on desktop so diagram text stays crisp; `https` covers stay plain `<img>`), body figures lazy-loaded. Mobile Lighthouse performance: home 85 -> 86 (median of 3), post 77 -> 86.
+- **Next:** awaiting Nonso's review. Open options: `/blog/tag/[tag]` pages; series support (PLAN Phase E); not preloading the Newsreader italic font (skipped for now).
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`

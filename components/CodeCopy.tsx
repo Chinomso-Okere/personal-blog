@@ -6,9 +6,9 @@ const DONE_MS = 1600;
 
 // Adds a Copy button to every code block in the post. The buttons are created
 // here, not in the markdown HTML, so the sanitiser never has to allow them.
-// Titled blocks get the button in their filename bar; untitled blocks get a
-// slim bar of their own above the code (built here, so the server HTML for an
-// untitled fence never has a .cap). Without the clipboard API nothing is added.
+// Titled blocks get the button in their filename bar; untitled blocks get it in
+// the empty .copybar that lib/markdown.ts renders on the server, so adding the
+// button never shifts the layout. Without the clipboard API nothing is added.
 export function CodeCopy() {
   useEffect(() => {
     const article = document.querySelector<HTMLElement>("[data-post-article]");
@@ -24,16 +24,18 @@ export function CodeCopy() {
       button.textContent = "Copy";
       button.setAttribute("aria-label", "Copy code");
 
-      const cap = figure.querySelector(":scope > .cap");
-      if (cap) {
-        cap.appendChild(button);
+      const bar = figure.querySelector(":scope > .cap, :scope > .copybar");
+      if (bar) {
+        bar.appendChild(button);
         added.push(button);
       } else {
-        const bar = document.createElement("div");
-        bar.className = "copybar";
-        bar.appendChild(button);
-        figure.insertBefore(bar, figure.firstChild);
-        added.push(bar);
+        // Fallback for code blocks the server step does not reach (nested in a
+        // list or quote): build the bar here.
+        const ownBar = document.createElement("div");
+        ownBar.className = "copybar";
+        ownBar.appendChild(button);
+        figure.insertBefore(ownBar, figure.firstChild);
+        added.push(ownBar);
       }
     });
 

@@ -8,6 +8,7 @@ import { PostCard } from "@/components/PostCard";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { TocTracker } from "@/components/TocTracker";
 import { CodeCopy } from "@/components/CodeCopy";
+import { CoverImage } from "@/components/CoverImage";
 import { siteConfig } from "@/lib/site";
 
 interface PostPageProps {
@@ -141,10 +142,26 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {post.coverImage && (
         <div className="post__cover rise d5">
-          <div className="post__cover-in">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.coverImage} alt={post.coverImageAlt || ""} />
-          </div>
+          <a
+            className="fig__open"
+            href={post.coverImage}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="post__cover-in">
+              <CoverImage
+                src={post.coverImage}
+                alt={post.coverImageAlt || ""}
+                // Deliberately ~2x the 856px display width on desktop: diagram
+                // text only stays crisp when the browser scales down once.
+                sizes="(min-width: 1100px) 1712px, 100vw"
+              />
+            </div>
+            <span className="sr-only"> (opens full size in new tab)</span>
+            <span className="fig__hint" aria-hidden="true">
+              View full size ↗
+            </span>
+          </a>
         </div>
       )}
 
