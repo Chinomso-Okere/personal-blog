@@ -4,9 +4,12 @@ import { Footer } from "@/components/Footer";
 
 export default function NotFound() {
   return (
-    <>
+    <div className="site">
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
       <Header />
-      <main className="flex-1 site-container py-20 md:py-32">
+      <main id="main" className="flex-1 site-container py-20 md:py-32">
         <div className="article-col text-center">
           <div className="eyebrow mb-4">404 · Page Not Found</div>
           <h1 className="font-[family-name:var(--font-display)] text-[clamp(32px,5vw,46px)] font-medium leading-[1.1] mb-6 text-[var(--fg)]">
@@ -27,7 +30,7 @@ export default function NotFound() {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

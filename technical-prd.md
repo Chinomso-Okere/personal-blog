@@ -3,7 +3,7 @@
 **Owner:** Nonso (Chinomso Okere)
 **Date:** 2 November 2026 (Updated 4 November 2026)
 **Status:** In implementation
-**Companion to:** `product-prd.md` (the *what* and *why*) and `design-spec.md` (the visual system). This document is the *how* — the build spec for the coding agent (Gemini, in Antigravity IDE).
+**Companion to:** `product-prd.md` (the *what* and *why*) and `design-spec.md` (the visual system). This document is the *how* — the build spec for the coding agent (Claude Code).
 **Instruction to the building agent:** Build **one phase at a time**, in the order below. At the end of each phase, stop at the stated check and wait for human approval before starting the next. Never build ahead. Keep to the hard rules in §7.
 
 ---
@@ -21,7 +21,7 @@
 | Repo writes | **GitHub API (via Octokit)** | How the admin publishes — see §3. |
 | Auth | **Single-admin credentials + signed session cookie** | One user (me). See §5. |
 
-Lock exact versions at Phase 0 and record them in the context file (`GEMINI.md`).
+Lock exact versions at Phase 0 and record them in the context file (`CLAUDE.md`).
 
 ## 2. Folder structure
 
@@ -57,7 +57,7 @@ Lock exact versions at Phase 0 and record them in the context file (`GEMINI.md`)
 │   └── reference.html           # Approved design mockup (source of truth for styling)
 ├── proxy.ts                     # Protects /admin and /api routes (Next.js 16)
 ├── .env.local                   # Secrets (gitignored) — never committed
-└── GEMINI.md                    # Context file Antigravity reads (status, rules, decisions)
+└── CLAUDE.md                    # Context file Claude Code reads (status, rules, decisions)
 ```
 
 ## 3. Content model & how publishing works
@@ -167,6 +167,7 @@ Admin post listing, editing existing posts, unpublishing, deleting.
 - [2026-11-04] Dropped image upload; images are links only (https URLs or static repo assets).
 - [2026-11-04] Commit drafts with published: false to the repo via GitHub Contents API rather than client storage — versioned, portable, and allows unpublishing live posts.
 - [2026-11-04] Phase 5 manage posts: direct GitHub Contents API reads with bounded concurrency (5) and 100-file cap. Server fetches current SHA and title for deletion. Unpublish/publish round-trips body exactly without tag-filtering. Edit mode automatically generates preview on load.
+- [2026-11-05] Switched the coding agent to **Claude Code**; the context file is now `CLAUDE.md` (replaces `GEMINI.md`).
 
 **Design** (full detail in `design-spec.md`)
 - [2026-11-02] Chose **Warm Editorial (Direction A)** as the base — reading-first, serif, warm paper; best fit for technical blog.

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design language</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.sys{--bg:#F5F1E8;--paper:#FBF8F1;--fg:#211B12;--muted:#6F6553;--line:#E4DBCB;--accent:#9C3B1B;width:1440px;min-height:1500px;padding:64px;background:var(--bg);color:var(--fg);font-family:"Newsreader",Georgia,serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;gap:56px}
+.sys *{box-sizing:border-box}
+.ui{font-family:"Inter",system-ui,sans-serif}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.eb{margin:0 0 14px;font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.h{margin:0;font-size:56px;line-height:1;letter-spacing:-.03em;font-weight:400;font-variation-settings:"opsz" 72}
+.h em{font-style:italic;color:var(--accent)}
+.sub{margin:18px 0 0;max-width:46em;font-size:21px;line-height:1.5;color:var(--muted)}
+.lab{margin:0 0 20px;display:flex;align-items:center;gap:18px;font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.lab i{flex:1;height:1px;background:var(--line)}
+
+.pal-row{display:flex;gap:14px;margin-bottom:26px;align-items:flex-start}
+.pal-name{width:90px;flex:none;padding-top:20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sw{flex:1}
+.sw .c{height:72px;border-radius:10px;border:1px solid rgba(0,0,0,.12)}
+.sw .n{margin:9px 0 0;font-size:12.5px;font-weight:500}
+.sw .x{margin:2px 0 0;font-size:12px;color:var(--muted)}
+
+.ts{border-top:1px solid var(--line)}
+.ts-row{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line)}
+.ts-k{font-size:12px;line-height:1.5;color:var(--muted)}
+.ts-k b{display:block;font-size:12.5px;font-weight:600;color:var(--fg);letter-spacing:.04em}
+.s-disp{font-size:96px;line-height:.95;letter-spacing:-.035em;font-weight:400;font-variation-settings:"opsz" 72}
+.s-disp em{font-style:italic;color:var(--accent)}
+.s-h1{font-size:56px;line-height:1;letter-spacing:-.03em;font-weight:400}
+.s-h2{font-size:36px;line-height:1.15;letter-spacing:-.022em;font-weight:500}
+.s-lead{font-size:27px;line-height:1.5;letter-spacing:-.008em}
+.s-body{font-size:20.5px;line-height:1.72;max-width:36em}
+.s-ui{font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.s-mono{font-size:15.5px;line-height:1.7;color:var(--fg)}
+
+.comp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.cbox{padding:26px;border:1px solid var(--line);border-radius:16px;background:var(--paper);display:flex;flex-direction:column;gap:18px}
+.cbox .t{margin:0;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;background:var(--fg);color:var(--bg);font-size:14px;font-weight:500}
+.btn2{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;border:1px solid var(--line);color:var(--fg);font-size:14px;font-weight:500}
+.lnk{font-size:14px;font-weight:500;border-bottom:1.5px solid var(--accent);padding-bottom:3px;align-self:flex-start}
+.pill{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.chipd{display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E59A5E;color:#211B12;font-size:12px;font-weight:600}
+.chipo{display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;border:1px solid #6F6553;color:var(--fg);font-size:12px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pq{margin:0;padding:6px 0 6px 22px;border-left:3px solid var(--accent);font-size:30px;line-height:1.2;letter-spacing:-.02em;font-style:italic}
+.cb{border-radius:10px;overflow:hidden;background:#2A2317;color:#EADFC9}
+.cb .bar{padding:8px 14px;border-bottom:1px solid #3D3322;font-size:12px;color:#A79B84}
+.cb pre{margin:0;padding:14px 16px;font-size:13.5px;line-height:1.65}
+.k{color:#E59A5E}
+.f{color:#F4EAD5;font-weight:500}
+.t{color:#E3C58A}
+.mini{padding:20px;border:1.5px dashed var(--line);border-radius:12px}
+.mini .a{margin:0 0 8px;font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.mini .b{margin:0;font-size:22px;line-height:1.2;letter-spacing:-.014em;font-style:italic;color:var(--muted)}
+</style>
+</helmet>
+<div class="sys">
+
+<header>
+<p class="eb ui">Design language</p>
+<h1 class="h">Warm, literary, <em>crafted.</em></h1>
+<p class="sub">The identity you already have, drawn with more care: one family of warm paper tones, a serif that does the heavy lifting, and a single brick-red accent used with intent.</p>
+</header>
+
+<section>
+<div class="lab ui"><span>Colour</span><i></i></div>
+<div class="pal-row">
+<span class="pal-name ui">Light</span>
+<div class="sw"><div class="c" style="background: #F5F1E8"></div><p class="n ui">Paper</p><p class="x mono">#F5F1E8</p></div>
+<div class="sw"><div class="c" style="background: #FBF8F1"></div><p class="n ui">Surface</p><p class="x mono">#FBF8F1</p></div>
+<div class="sw"><div class="c" style="background: #EDE5D3"></div><p class="n ui">Tint</p><p class="x mono">#EDE5D3</p></div>
+<div class="sw"><div class="c" style="background: #E4DBCB"></div><p class="n ui">Line</p><p class="x mono">#E4DBCB</p></div>
+<div class="sw"><div class="c" style="background: #6F6553"></div><p class="n ui">Muted</p><p class="x mono">#6F6553</p></div>
+<div class="sw"><div class="c" style="background: #211B12"></div><p class="n ui">Ink</p><p class="x mono">#211B12</p></div>
+<div class="sw"><div class="c" style="background: #9C3B1B"></div><p class="n ui">Accent</p><p class="x mono">#9C3B1B</p></div>
+<div class="sw"><div class="c" style="background: #2A2317"></div><p class="n ui">Code</p><p class="x mono">#2A2317</p></div>
+</div>
+<div class="pal-row">
+<span class="pal-name ui">Dark</span>
+<div class="sw"><div class="c" style="background: #191510"></div><p class="n ui">Paper</p><p class="x mono">#191510</p></div>
+<div class="sw"><div class="c" style="background: #221C14"></div><p class="n ui">Surface</p><p class="x mono">#221C14</p></div>
+<div class="sw"><div class="c" style="background: #2A2318"></div><p class="n ui">Tint</p><p class="x mono">#2A2318</p></div>
+<div class="sw"><div class="c" style="background: #332A1E"></div><p class="n ui">Line</p><p class="x mono">#332A1E</p></div>
+<div class="sw"><div class="c" style="background: #A79B84"></div><p class="n ui">Muted</p><p class="x mono">#A79B84</p></div>
+<div class="sw"><div class="c" style="background: #ECE3D2"></div><p class="n ui">Ink</p><p class="x mono">#ECE3D2</p></div>
+<div class="sw"><div class="c" style="background: #E59A5E"></div><p class="n ui">Accent</p><p class="x mono">#E59A5E</p></div>
+<div class="sw"><div class="c" style="background: #120E09"></div><p class="n ui">Code</p><p class="x mono">#120E09</p></div>
+</div>
+</section>
+
+<section>
+<div class="lab ui"><span>Type</span><i></i></div>
+<div class="ts">
+<div class="ts-row"><div class="ts-k ui"><b>Display</b>Newsreader 400, optical size 72, 96 / 0.95, &minus;3.5%</div><div class="s-disp">Evidence <em>first.</em></div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Title</b>Newsreader 400, 56 / 1.0, &minus;3%</div><div class="s-h1">The model is the easy part</div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Heading</b>Newsreader 500, 36 / 1.15, &minus;2.2%</div><div class="s-h2">A stack you add to, not start with</div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Lead</b>Newsreader 400, 27 / 1.5, with an accent drop cap</div><div class="s-lead">The hardest part of building an AI system is almost never the AI.</div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Body</b>Newsreader 400, 20.5 / 1.72, 66 characters per line</div><div class="s-body">Trust is built in the layers around the model: a typed output instead of a string, a rule instead of a model call, a stored fact instead of a stored guess.</div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Label</b>Inter 600, 12.5, tracked 16%, caps</div><div class="s-ui ui">AI Implementation</div></div>
+<div class="ts-row"><div class="ts-k ui"><b>Code</b>JetBrains Mono 400, 15.5 / 1.7</div><div class="s-mono mono">confidence: float</div></div>
+</div>
+</section>
+
+<section>
+<div class="lab ui"><span>Components</span><i></i></div>
+<div class="comp">
+<div class="cbox">
+<p class="t ui">Actions</p>
+<div class="row"><a class="btn ui" href="#">Read the writing</a><a class="btn2 ui" href="#">Elsewhere</a></div>
+<a class="lnk ui" href="#">Research papers &rarr;</a>
+<p class="t ui">Topics and status</p>
+<div class="row"><span class="pill ui">AI Evaluation</span><span class="pill ui">Voice AI</span></div>
+<div class="row" style="background: #211B12; padding: 14px; border-radius: 10px"><span class="chipd ui">Published</span><span class="chipo ui">Accepted &middot; awaiting publication</span></div>
+</div>
+<div class="cbox">
+<p class="t ui">Pull quote</p>
+<blockquote class="pq" style="margin: 0">A good answer from the model is cheap to produce and expensive to trust.</blockquote>
+<p class="t ui">Code with a file name</p>
+<div class="cb mono"><div class="bar">structured_output.py</div><pre><code><span class="k">class</span> <span class="f">Classification</span>(<span class="t">BaseModel</span>):
+    label: <span class="t">str</span>
+    reason: <span class="t">str</span></code></pre></div>
+</div>
+<div class="cbox">
+<p class="t ui">Series</p>
+<div class="mini"><p class="a ui">Next &middot; Part 2</p><p class="b">[title to come]</p></div>
+<p class="t ui">Motion, and what each one is for</p>
+<div class="ui" style="font-size: 13.5px; line-height: 1.7; color: #6F6553">
+<b style="color: #211B12">Arrival.</b> Hero lines rise out of a mask once, 1.1 s, then stay still.<br>
+<b style="color: #211B12">Feedback.</b> Underlines draw, arrows nudge 4 px, buttons press to 98%, index rows get an accent hairline sweep.<br>
+<b style="color: #211B12">Context.</b> Images ease in 3% on hover. Dark mode cross-fades over 0.45 s from a switch that slides.<br>
+<b style="color: #211B12">Confirmation.</b> Copy turns accent and reads Copied for 1.8 s.<br>
+<b style="color: #211B12">In the build.</b> Reading progress follows scroll, the contents list tracks the section, and pages cross-fade between routes.<br>
+<b style="color: #211B12">Always.</b> Nothing loops, and reduced-motion turns it all off.
+</div>
+</div>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

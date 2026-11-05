@@ -7,11 +7,15 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="site">
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
-

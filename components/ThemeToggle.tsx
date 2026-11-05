@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 function subscribe(callback: () => void) {
   const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -53,6 +53,16 @@ export function ThemeToggle() {
   const mounted = useIsMounted();
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
+  // Enable the theme cross-fade only after the first client paint.
+  useEffect(() => {
+    const root = document.documentElement;
+    const frame = requestAnimationFrame(() => root.classList.add("theme-ready"));
+    return () => {
+      cancelAnimationFrame(frame);
+      root.classList.remove("theme-ready");
+    };
+  }, []);
+
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     const root = document.documentElement;
@@ -64,30 +74,32 @@ export function ThemeToggle() {
     }
   };
 
-  const actionDescription = mounted
-    ? theme === "dark"
-      ? "Switch to light theme"
-      : "Switch to dark theme"
-    : "Switch theme";
+  const isDark = mounted && theme === "dark";
 
+  // The accessible name stays constant; aria-checked carries the state.
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={isDark}
+      aria-label="Dark mode"
       className="toggle"
       onClick={toggleTheme}
-      aria-label={actionDescription}
     >
-      {mounted ? (
-        theme === "dark" ? (
-          "Light"
+      <span className="toggle__track" aria-hidden="true">
+        <span className="toggle__knob" />
+      </span>
+      <span className="toggle__label" aria-hidden="true">
+        {mounted ? (
+          isDark ? (
+            "Dark"
+          ) : (
+            "Light"
+          )
         ) : (
-          "Dark"
-        )
-      ) : (
-        <span className="opacity-0 select-none" aria-hidden="true">
-          Dark
-        </span>
-      )}
+          <span className="opacity-0 select-none">Light</span>
+        )}
+      </span>
     </button>
   );
 }

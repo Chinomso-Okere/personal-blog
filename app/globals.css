@@ -2,7 +2,8 @@
 
 :root {
   --bg: #F5F1E8;
-  --surface: #FFFFFF;
+  --surface: #FBF8F1;
+  --tint: #EDE5D3;
   --fg: #211B12;
   --muted: #6F6553;
   --border: #E4DBCB;
@@ -10,7 +11,15 @@
   --accent-ink: #9C3B1B;
   --code-bg: #2A2317;
   --code-fg: #EADFC9;
-  --band: #F5F1E8;
+  --code-line: #3D3322;
+  --band: #211B12;
+  --band-fg: #F5F1E8;
+  --band-muted: #BDB19B;
+  --band-line: #3A3023;
+  --band-accent: #E59A5E;
+  --shadow-soft: rgba(33, 27, 18, 0.3);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: clamp(20px, 5vw, 56px);
   --display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --ui: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
@@ -20,14 +29,21 @@
   :root:not([data-theme="light"]) {
     --bg: #191510;
     --surface: #221C14;
+    --tint: #2A2318;
     --fg: #ECE3D2;
     --muted: #A79B84;
     --border: #332A1E;
-    --accent: #E08A4C;
+    --accent: #E59A5E;
     --accent-ink: #E59A5E;
     --code-bg: #120E09;
     --code-fg: #E7DDC8;
-    --band: #191510;
+    --code-line: #2A2318;
+    --band: #120E09;
+    --band-fg: #ECE3D2;
+    --band-muted: #A79B84;
+    --band-line: #2A2318;
+    --band-accent: #E59A5E;
+    --shadow-soft: rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
@@ -35,20 +51,28 @@
 :root[data-theme="dark"] {
   --bg: #191510;
   --surface: #221C14;
+  --tint: #2A2318;
   --fg: #ECE3D2;
   --muted: #A79B84;
   --border: #332A1E;
-  --accent: #E08A4C;
+  --accent: #E59A5E;
   --accent-ink: #E59A5E;
   --code-bg: #120E09;
   --code-fg: #E7DDC8;
-  --band: #191510;
+  --code-line: #2A2318;
+  --band: #120E09;
+  --band-fg: #ECE3D2;
+  --band-muted: #A79B84;
+  --band-line: #2A2318;
+  --band-accent: #E59A5E;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
 :root[data-theme="light"] {
   --bg: #F5F1E8;
-  --surface: #FFFFFF;
+  --surface: #FBF8F1;
+  --tint: #EDE5D3;
   --fg: #211B12;
   --muted: #6F6553;
   --border: #E4DBCB;
@@ -56,13 +80,20 @@
   --accent-ink: #9C3B1B;
   --code-bg: #2A2317;
   --code-fg: #EADFC9;
-  --band: #F5F1E8;
+  --code-line: #3D3322;
+  --band: #211B12;
+  --band-fg: #F5F1E8;
+  --band-muted: #BDB19B;
+  --band-line: #3A3023;
+  --band-accent: #E59A5E;
+  --shadow-soft: rgba(33, 27, 18, 0.3);
   color-scheme: light;
 }
 
 @theme {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-tint: var(--tint);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-border: var(--border);
@@ -70,7 +101,12 @@
   --color-accent-ink: var(--accent-ink);
   --color-code-bg: var(--code-bg);
   --color-code-fg: var(--code-fg);
+  --color-code-line: var(--code-line);
   --color-band: var(--band);
+  --color-band-fg: var(--band-fg);
+  --color-band-muted: var(--band-muted);
+  --color-band-line: var(--band-line);
+  --color-band-accent: var(--band-accent);
   --font-display: var(--display);
   --font-ui: var(--ui);
   --font-mono: var(--mono);
@@ -92,6 +128,7 @@
     color: var(--fg);
     font-family: var(--display);
     font-optical-sizing: auto;
+    font-feature-settings: "kern", "liga", "calt";
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -103,8 +140,12 @@
     position: fixed;
     inset: 0 0 auto;
     height: env(safe-area-inset-top, 0px);
-    background: var(--band);
+    background: var(--bg);
     z-index: 20;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 24%, transparent);
   }
 
   a {
@@ -112,10 +153,24 @@
     text-decoration: none;
   }
 
+  p {
+    text-wrap: pretty;
+  }
+
   /* Visible keyboard focus state */
   :focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Theme cross-fade, public site only, and only after the first client render
+     (ThemeToggle adds .theme-ready) so the bootstrap script never animates. */
+  :where(html.theme-ready body),
+  :where(html.theme-ready .site, html.theme-ready .site *) {
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.45s;
+    transition-timing-function: ease;
   }
 
   /* Reduced motion preference */
@@ -132,34 +187,60 @@
 }
 
 @layer components {
+  /* Public layout wrapper (scopes public-only rules away from admin) */
+  .site {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skip {
+    position: absolute;
+    left: 16px;
+    top: -64px;
+    z-index: 30;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: var(--fg);
+    color: var(--bg);
+    font: 600 13px var(--ui);
+    transition: top 0.2s ease;
+  }
+
+  .skip:focus {
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+  }
+
   /* Masthead styling */
   .masthead {
     position: sticky;
     top: env(safe-area-inset-top, 0px);
     z-index: 15;
-    background: color-mix(in srgb, var(--band) 88%, transparent);
-    backdrop-filter: saturate(1.1) blur(8px);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
     border-bottom: 1px solid var(--border);
   }
 
   .masthead__in {
-    max-width: 960px;
+    max-width: 1200px;
     margin-inline: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 24px;
     flex-wrap: wrap;
-    padding-left: max(20px, env(safe-area-inset-left, 0px));
-    padding-right: max(20px, env(safe-area-inset-right, 0px));
-    padding-block: 16px;
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+    padding-block: 14px;
   }
 
   .brand {
     font-family: var(--display);
     font-weight: 500;
-    font-size: 19px;
-    letter-spacing: 0.01em;
+    font-size: 25px;
+    letter-spacing: -0.015em;
+    transition: color 0.2s ease;
   }
 
   .brand:hover {
@@ -169,52 +250,112 @@
   .nav {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 8px 28px;
     font-family: var(--ui);
-    font-size: 12px;
+    font-size: 12.5px;
     text-transform: uppercase;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.14em;
     color: var(--muted);
     font-weight: 500;
     flex-wrap: wrap;
   }
 
-  .nav a:hover {
-    color: var(--accent-ink);
+  .nav > a {
+    position: relative;
+    display: inline-block;
+    padding: 13px 0;
+    transition: color 0.2s ease;
   }
 
-  /* Theme toggle button */
+  .nav > a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    height: 1.5px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  .nav > a:hover,
+  .nav > a:focus-visible {
+    color: var(--fg);
+  }
+
+  .nav > a:hover::after,
+  .nav > a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Theme toggle switch */
   .toggle {
-    font-family: var(--ui);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 6px 12px;
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 68px;
-    height: 28px;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 16px 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: 500 12px var(--ui);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.25s ease, color 0.25s ease;
   }
 
   .toggle:hover {
-    color: var(--accent-ink);
-    border-color: var(--accent);
+    border-color: var(--muted);
+    color: var(--fg);
+  }
+
+  .toggle__track {
+    position: relative;
+    flex: none;
+    width: 38px;
+    height: 22px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--tint);
+  }
+
+  .toggle__knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  /* Knob position follows the theme on <html>, so it is right from first paint. */
+  :root[data-theme="dark"] .toggle__knob {
+    transform: translateX(16px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .toggle__knob {
+      transform: translateX(16px);
+    }
+  }
+
+  .toggle__label {
+    min-width: 3.3em;
+    text-align: left;
   }
 
   /* Layout containers */
   .site-container {
-    max-width: 960px;
+    max-width: 1200px;
     margin-inline: auto;
-    padding-left: max(20px, env(safe-area-inset-left, 0px));
-    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
   }
 
   .article-col {
@@ -258,6 +399,7 @@
     flex-wrap: wrap;
     font-weight: 500;
     align-items: center;
+    font-variant-numeric: tabular-nums;
   }
 
   .meta .dot,
@@ -297,6 +439,7 @@
     line-height: 1.2;
     letter-spacing: -0.01em;
     margin: 44px 0 12px;
+    text-wrap: balance;
     color: var(--fg);
   }
 
@@ -347,11 +490,10 @@
   /* Inline code */
   .article :not(pre) > code {
     font-family: var(--mono);
-    font-size: 0.88em;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 5px;
+    font-size: 0.82em;
+    background: var(--tint);
+    border-radius: 5px;
+    padding: 0.12em 0.4em;
     color: var(--fg);
   }
 
@@ -390,6 +532,7 @@
     font-size: 23px;
     line-height: 1.38;
     font-weight: 500;
+    text-wrap: balance;
     color: var(--fg);
   }
 
@@ -418,6 +561,15 @@
     background: var(--surface);
     padding: 8px 16px;
     border-bottom: 1px solid var(--border);
+  }
+
+  /* Shiki's <code> inside <pre> must never pick up the inline-code pill. */
+  .article pre code {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    font-size: inherit;
   }
 
   figure.code pre {
@@ -478,6 +630,7 @@
     line-height: 1.2;
     margin: 8px 0 6px;
     letter-spacing: -0.01em;
+    text-wrap: balance;
     color: var(--fg);
     transition: color 0.15s ease;
   }
@@ -503,6 +656,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Responsive breakdown */
@@ -516,44 +670,58 @@
   }
 
   /* Footer styling */
-  footer {
+  .foot {
+    margin-top: clamp(72px, 9vw, 120px);
     border-top: 1px solid var(--border);
-    margin-top: 60px;
-    background: var(--band);
+    padding-block: 44px 56px;
+    font-family: var(--ui);
   }
 
-  .foot {
-    max-width: 960px;
-    margin-inline: auto;
-    padding-left: max(20px, env(safe-area-inset-left, 0px));
-    padding-right: max(20px, env(safe-area-inset-right, 0px));
-    padding-block: 34px 44px;
+  .foot__in {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 28px;
     flex-wrap: wrap;
-    font-family: var(--ui);
-    font-size: 13px;
-    color: var(--muted);
   }
 
   .foot__bio {
+    margin: 0;
     max-width: 44ch;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
   }
 
-  .foot__bio b {
+  .foot__bio strong {
     color: var(--fg);
     font-weight: 600;
   }
 
   .foot__links {
     display: flex;
-    gap: 18px;
+    gap: 0 26px;
     flex-wrap: wrap;
+    font-size: 14px;
+    font-weight: 500;
   }
 
-  .foot__links a:hover {
+  .foot__links a {
+    padding: 10px 0;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .foot__links a:hover,
+  .foot__links a:focus-visible {
     color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+
+  .foot__c {
+    margin: 28px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
   }
 }

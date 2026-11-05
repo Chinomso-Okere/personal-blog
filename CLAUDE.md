@@ -1,4 +1,4 @@
-# GEMINI.md — Personal AI Technical Blog
+# CLAUDE.md — Personal AI Technical Blog
 
 Standing context for this project. Read this first, every session.
 
@@ -16,8 +16,11 @@ professional visibility push.
   auth, security rules, and the **phased implementation order**.
 - @design-spec.md — the visual system: colour tokens (light + dark), type scale,
   spacing, components.
-- @design/reference.html — the approved design mockup. Its CSS is the source of
-  truth for exact token values and component styling.
+- @design/reference.html — the original approved design mockup. **Superseded for
+  the public site** by the redesign mockups in `docs/redesign/mockup/` (5 Nov 2026);
+  still the reference for anything the redesign does not cover.
+
+Redesign in progress: read `docs/redesign/PLAN.md`; mockups in `docs/redesign/mockup/`.
 
 > If you place these in a `/docs` folder instead of the repo root, update the
 > paths above to match.
@@ -66,14 +69,17 @@ update to the "Current status" section below.
 
 ## Current status
 
-- **Phase:** Phase 5 in progress (Manage posts).
+- **Phase:** Phases 0 to 5 complete and live.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
   - Phase 2: admin auth & shell (verified live on Vercel over HTTPS; the repo is now private). Features proxy.ts route guard, jose session tokens (HS256, 8h expiry, payload.admin verification), fail-closed rate-limited /api/login and /api/logout with Origin verification, route groups (protected) and login, scripts/hash-password.mjs (raw mode, no-echo, 16-char min, 72-byte max), and test:auth test suite.
   - Phase 3: Post editor and preview (`/admin/new`, `/api/parse`, `/api/preview`, `lib/frontmatter.ts`, `lib/post-input.ts`, `lib/reading-time.ts`, `components/PostEditor.tsx`, `test:post` suite).
   - Phase 4: Publish (`/api/publish`, `lib/github.ts`, `lib/publish.ts`, cache-busted post-publish polling, inline overwrite modal with live-to-draft warnings, `test:publish` suite).
-- **Next:** Phase 5 — Manage posts (`/admin`, `/admin/edit/[slug]`, `/api/posts`, `/api/posts/[slug]`, `lib/manage.ts`, `components/AdminPostList.tsx`, `test:manage` suite).
+  - Phase 5: Manage posts (`/admin`, `/admin/edit/[slug]`, `/api/posts`, `/api/posts/[slug]`, `lib/manage.ts`, `components/AdminPostList.tsx`, `test:manage` suite).
+  - First post published: "My AI build playbook, part 1: the model is the easy part".
+  - Self-hosted `/images/` covers allowed (alongside https cover URLs).
+- **Next:** Redesign under way, phases A to D (see `docs/redesign/PLAN.md`); each phase stops at its check for approval.
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -95,7 +101,7 @@ update to the "Current status" section below.
 Everything that must change before the site goes public:
 - [ ] Remove site-wide noindex from root metadata in `app/layout.tsx`
 - [ ] Change `app/robots.ts` to allow search indexing and add the sitemap line
-- [ ] Delete both [Sample post] files in `content/posts/`
+- [x] Delete both [Sample post] files in `content/posts/`
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables
 - [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
 - [ ] Add the About photo at public/images/chinomso-okere.jpg
