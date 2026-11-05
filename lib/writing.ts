@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { isValidCalendarDate } from "./post-input.ts";
 
 export type WritingStatus = "published" | "accepted";
 
@@ -9,11 +10,19 @@ export interface WritingEntry {
   venue: string;
   year: number;
   status: WritingStatus;
-  note: string;
+  /** Required for papers; optional for articles. */
+  note?: string;
   url?: string;
+  /** "YYYY-MM-DD"; its year must equal `year`. */
+  date?: string;
 }
 
 const WRITING_FILE = path.join(process.cwd(), "content", "writing.json");
+
+/** Articles (pieces written for publications) as opposed to research papers. */
+export function isArticle(entry: Pick<WritingEntry, "type">): boolean {
+  return entry.type.trim().toLowerCase() === "article";
+}
 
 function validateWritingEntry(
   raw: unknown,
@@ -45,16 +54,38 @@ function validateWritingEntry(
     );
   }
 
-  if (typeof entry.note !== "string" || !entry.note.trim()) {
-    throw new Error(
-      `Writing validation error at index ${index}: required field "note" must be a non-empty string.`
-    );
+  const article = isArticle({ type: entry.type });
+  if (entry.note !== undefined || !article) {
+    if (typeof entry.note !== "string" || !entry.note.trim()) {
+      throw new Error(
+        `Writing validation error at index ${index}: "note" must be a non-empty string${
+          article ? " when present" : ""
+        }.`
+      );
+    }
   }
 
   if (typeof entry.year !== "number" || isNaN(entry.year)) {
     throw new Error(
       `Writing validation error at index ${index}: required field "year" must be a valid number.`
     );
+  }
+
+  if (entry.date !== undefined) {
+    if (
+      typeof entry.date !== "string" ||
+      entry.date !== entry.date.trim() ||
+      !isValidCalendarDate(entry.date)
+    ) {
+      throw new Error(
+        `Writing validation error at index ${index}: "date" must be a real calendar date in YYYY-MM-DD format.`
+      );
+    }
+    if (Number(entry.date.slice(0, 4)) !== entry.year) {
+      throw new Error(
+        `Writing validation error at index ${index}: "year" (${entry.year}) must match the year in "date" (${entry.date}).`
+      );
+    }
   }
 
   if (entry.status !== "published" && entry.status !== "accepted") {
@@ -81,17 +112,10 @@ function validateWritingEntry(
 }
 
 /**
- * Returns all writing entries from content/writing.json.
- * Preserves file order (no sorting). Fails build if any entry is invalid.
+ * Validates parsed writing.json content. Throws on the first invalid entry.
+ * Pure (no file access) so it can be tested directly.
  */
-export function getWritingEntries(): WritingEntry[] {
-  if (!fs.existsSync(WRITING_FILE)) {
-    return [];
-  }
-
-  const raw = fs.readFileSync(WRITING_FILE, "utf-8");
-  const parsed = JSON.parse(raw);
-
+export function validateWritingEntries(parsed: unknown): WritingEntry[] {
   if (!Array.isArray(parsed)) {
     throw new Error("Writing data error: content/writing.json must contain an array.");
   }
@@ -103,3 +127,24 @@ export function getWritingEntries(): WritingEntry[] {
   return parsed as WritingEntry[];
 }
 
+/**
+ * Returns all writing entries from content/writing.json.
+ * Preserves file order (no sorting). Fails build if any entry is invalid.
+ */
+export function getWritingEntries(): WritingEntry[] {
+  if (!fs.existsSync(WRITING_FILE)) {
+    return [];
+  }
+
+  const raw = fs.readFileSync(WRITING_FILE, "utf-8");
+  return validateWritingEntries(JSON.parse(raw));
+}
+
+/** Articles, newest first: by date, then year for any undated entries. */
+export function sortArticlesNewestFirst(entries: WritingEntry[]): WritingEntry[] {
+  return [...entries].sort((a, b) => {
+    if (a.year !== b.year) return b.year - a.year;
+    if (a.date && b.date) return b.date.localeCompare(a.date);
+    return a.date ? -1 : b.date ? 1 : 0;
+  });
+}

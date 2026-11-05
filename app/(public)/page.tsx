@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { getRecentPosts } from "@/lib/posts";
-import { getWritingEntries } from "@/lib/writing";
+import { getWritingEntries, isArticle } from "@/lib/writing";
 import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
 import { formatDate } from "@/lib/format";
 import { PostRow } from "@/components/PostRow";
 import { ExternalArrow } from "@/components/ExternalArrow";
 import { Venue } from "@/components/Venue";
 import { CoverImage } from "@/components/CoverImage";
+import { Sep } from "@/components/Sep";
 
 export const metadata: Metadata = {
   description: siteConfig.description,
@@ -31,7 +32,8 @@ function splitTagline(tagline: string): [string, string | null] {
 
 export default function HomePage() {
   const [latest, ...morePosts] = getRecentPosts(3);
-  const research = getWritingEntries();
+  // Papers only; articles live on /writing.
+  const research = getWritingEntries().filter((entry) => !isArticle(entry));
   const topics = getWriteAboutTopics();
   const statement = getAboutStatement();
   const [line1, line2] = splitTagline(siteConfig.tagline);
@@ -74,7 +76,7 @@ export default function HomePage() {
                     →
                   </span>
                 </Link>
-                <Link href="/writing" className="text-link">
+                <Link href="/writing#papers" className="text-link">
                   Research papers →
                 </Link>
               </div>
@@ -130,7 +132,7 @@ export default function HomePage() {
                 )}
                 <p className="feature__meta">
                   <time dateTime={latest.date}>{formatDate(latest.date)}</time>
-                  <span className="kicker__dot" aria-hidden="true"></span>
+                  <Sep className="kicker__dot" />
                   <span>{latest.readingTime}</span>
                 </p>
                 <Link

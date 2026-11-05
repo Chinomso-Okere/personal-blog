@@ -9,6 +9,7 @@ import { ReadingProgress } from "@/components/ReadingProgress";
 import { TocTracker } from "@/components/TocTracker";
 import { CodeCopy } from "@/components/CodeCopy";
 import { CoverImage } from "@/components/CoverImage";
+import { Sep } from "@/components/Sep";
 import { siteConfig } from "@/lib/site";
 
 interface PostPageProps {
@@ -107,7 +108,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 <span className="kicker__tag">{primaryTag}</span>
                 {otherTags.map((tag) => (
                   <span key={tag} className="kicker__more">
-                    <span className="kicker__dot" aria-hidden="true"></span>
+                    <Sep className="kicker__dot" />
                     {tag}
                   </span>
                 ))}
@@ -125,13 +126,10 @@ export default async function PostPage({ params }: PostPageProps) {
               </span>
               <div className="byline__text">
                 <strong>{siteConfig.name}</strong>
-                <span
-                  className="byline__sep byline__sep--name"
-                  aria-hidden="true"
-                ></span>
+                <Sep className="byline__sep byline__sep--name" />
                 <span className="byline__meta">
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
-                  <span className="byline__sep" aria-hidden="true"></span>
+                  <Sep className="byline__sep" />
                   <span>{post.readingTime}</span>
                 </span>
               </div>

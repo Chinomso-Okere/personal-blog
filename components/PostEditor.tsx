@@ -11,6 +11,7 @@ import {
 } from "@/lib/post-input";
 import { calculateReadingTime } from "@/lib/reading-time";
 import { formatDate } from "@/lib/format";
+import { Sep } from "@/components/Sep";
 
 interface PostEditorProps {
   editSlug?: string;
@@ -972,7 +973,7 @@ export function PostEditor({ editSlug }: PostEditorProps = {}) {
             <h1>{title || "Untitled Post"}</h1>
             <div className="meta">
               <span>{formatDate(date)}</span>
-              <span className="dot" aria-hidden="true"></span>
+              <Sep className="dot" />
               <span>{calculateReadingTime(body)}</span>
             </div>
             <div className="rule" aria-hidden="true"></div>

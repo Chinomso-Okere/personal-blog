@@ -1900,6 +1900,20 @@ html:has(.post) {
     margin-top: 2px;
   }
 
+  /* Writing page: Research papers, then Articles */
+  .writing-sec {
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+
+  .writing-sec + .writing-sec {
+    margin-top: clamp(48px, 6vw, 72px);
+  }
+
+  /* Keeps the hover underline under the text when the link gets touch padding. */
+  .post-row__title a {
+    background-origin: content-box;
+  }
+
   @media (max-width: 900px) {
     .hero__grid,
     .feature,
@@ -1978,6 +1992,12 @@ html:has(.post) {
       align-items: center;
       min-height: 44px;
       padding-block: 0;
+    }
+
+    /* Headline links (Writing articles): inline padding enlarges the tap
+       area to 44px without moving any text. */
+    .post-row__title a {
+      padding-block: 10px;
     }
 
     .toc--inline .toc__list a {

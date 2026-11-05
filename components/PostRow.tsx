@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { PostSummary } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
+import { Sep } from "@/components/Sep";
 
 interface PostRowProps {
   post: PostSummary;
@@ -17,7 +18,7 @@ export function PostRow({ post, headingLevel = "h2" }: PostRowProps) {
         <time dateTime={post.date}>{formatDate(post.date)}</time>
         {primaryTag && (
           <>
-            <span className="kicker__dot" aria-hidden="true"></span>
+            <Sep className="kicker__dot" />
             <span className="post-row__tag">{primaryTag}</span>
           </>
         )}

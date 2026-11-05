@@ -25,5 +25,50 @@
     "status": "accepted",
     "note": "Co-authored benchmark that scores the handoffs between components of a causal analytics pipeline, including corrupted inputs and abstention. Accepted, not yet published.",
     "url": ""
+  },
+  {
+    "title": "Nigeria's AI ambitions are being held back by weak data systems",
+    "type": "article",
+    "venue": "Daily Times Nigeria",
+    "year": 2026,
+    "date": "2026-03-30",
+    "status": "published",
+    "url": "https://dailytimesng.com/nigerias-ai-ambitions-are-being-held-back-by-weak-data-systems/"
+  },
+  {
+    "title": "AI will not transform African businesses until operations are fixed",
+    "type": "article",
+    "venue": "Daily Times Nigeria",
+    "year": 2026,
+    "date": "2026-02-26",
+    "status": "published",
+    "url": "https://dailytimesng.com/ai-will-not-transform-african-businesses-until-operations-are-fixed/"
+  },
+  {
+    "title": "Across Africa, companies are trying to automate processes they do not understand",
+    "type": "article",
+    "venue": "Daily Times Nigeria",
+    "year": 2026,
+    "date": "2026-01-07",
+    "status": "published",
+    "url": "https://dailytimesng.com/across-africa-companies-are-trying-to-automate-processes-they-do-not-understand/"
+  },
+  {
+    "title": "Global access to AI is expanding, but meaningful use remains uneven in emerging markets",
+    "type": "article",
+    "venue": "Daily Times Nigeria",
+    "year": 2025,
+    "date": "2025-06-27",
+    "status": "published",
+    "url": "https://dailytimesng.com/global-access-to-ai-is-expanding-but-meaningful-use-remains-uneven-in-emerging-markets/"
+  },
+  {
+    "title": "Africa does not have an AI talent gap, it has an AI opportunity gap",
+    "type": "article",
+    "venue": "Daily Times Nigeria",
+    "year": 2024,
+    "date": "2024-03-03",
+    "status": "published",
+    "url": "https://dailytimesng.com/africa-does-not-have-an-ai-talent-gap-it-has-an-ai-opportunity-gap/"
   }
 ]

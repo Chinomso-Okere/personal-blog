@@ -6,6 +6,12 @@ import {
   normalizeParsedDate,
   isValidCalendarDate,
 } from "../lib/post-input.ts";
+import { readFileSync } from "node:fs";
+import {
+  validateWritingEntries,
+  isArticle,
+  sortArticlesNewestFirst,
+} from "../lib/writing.ts";
 
 async function runTests() {
   console.log("=== RUNNING POST INPUT, VALIDATION & FRONTMATTER TESTS ===\n");
@@ -250,6 +256,68 @@ Line 4`;
       checkMarkerPost.error.includes("line 3"),
     "Body containing [CHECK: is rejected and reports exact line number"
   );
+
+  // Writing entries (content/writing.json): papers and articles
+  const writingJson = JSON.parse(readFileSync("content/writing.json", "utf-8"));
+  let realEntries = [];
+  let realError = null;
+  try {
+    realEntries = validateWritingEntries(writingJson);
+  } catch (err) {
+    realError = err.message;
+  }
+  assert(realError === null, `Real writing.json validates${realError ? ": " + realError : ""}`);
+  assert(
+    realEntries.filter((e) => !isArticle(e)).length === 3 &&
+      realEntries.filter(isArticle).length === 5,
+    "Real writing.json has 3 papers and 5 articles"
+  );
+  assert(
+    isArticle({ type: "article" }) && isArticle({ type: "Article" }) && !isArticle({ type: "paper" }),
+    "isArticle is case-insensitive and excludes papers"
+  );
+  const sortedDates = sortArticlesNewestFirst(realEntries.filter(isArticle)).map((e) => e.date);
+  assert(
+    JSON.stringify(sortedDates) ===
+      JSON.stringify(["2026-03-30", "2026-02-26", "2026-01-07", "2025-06-27", "2024-03-03"]),
+    "Articles sort newest first"
+  );
+
+  const article = {
+    title: "An article",
+    type: "article",
+    venue: "Daily Times Nigeria",
+    year: 2026,
+    date: "2026-03-30",
+    status: "published",
+    url: "https://example.com/article",
+  };
+  const paper = {
+    title: "A paper",
+    type: "paper",
+    venue: "A venue",
+    year: 2026,
+    status: "accepted",
+    note: "A note.",
+  };
+  const rejects = (entry) => {
+    try {
+      validateWritingEntries([entry]);
+      return false;
+    } catch {
+      return true;
+    }
+  };
+  assert(!rejects(article), "Article without note is accepted");
+  assert(!rejects({ ...article, type: "Article" }), "Article type is accepted in either case");
+  assert(rejects({ ...paper, note: undefined }), "Paper without note is rejected");
+  assert(rejects({ ...article, note: "   " }), "Article with an empty note is rejected");
+  assert(rejects({ ...article, date: "30/03/2026" }), "Date not in YYYY-MM-DD format is rejected");
+  assert(rejects({ ...article, date: "2026-02-30" }), "Impossible calendar date is rejected");
+  assert(rejects({ ...article, date: " 2026-03-30" }), "Date with surrounding whitespace is rejected");
+  assert(rejects({ ...article, year: 2025 }), "Year that does not match the date is rejected");
+  assert(rejects({ ...article, url: "http://example.com/article" }), "Non-https url is rejected");
+  assert(rejects({ ...article, url: "" }), "Published entry without url is rejected");
 
   if (failed) {
     console.error("\nONE OR MORE POST TESTS FAILED!");

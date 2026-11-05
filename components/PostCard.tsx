@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { PostSummary } from "@/lib/posts";
 import { formatDate } from "@/lib/format";
+import { Sep } from "@/components/Sep";
 
 interface PostCardProps {
   post: PostSummary;
@@ -18,7 +19,7 @@ export function PostCard({ post, headingLevel = "h3" }: PostCardProps) {
       <p>{post.description}</p>
       <div className="card-meta">
         <span>{formatDate(post.date)}</span>
-        <span className="dot" aria-hidden="true"></span>
+        <Sep className="dot" />
         <span>{post.readingTime}</span>
       </div>
     </Link>
