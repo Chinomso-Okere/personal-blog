@@ -1240,7 +1240,52 @@ html:has(.post) {
     }
   }
 
+  /* Restrained post header from tablet width up; phones keep the layout above. */
+  @media (min-width: 760px) {
+    .post__head {
+      padding-top: clamp(32px, 4vw, 56px);
+    }
+
+    .kicker {
+      margin-bottom: 17px;
+    }
+
+    .post__title {
+      margin-bottom: 17px;
+      font-size: clamp(34px, 4.4vw, 56px);
+      line-height: 1.08;
+    }
+
+    .post__dek {
+      margin-bottom: 23px;
+      max-width: 34em;
+      font-size: clamp(19px, 1.6vw, 22px);
+    }
+
+    .byline {
+      padding-block: 14px;
+    }
+
+    .post__cover {
+      margin-top: clamp(28px, 3vw, 40px);
+    }
+  }
+
   @media (min-width: 1100px) {
+    /* Cover spans the article column plus the 176px breakout (856px),
+       aligned with the text rather than centred at 1100px. */
+    .post__cover {
+      max-width: 1320px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 680px) minmax(0, 1fr);
+      column-gap: 56px;
+    }
+
+    .post__cover-in {
+      grid-column: 2;
+      margin-right: -176px;
+    }
+
     .post__grid {
       grid-template-columns: minmax(0, 1fr) minmax(0, 680px) minmax(0, 1fr);
       column-gap: 56px;
