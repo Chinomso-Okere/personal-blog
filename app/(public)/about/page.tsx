@@ -30,7 +30,7 @@ export default async function AboutPage() {
 
   return (
     <div className="site-container">
-      <article className="article">
+      <article className="article article--page">
         <h1>About</h1>
 
         {hasPhoto && (

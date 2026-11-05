@@ -5,7 +5,12 @@ import rehypeSanitize, { defaultSchema, type Options as SanitizeOptions } from "
 import rehypeStringify from "rehype-stringify";
 import { createHighlighter, type Highlighter } from "shiki";
 import type { Root as MdastRoot, Node as MdastNode } from "mdast";
-import type { Root as HastRoot, Element as HastElement, Node as HastNode } from "hast";
+import type {
+  Root as HastRoot,
+  Element as HastElement,
+  Node as HastNode,
+  Text as HastText,
+} from "hast";
 
 const SUPPORTED_LANGS = [
   "python",
@@ -39,15 +44,32 @@ function getHighlighter(): Promise<Highlighter> {
           tokenColors: [
             {
               scope: ["keyword", "storage.type", "storage.modifier"],
-              settings: { foreground: "#E0A05A" },
+              settings: { foreground: "#E59A5E" },
             },
             {
               scope: ["string", "string.quoted"],
               settings: { foreground: "#B8C08A" },
             },
             {
-              scope: ["entity.name.function", "support.function"],
-              settings: { foreground: "#ECD9AC" },
+              // Referenced types: base classes, built-in types, type annotations.
+              scope: [
+                "entity.name.type",
+                "entity.other.inherited-class",
+                "support.type",
+                "support.class",
+              ],
+              settings: { foreground: "#E3C58A" },
+            },
+            {
+              // Names being defined or called. Shiki themes can only set bold
+              // (700), so the mockup's weight 500 is not applied.
+              scope: [
+                "entity.name.function",
+                "support.function",
+                "entity.name.type.class",
+                "entity.name.class",
+              ],
+              settings: { foreground: "#F4EAD5" },
             },
             {
               scope: ["comment", "punctuation.definition.comment"],
@@ -172,7 +194,121 @@ function rehypeShiki(highlighter: Highlighter) {
   };
 }
 
-const sanitizeSchema: SanitizeOptions = {
+export interface Heading {
+  id: string;
+  text: string;
+}
+
+function textOf(node: HastNode): string {
+  if (node.type === "text") return (node as HastText).value;
+  const children = (node as { children?: HastNode[] }).children;
+  return children ? children.map(textOf).join("") : "";
+}
+
+// IDs are strictly [a-z0-9-]: accents are folded, everything else becomes a hyphen.
+function slugify(text: string): string {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80)
+    .replace(/-+$/, "");
+}
+
+function isImageOnlyParagraph(el: HastElement): boolean {
+  if (el.tagName !== "p") return false;
+  const meaningful = el.children.filter(
+    (c) => !(c.type === "text" && c.value.trim() === "")
+  );
+  return (
+    meaningful.length === 1 &&
+    meaningful[0].type === "element" &&
+    meaningful[0].tagName === "img"
+  );
+}
+
+function hasClass(el: HastElement, name: string): boolean {
+  const cls = el.properties?.className;
+  return Array.isArray(cls) && cls.includes(name);
+}
+
+// Runs AFTER rehype-sanitize. Everything it adds is generated here (slug IDs,
+// fixed anchor markup, a data flag, figure wrappers around already-sanitised
+// images), so the sanitiser schema stays unchanged.
+function rehypePostEnhance(headings: Heading[]) {
+  return (tree: HastRoot) => {
+    const used = new Set<string>();
+    let h2Count = 0;
+
+    tree.children = tree.children.map((node) => {
+      if (node.type !== "element") return node;
+      const el = node as HastElement;
+
+      if (isImageOnlyParagraph(el)) {
+        const img = el.children.find(
+          (c): c is HastElement => c.type === "element"
+        )!;
+        return {
+          type: "element",
+          tagName: "figure",
+          properties: { className: ["fig"] },
+          children: [
+            {
+              type: "element",
+              tagName: "div",
+              properties: { className: ["fig__in"] },
+              children: [img],
+            },
+          ],
+        } satisfies HastElement;
+      }
+
+      if (el.tagName === "p" && hasClass(el, "lead")) {
+        if (/^[A-Za-z]/.test(textOf(el).trimStart())) {
+          el.properties = { ...el.properties, dataDropcap: "true" };
+        }
+        return el;
+      }
+
+      if (el.tagName === "h2") {
+        h2Count += 1;
+        const text = textOf(el).trim();
+        const base = slugify(text) || `section-${h2Count}`;
+        let id = base;
+        for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+        used.add(id);
+
+        headings.push({ id, text: text || `Section ${h2Count}` });
+        el.properties = { ...el.properties, id };
+        // Section number marker (01, 02...), hidden from assistive tech.
+        el.children.unshift({
+          type: "element",
+          tagName: "span",
+          properties: { className: ["h2-num"], ariaHidden: "true" },
+          children: [{ type: "text", value: String(h2Count).padStart(2, "0") }],
+        });
+        // Appended after the text so the heading's accessible name starts with
+        // its own words; CSS positions it in the left margin.
+        el.children.push({
+          type: "element",
+          tagName: "a",
+          properties: {
+            className: ["anchor"],
+            href: `#${id}`,
+            ariaLabel: "Link to this section",
+          },
+          children: [{ type: "text", value: "#" }],
+        });
+      }
+
+      return el;
+    });
+  };
+}
+
+export const sanitizeSchema: SanitizeOptions = {
   ...defaultSchema,
   tagNames: [
     ...(defaultSchema.tagNames || []),
@@ -212,8 +348,11 @@ const sanitizeSchema: SanitizeOptions = {
   },
 };
 
-export async function renderMarkdown(content: string): Promise<string> {
+export async function renderMarkdownWithHeadings(
+  content: string
+): Promise<{ html: string; headings: Heading[] }> {
   const highlighter = await getHighlighter();
+  const headings: Heading[] = [];
 
   const file = await unified()
     .use(remarkParse)
@@ -221,8 +360,14 @@ export async function renderMarkdown(content: string): Promise<string> {
     .use(remarkRehype)
     .use(rehypeShiki, highlighter)
     .use(rehypeSanitize, sanitizeSchema)
+    .use(rehypePostEnhance, headings)
     .use(rehypeStringify)
     .process(content);
 
-  return String(file);
+  return { html: String(file), headings };
+}
+
+export async function renderMarkdown(content: string): Promise<string> {
+  const { html } = await renderMarkdownWithHeadings(content);
+  return html;
 }

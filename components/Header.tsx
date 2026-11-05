@@ -25,8 +25,8 @@ export function Header() {
             </a>
           )}
           <Link href="/about">About</Link>
-          <ThemeToggle />
         </nav>
+        <ThemeToggle />
       </div>
     </header>
   );
