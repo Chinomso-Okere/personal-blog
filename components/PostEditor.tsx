@@ -705,14 +705,14 @@ export function PostEditor({ editSlug }: PostEditorProps = {}) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="coverImage" className="block font-[family-name:var(--font-ui)] text-[13px] font-medium text-[var(--fg)] mb-2">
-              Cover image URL <span className="text-[var(--muted)] font-normal">(optional, https://)</span>
+              Cover image URL <span className="text-[var(--muted)] font-normal">(optional, https:// or /images/…)</span>
             </label>
             <input
               id="coverImage"
-              type="url"
+              type="text"
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="https://example.com/cover.jpg"
+              placeholder="https://example.com/cover.jpg or /images/cover.jpg"
               className="w-full rounded-[6px] border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-[13px] font-[family-name:var(--font-ui)] text-[var(--fg)] placeholder:text-[var(--muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
             />
           </div>

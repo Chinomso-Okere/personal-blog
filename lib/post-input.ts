@@ -104,7 +104,7 @@ export function normalizeParsedDate(rawDate: unknown): string {
  * - date: YYYY-MM-DD, valid calendar date
  * - description: 1 to 300 chars
  * - tags: max 3, must be members of ALLOWED_TAGS, no duplicates
- * - coverImage: optional, https:// only
+ * - coverImage: optional, https:// or /images/
  * - coverImageAlt: required and non-empty if coverImage is given
  * - originalUrl: optional, https:// only
  * - body: required, max 200,000 chars, refuses [CHECK: with line number
@@ -190,10 +190,14 @@ export function validatePostInput(fields: PostInputFields): PostValidationResult
 
   // Cover image & alt text
   if (fields.coverImage !== undefined && fields.coverImage !== null && fields.coverImage !== "") {
-    if (typeof fields.coverImage !== "string" || !fields.coverImage.startsWith("https://")) {
+    if (
+      typeof fields.coverImage !== "string" ||
+      (!fields.coverImage.startsWith("https://") &&
+        !fields.coverImage.startsWith("/images/"))
+    ) {
       return {
         success: false,
-        error: 'Cover image URL must start with "https://".',
+        error: 'Cover image URL must start with "https://" or "/images/".',
       };
     }
     if (

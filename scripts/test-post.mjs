@@ -193,19 +193,42 @@ Body text.`;
   });
   assert(!disallowedTagPost.success, "Disallowed tag is rejected");
 
-  // Cover image: https:// only & required alt text
+  // Cover image: https:// or /images/ & required alt text
+  const localCoverPost = validatePostInput({
+    ...testPost,
+    coverImage: "/images/x.png",
+    coverImageAlt: "Alt description",
+  });
+  assert(localCoverPost.success, 'a coverImage of "/images/x.png" with alt text passes');
+
   const httpCoverPost = validatePostInput({
     ...testPost,
-    coverImage: "http://insecure.com/img.png",
+    coverImage: "http://x.png",
+    coverImageAlt: "Alt description",
   });
-  assert(!httpCoverPost.success, "Non-https cover image URL is rejected");
+  assert(
+    !httpCoverPost.success &&
+      httpCoverPost.error === 'Cover image URL must start with "https://" or "/images/".',
+    'a coverImage of "http://x.png" is rejected'
+  );
+
+  const uploadsCoverPost = validatePostInput({
+    ...testPost,
+    coverImage: "/uploads/x.png",
+    coverImageAlt: "Alt description",
+  });
+  assert(
+    !uploadsCoverPost.success &&
+      uploadsCoverPost.error === 'Cover image URL must start with "https://" or "/images/".',
+    'a coverImage of "/uploads/x.png" is rejected'
+  );
 
   const missingAltPost = validatePostInput({
     ...testPost,
-    coverImage: "https://example.com/cover.png",
+    coverImage: "/images/x.png",
     coverImageAlt: "",
   });
-  assert(!missingAltPost.success, "Missing alt text when cover image URL is present is rejected");
+  assert(!missingAltPost.success, "a coverImage set with empty alt is still rejected");
 
   // Body: max 200,000 chars & [CHECK: rejection
   const longBodyPost = validatePostInput({
