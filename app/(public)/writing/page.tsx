@@ -8,23 +8,16 @@ import { formatDate } from "@/lib/format";
 import { ExternalArrow } from "@/components/ExternalArrow";
 import { Venue } from "@/components/Venue";
 import { Sep } from "@/components/Sep";
-import { siteConfig } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
 const DESCRIPTION =
   "Research papers co-authored by Chinomso Okere on multi-agent evaluation and causal reasoning, and articles written for publications.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Writing",
   description: DESCRIPTION,
-  alternates: {
-    canonical: "/writing",
-  },
-  openGraph: {
-    title: "Writing",
-    description: DESCRIPTION,
-    siteName: siteConfig.name,
-  },
-};
+  path: "/writing",
+});
 
 export default function WritingPage() {
   const entries = getWritingEntries();

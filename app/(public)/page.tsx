@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 import { getRecentPosts } from "@/lib/posts";
 import { getWritingEntries, isArticle } from "@/lib/writing";
 import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
@@ -9,19 +10,13 @@ import { PostRow } from "@/components/PostRow";
 import { ExternalArrow } from "@/components/ExternalArrow";
 import { Venue } from "@/components/Venue";
 import { CoverImage } from "@/components/CoverImage";
+import { JsonLd } from "@/components/JsonLd";
 import { Sep } from "@/components/Sep";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   description: siteConfig.description,
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: siteConfig.title,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-  },
-};
+  path: "/",
+});
 
 // "Applied AI, evidence first." -> ["Applied AI,", "evidence first."]
 function splitTagline(tagline: string): [string, string | null] {
@@ -38,8 +33,17 @@ export default function HomePage() {
   const statement = getAboutStatement();
   const [line1, line2] = splitTagline(siteConfig.tagline);
 
+  const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    sameAs: [siteConfig.links.linkedin, siteConfig.links.github].filter(Boolean),
+  };
+
   return (
     <div className="home">
+      <JsonLd data={person} />
       <section className="hero">
         <div className="site-container">
           <div className="hero__grid">

@@ -10,7 +10,9 @@ import { TocTracker } from "@/components/TocTracker";
 import { CodeCopy } from "@/components/CodeCopy";
 import { CoverImage } from "@/components/CoverImage";
 import { Sep } from "@/components/Sep";
+import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/lib/site";
+import { absoluteUrl, pageMetadata } from "@/lib/seo";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -37,23 +39,19 @@ export async function generateMetadata({
     };
   }
 
-  const canonical = post.originalUrl || `/blog/${post.slug}`;
-
-  return {
+  return pageMetadata({
     title: post.title,
     description: post.description,
-    alternates: {
-      canonical,
-    },
-    openGraph: {
-      type: "article",
-      title: post.title,
-      description: post.description,
-      publishedTime: post.date,
-      siteName: siteConfig.name,
-      ...(post.coverImage ? { images: [post.coverImage] } : {}),
-    },
-  };
+    path: postCanonical(post),
+    image: post.coverImage,
+    imageAlt: post.coverImageAlt,
+    article: { publishedTime: post.date },
+  });
+}
+
+// A post republished from elsewhere keeps the original as its canonical.
+function postCanonical(post: { slug: string; originalUrl?: string }): string {
+  return post.originalUrl || `/blog/${post.slug}`;
 }
 
 const AUTHOR_INITIALS = siteConfig.name
@@ -98,8 +96,20 @@ export default async function PostPage({ params }: PostPageProps) {
   const allPosts = getAllPosts();
   const morePosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 2);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    ...(post.description ? { description: post.description } : {}),
+    datePublished: post.date,
+    author: { "@type": "Person", name: siteConfig.name, url: siteConfig.url },
+    url: absoluteUrl(postCanonical(post)),
+    ...(post.coverImage ? { image: absoluteUrl(post.coverImage) } : {}),
+  };
+
   return (
     <article className="post">
+      <JsonLd data={structuredData} />
       <div className="post__wrap">
         <div className="post__grid">
           <header className="post__head">

@@ -3,22 +3,14 @@ import path from "path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { renderMarkdown } from "@/lib/markdown";
-import { siteConfig } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description:
     "About Chinomso Okere: business analyst and applied AI researcher writing about evaluating AI agents and putting AI into real work.",
-  alternates: {
-    canonical: "/about",
-  },
-  openGraph: {
-    title: "About",
-    description:
-      "About Chinomso Okere: business analyst and applied AI researcher writing about evaluating AI agents and putting AI into real work.",
-    siteName: siteConfig.name,
-  },
-};
+  path: "/about",
+});
 
 export default async function AboutPage() {
   const aboutPath = path.join(process.cwd(), "content", "about.md");

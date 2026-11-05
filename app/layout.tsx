@@ -32,10 +32,6 @@ export const metadata: Metadata = {
     template: "%s | Chinomso Okere",
   },
   description: siteConfig.description,
-  robots: {
-    index: false,
-    follow: false,
-  },
 };
 
 const themeBootstrapScript = `(function(){try{var t=localStorage.getItem('blogTheme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;

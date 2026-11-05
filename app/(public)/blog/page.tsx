@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
 import { PostRow } from "@/components/PostRow";
-import { siteConfig } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog",
   description:
     "Long-form articles on evaluating AI agents, voice systems, and production engineering.",
-  alternates: {
-    canonical: "/blog",
-  },
-  openGraph: {
-    title: "Blog",
-    description:
-      "Long-form articles on evaluating AI agents, voice systems, and production engineering.",
-    siteName: siteConfig.name,
-  },
-};
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const posts = getAllPosts();

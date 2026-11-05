@@ -85,7 +85,8 @@ update to the "Current status" section below.
     - C: home (hero capped at 96px, Latest feature, dark research band from `writing.json`, "What I write about" from `about.md`, About strip), `/blog` rows, Writing and About restyled.
     - D: contrast AA on every measured pair, full-size image links, 44px touch targets on coarse pointers, zero layout shift, route cross-fade, dead CSS removed. Lighthouse accessibility 100 on home and post.
     - D follow-up: local `/images/` covers served through `next/image` (quality 90, ~2x variants on desktop so diagram text stays crisp; `https` covers stay plain `<img>`), body figures lazy-loaded. Mobile Lighthouse performance: home 85 -> 86 (median of 3), post 77 -> 86.
-- **Next:** awaiting Nonso's review. Open options: `/blog/tag/[tag]` pages; series support (PLAN Phase E); not preloading the Newsreader italic font (skipped for now).
+  - Search launch (built, awaiting commit and live check): indexing open (admin and API stay noindex), robots.txt and sitemap.xml on `siteConfig.url`, absolute canonicals and og:url everywhere via `lib/seo.ts`, Twitter cards, BlogPosting and Person JSON-LD.
+- **Next:** commit and verify the search launch live; then the approved follow-up round: a default branded OG image (`next/og`, Newsreader TTF) and an RSS feed at `/feed.xml`. Other open options: `/blog/tag/[tag]` pages; series support (PLAN Phase E); not preloading the Newsreader italic font (skipped for now).
 - **Locked versions & environment:**
   - Node.js: `v24.22.1`
   - `next`: `16.4.4`
@@ -105,15 +106,16 @@ update to the "Current status" section below.
 ## Pre-launch checklist
 
 Everything that must change before the site goes public:
-- [ ] Remove site-wide noindex from root metadata in `app/layout.tsx`
-- [ ] Change `app/robots.ts` to allow search indexing and add the sitemap line
+- [x] Remove site-wide noindex from root metadata in `app/layout.tsx` (admin stays noindex via its layouts plus an `X-Robots-Tag` header on `/admin` and `/api`)
+- [x] Change `app/robots.ts` to allow search indexing and add the sitemap line (allows `/`, disallows `/admin` and `/api`)
 - [x] Delete both [Sample post] files in `content/posts/`
-- [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables
+- [x] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables (`https://chinomsookere.co.uk`, confirmed by Nonso; vercel.app redirects to it)
 - [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
 - [ ] Add the About photo at public/images/chinomso-okere.jpg
 - [ ] Add the ICSRS paper URLs to content/writing.json when proceedings are published
 - [ ] Confirm the CausalAgentBench title matches the camera-ready version
 - [ ] Confirm the AAIML DOI resolves
+- [ ] After deploy: submit `https://chinomsookere.co.uk/sitemap.xml` in Google Search Console and Bing Webmaster Tools, and check a post in LinkedIn Post Inspector
 
 ## Checkpoint (c) notes
 

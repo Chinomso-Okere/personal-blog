@@ -5,9 +5,11 @@ export const siteConfig = {
   description:
     "Writing by Chinomso Okere on evaluating AI agents and putting AI into real work.",
   bio: "applied AI researcher and business analyst, writing about evaluating AI agents and putting AI into real work.",
-  url:
+  // No trailing slash, so `${url}/blog` never becomes "//blog".
+  url: (
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://personal-blog-omega-flax.vercel.app",
+    "https://personal-blog-omega-flax.vercel.app"
+  ).replace(/\/+$/, ""),
   links: {
     github: "https://github.com/Chinomso-Okere",
     linkedin: "https://www.linkedin.com/in/chinomso-okere-silverpathai",
