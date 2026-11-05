@@ -31,7 +31,7 @@ export default async function AboutPage() {
   return (
     <div className="site-container">
       <article className="article article--page">
-        <h1>About</h1>
+        <h1 className="page-title">About</h1>
 
         {hasPhoto && (
           <div className="mb-8">
