@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
-import { PostCard } from "@/components/PostCard";
+import { PostRow } from "@/components/PostRow";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -22,22 +22,21 @@ export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <div className="site-container py-12 md:py-16">
-      <div className="article-col">
-        <header className="mb-10">
-          <h1 className="font-[family-name:var(--font-display)] text-[clamp(32px,5vw,42px)] font-medium leading-[1.15] tracking-[-0.015em] mb-3 text-[var(--fg)]">
-            Blog
-          </h1>
-          <p className="font-[family-name:var(--font-ui)] text-[15px] text-[var(--muted)] leading-relaxed">
+    <div className="site-container">
+      <div className="page-col">
+        <header className="page-head">
+          <h1 className="page-title">Blog</h1>
+          <p className="page-intro">
             Long-form technical articles, evaluations, and architecture notes.
+          </p>
+          <p className="page-count">
+            {posts.length} {posts.length === 1 ? "post" : "posts"}
           </p>
         </header>
 
-        <div className="space-y-8">
+        <div className="post-list">
           {posts.map((post) => (
-            <article key={post.slug} className="border-b border-[var(--border)] pb-8 last:border-b-0">
-              <PostCard post={post} headingLevel="h2" />
-            </article>
+            <PostRow key={post.slug} post={post} headingLevel="h2" />
           ))}
         </div>
       </div>

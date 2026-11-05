@@ -30,24 +30,26 @@ export default async function AboutPage() {
 
   return (
     <div className="site-container">
-      <article className="article">
-        <h1>About</h1>
+      <div className="page-col">
+        <article className="article article--page">
+          <h1 className="page-title">About</h1>
 
-        {hasPhoto && (
-          <div className="mb-8">
-            <Image
-              src="/images/chinomso-okere.jpg"
-              alt="Photo of Chinomso Okere"
-              width={128}
-              height={128}
-              className="w-[128px] h-[128px] rounded-[10px] border border-[var(--border)] object-cover"
-              priority
-            />
-          </div>
-        )}
+          {hasPhoto && (
+            <div className="mb-8">
+              <Image
+                src="/images/chinomso-okere.jpg"
+                alt="Photo of Chinomso Okere"
+                width={128}
+                height={128}
+                className="w-[128px] h-[128px] rounded-[10px] border border-[var(--border)] object-cover"
+                priority
+              />
+            </div>
+          )}
 
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-      </article>
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </article>
+      </div>
     </div>
   );
 }

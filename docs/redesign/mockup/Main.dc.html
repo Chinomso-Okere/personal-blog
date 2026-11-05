@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.root{--bg:#F5F1E8;--paper:#FBF8F1;--fg:#211B12;--muted:#6F6553;--line:#E4DBCB;--accent:#9C3B1B;--band:#211B12;--bandfg:#F5F1E8;--bandmuted:#BDB19B;--bandline:#3A3023;--bandaccent:#E59A5E;--tint:#EDE5D3;background:var(--bg);color:var(--fg);font-family:"Newsreader",Georgia,serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;min-height:100%}
+.root[data-theme="dark"]{--bg:#191510;--paper:#221C14;--fg:#ECE3D2;--muted:#A79B84;--line:#332A1E;--accent:#E59A5E;--band:#120E09;--bandfg:#ECE3D2;--bandmuted:#A79B84;--bandline:#2A2318;--bandaccent:#E59A5E;--tint:#2A2318}
+.root *{box-sizing:border-box}
+.root a{color:inherit;text-decoration:none}
+.ui{font-family:"Inter",system-ui,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+
+.mast{border-bottom:1px solid var(--line)}
+.mast-in{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.brand{font-size:25px;font-weight:500;letter-spacing:-.015em}
+.nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.nl{position:relative;display:inline-block;padding:13px 0;font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nl::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.nl:hover{color:var(--fg)}
+.nl:hover::after{transform:scaleX(1)}
+.toggle{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:500 12px "Inter",sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.toggle .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+
+.hero{padding:clamp(56px,9vw,112px) 0 0}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:clamp(32px,6vw,88px);align-items:end}
+.eyebrow{margin:0 0 26px;font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.display{margin:0;font-size:clamp(52px,9.2vw,124px);line-height:.95;letter-spacing:-.035em;font-weight:400;font-variation-settings:"opsz" 72}
+.display em{font-style:italic;color:var(--accent);font-weight:400}
+.lede{margin:0 0 30px;font-size:clamp(20px,2vw,25px);line-height:1.5;color:var(--fg);max-width:34ch}
+.cta{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;background:var(--fg);color:var(--bg) !important;font-size:14px;font-weight:500;letter-spacing:.02em;transition:transform .2s ease,background .2s ease}
+.btn:hover{transform:translateY(-1px);background:var(--accent)}
+.link{font-size:14px;font-weight:500;border-bottom:1.5px solid var(--line);padding-bottom:3px;transition:border-color .2s ease,color .2s ease}
+.link:hover{color:var(--accent);border-color:var(--accent)}
+.topics{margin-top:clamp(48px,7vw,88px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0}
+.topics-in{display:flex;flex-wrap:wrap;gap:10px 10px}
+.pill{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;font-weight:500;color:var(--muted);background:transparent}
+.pill:hover{color:var(--fg);border-color:var(--muted)}
+
+.sec{padding:clamp(64px,8vw,104px) 0 0}
+.sec-head{display:flex;align-items:center;gap:20px;margin-bottom:36px}
+.sec-label{font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--fg);white-space:nowrap}
+.rule{flex:1;height:1px;background:var(--line)}
+.sec-link{font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap}
+.sec-link:hover{color:var(--accent)}
+
+.feature{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:center}
+.feature-img{display:block;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);transition:transform .35s ease}
+.feature-img img{display:block;width:100%;height:auto}
+.feature:hover .feature-img{transform:translateY(-3px)}
+.kicker{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 20px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.k-tag{font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.k-dot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.feature-title{margin:0 0 18px;font-size:clamp(32px,3.7vw,48px);line-height:1.08;letter-spacing:-.022em;font-weight:500}
+.feature-title a{background-image:linear-gradient(var(--accent),var(--accent));background-size:0 1.5px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .35s ease}
+.feature:hover .feature-title a{background-size:100% 1.5px}
+.feature-desc{margin:0 0 22px;font-size:20px;line-height:1.55;color:var(--muted)}
+.meta{margin:0 0 26px;font-size:13px;color:var(--muted)}
+.read{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--accent)}
+.read .arr{transition:transform .25s ease}
+.feature:hover .read .arr{transform:translateX(5px)}
+.slot{margin-top:40px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:26px 30px;border:1.5px dashed var(--line);border-radius:14px}
+.slot-l{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap}
+.slot-n{font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.slot-t{font-size:24px;letter-spacing:-.01em;color:var(--muted);font-style:italic}
+.slot-s{font-size:13px;color:var(--muted)}
+
+.band{margin-top:clamp(72px,9vw,120px);background:var(--band);color:var(--bandfg);padding:clamp(64px,8vw,104px) 0}
+.band-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:clamp(24px,5vw,72px);margin-bottom:48px;align-items:start}
+.eb{margin:0;font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--bandaccent)}
+.band-title{margin:0;font-size:clamp(30px,3.4vw,46px);line-height:1.12;letter-spacing:-.02em;font-weight:400;max-width:22ch}
+.ledger{list-style:none;margin:0;padding:0;border-top:1px solid var(--bandline)}
+.row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:clamp(16px,3vw,40px);align-items:start;padding:30px 0;border-bottom:1px solid var(--bandline)}
+.yr{font-size:14px;font-weight:500;letter-spacing:.08em;color:var(--bandmuted);padding-top:7px}
+.row h3{margin:0 0 10px;font-size:clamp(21px,2vw,26px);line-height:1.25;letter-spacing:-.012em;font-weight:500}
+.row p{margin:0;font-size:14.5px;line-height:1.6;color:var(--bandmuted)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
+.chip.pub{background:var(--bandaccent);color:#211B12}
+.chip.acc{border:1px solid var(--bandmuted);color:var(--bandfg)}
+
+.idx{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.idx li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:20px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line);transition:padding .3s ease}
+.idx li:hover{padding-left:12px}
+.idx .n{font-size:13px;font-weight:600;letter-spacing:.1em;color:var(--accent)}
+.idx .t{font-size:clamp(24px,2.8vw,36px);line-height:1.2;letter-spacing:-.018em}
+.idx .go{font-size:22px;color:var(--muted);transition:transform .25s ease,color .25s ease}
+.idx li:hover .go{transform:translateX(4px);color:var(--accent)}
+
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr);gap:clamp(24px,5vw,72px);align-items:start}
+.about p.big{margin:0 0 26px;font-size:clamp(24px,2.7vw,34px);line-height:1.35;letter-spacing:-.012em}
+.about p.big em{font-style:italic;color:var(--accent)}
+
+.foot{margin-top:clamp(72px,9vw,120px);border-top:1px solid var(--line);padding:44px 0 56px}
+.foot-in{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.foot p{margin:0;max-width:44ch;font-size:15px;line-height:1.6;color:var(--muted)}
+.foot p strong{color:var(--fg);font-weight:600}
+.foot-links{display:flex;gap:26px;flex-wrap:wrap;font-size:14px;font-weight:500}
+.foot-links a{padding:10px 0;border-bottom:1.5px solid transparent}
+.foot-links a:hover{color:var(--accent);border-color:var(--accent)}
+.foot-c{margin-top:28px;font-size:12.5px;color:var(--muted)}
+
+@media (max-width:900px){
+.hero-grid{grid-template-columns:minmax(0,1fr)}
+.feature{grid-template-columns:minmax(0,1fr)}
+.band-head{grid-template-columns:minmax(0,1fr)}
+.about{grid-template-columns:minmax(0,1fr)}
+.row{grid-template-columns:minmax(0,1fr)}
+.yr{padding-top:0}
+.idx li{grid-template-columns:44px minmax(0,1fr) auto}
+}
+:where(.root *){transition-property:background-color,border-color,color;transition-duration:.45s;transition-timing-function:ease}
+.root{font-feature-settings:"kern","liga","calt"}
+.root ::selection{background:color-mix(in srgb,var(--accent) 24%,transparent)}
+.root :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:16px;top:-64px;z-index:20;padding:12px 18px;border-radius:999px;background:var(--fg);color:var(--bg) !important;font:600 13px "Inter",sans-serif;transition:top .2s ease}
+.skip:focus{top:12px}
+.mast{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}
+.toggle{gap:12px;padding:0 16px 0 10px;transition:border-color .25s ease,color .25s ease}
+.toggle:hover{border-color:var(--muted);color:var(--fg)}
+.toggle .dot{display:none}
+.track{position:relative;flex:none;width:38px;height:22px;border-radius:999px;border:1px solid var(--line);background:var(--tint)}
+.knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.toggle[data-on="on"] .knob{transform:translateX(16px)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+@keyframes lineup{from{transform:translateY(108%)}
+to{transform:none}
+}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+.d1{animation-delay:.05s}
+.d2{animation-delay:.18s}
+.d3{animation-delay:.34s}
+.d4{animation-delay:.48s}
+.d5{animation-delay:.62s}
+.ln{display:block;overflow:hidden;padding-bottom:.14em;margin-bottom:-.14em}
+.ln>span{display:inline-block;animation:lineup 1.1s cubic-bezier(.16,1,.3,1) both}
+.ln.l2>span{animation-delay:.14s}
+.btn:active{transform:scale(.98)}
+.btn .barr{display:inline-block;margin-left:10px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.btn:hover .barr{transform:translateX(4px)}
+.pill{transition:color .2s ease,border-color .2s ease,background-color .2s ease}
+.pill:hover{background:var(--tint)}
+.feature-img{transition:border-color .4s ease,box-shadow .5s ease}
+.feature-img img{transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.feature:hover .feature-img{transform:none;border-color:var(--muted);box-shadow:0 24px 48px -24px rgba(33,27,18,.28)}
+.feature:hover .feature-img img{transform:scale(1.03)}
+.idx li{position:relative}
+.idx li::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.idx li:hover::after{transform:scaleX(1)}
+.display,.feature-title,.band-title,.idx .t,.about p.big,.row h3{text-wrap:balance}
+.lede,.feature-desc,.row p,.foot p{text-wrap:pretty}
+.meta,.yr,.n,.foot-c{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){
+.rise,.ln>span{animation:none !important}
+.root *,.root *::after{transition-duration:.01ms !important}
+}
+</style>
+</helmet>
+<div class="root" data-theme="{{theme}}">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="mast">
+<div class="wrap mast-in">
+<a class="brand" href="#">Chinomso Okere</a>
+<nav class="nav ui" aria-label="Main">
+<a class="nl" href="#">Blog</a>
+<a class="nl" href="#">Writing</a>
+<a class="nl" href="#">About</a>
+<button class="toggle" type="button" role="switch" aria-checked="{{isDark}}" aria-label="Dark mode" data-on="{{switchOn}}" onClick="{{toggleTheme}}"><span class="track"><span class="knob"></span></span><span>{{themeLabel}}</span></button>
+</nav>
+</div>
+</header>
+
+<main id="main">
+<section class="hero">
+<div class="wrap">
+<div class="hero-grid">
+<div>
+<p class="eyebrow ui rise d1">Applied AI researcher &middot; Business analyst &middot; Scotland</p>
+<h1 class="display"><span class="ln"><span>Applied AI,</span></span><span class="ln l2"><span><em>evidence first.</em></span></span></h1>
+</div>
+<div>
+<p class="lede rise d3">I write about what actually works in AI, and what is only a good demo: evaluating agents, multi-agent systems, voice agents, and putting AI into real organisations.</p>
+<div class="cta ui rise d4">
+<a class="btn" href="#">Read the writing<span class="barr">&rarr;</span></a>
+<a class="link" href="#">Research papers &rarr;</a>
+</div>
+</div>
+</div>
+<div class="topics ui rise d5">
+<div class="topics-in">
+<a class="pill" href="#">AI Evaluation</a>
+<a class="pill" href="#">Multi-Agent Systems</a>
+<a class="pill" href="#">Causal Reasoning</a>
+<a class="pill" href="#">Voice AI</a>
+<a class="pill" href="#">Responsible AI</a>
+<a class="pill" href="#">AI Implementation</a>
+<a class="pill" href="#">Business Analysis</a>
+<a class="pill" href="#">UK AI</a>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sec">
+<div class="wrap">
+<div class="sec-head ui">
+<span class="sec-label">Latest</span>
+<span class="rule"></span>
+<a class="sec-link" href="#">All posts &rarr;</a>
+</div>
+<article class="feature">
+<a class="feature-img" href="#"><img src="/_blob/6d00051800cf8bcc457783330a447034" alt="The five layers of an AI build: AI layer, backend, storage, optional frontend and infrastructure, with the AI layer marked as the easy part"></a>
+<div>
+<p class="kicker ui"><span class="k-tag">AI Implementation</span><span class="k-dot"></span><span>Series &middot; The AI build playbook</span></p>
+<h2 class="feature-title"><a href="#">My AI build playbook, part 1: the model is the easy part</a></h2>
+<p class="feature-desc">The principles behind reliable outputs, and a stack you add to only when a build needs it.</p>
+<p class="meta ui">November 2026 &middot; 6 min read</p>
+<a class="read ui" href="#">Read the post <span class="arr">&rarr;</span></a>
+</div>
+</article>
+<div class="slot">
+<div class="slot-l">
+<span class="slot-n ui">Next in the series</span>
+<span class="slot-t">Part 2 &middot; [title to come]</span>
+</div>
+<span class="slot-s ui">[date to come]</span>
+</div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<div class="band-head">
+<p class="eb ui">Research</p>
+<h2 class="band-title">Co-authored work on multi-agent evaluation and causal reasoning</h2>
+</div>
+<ul class="ledger">
+<li class="row">
+<span class="yr ui">2026</span>
+<div>
+<h3>Persona-Driven Feedback Agents for High-Stakes Documents: A Multi-Perspective Evaluation of Global Talent Visa Submissions</h3>
+<p class="ui">IEEE AAIML 2026, pp. 367&ndash;372. A research prototype evaluated on 20 synthetic applications, with no real-world outcome validation.</p>
+</div>
+<span class="chip pub ui">Published</span>
+</li>
+<li class="row">
+<span class="yr ui">2026</span>
+<div>
+<h3>Adversarial Causal Deliberation among Autonomous Agents for Reliable Consumer Behaviour Explanation</h3>
+<p class="ui">ICSRS 2026, Rome. A simulation study in which agents with competing roles must challenge a causal claim before it is accepted.</p>
+</div>
+<span class="chip acc ui">Accepted &middot; awaiting publication</span>
+</li>
+<li class="row">
+<span class="yr ui">2026</span>
+<div>
+<h3>CausalAgentBench: Reliability-Aware Benchmarking of Causal Reasoning, Coordination and Explainability in Multi-Agent Consumer Intelligence</h3>
+<p class="ui">ICSRS 2026, Rome. A benchmark that scores the handoffs between components of a causal analytics pipeline.</p>
+</div>
+<span class="chip acc ui">Accepted &middot; awaiting publication</span>
+</li>
+</ul>
+</div>
+</section>
+
+<section class="sec">
+<div class="wrap">
+<div class="sec-head ui">
+<span class="sec-label">What I write about</span>
+<span class="rule"></span>
+</div>
+<ul class="idx">
+<li><span class="n ui">01</span><span class="t">Evaluating AI agents</span><span class="go ui">&rarr;</span></li>
+<li><span class="n ui">02</span><span class="t">Multi-agent systems and causal reasoning</span><span class="go ui">&rarr;</span></li>
+<li><span class="n ui">03</span><span class="t">Building voice agents: design, guardrails and failure modes</span><span class="go ui">&rarr;</span></li>
+<li><span class="n ui">04</span><span class="t">AI implementation in real organisations, through the business-analysis lens</span><span class="go ui">&rarr;</span></li>
+<li><span class="n ui">05</span><span class="t">UK and Scottish AI: policy, ecosystem and what it means in practice</span><span class="go ui">&rarr;</span></li>
+</ul>
+</div>
+</section>
+
+<section class="sec">
+<div class="wrap">
+<div class="about">
+<div class="sec-head ui" style="margin-bottom: 0">
+<span class="sec-label">About</span>
+<span class="rule"></span>
+</div>
+<div>
+<p class="big">I'm a business analyst, applied AI researcher and builder, based in Scotland. I care less about whether a system produces an impressive answer and more about whether anyone can <em>show the answer is right.</em></p>
+<a class="link ui" href="#">More about me &rarr;</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="foot">
+<div class="wrap">
+<div class="foot-in">
+<p><strong>Chinomso Okere</strong> &mdash; applied AI researcher and business analyst, writing about evaluating AI agents and putting AI into real work.</p>
+<nav class="foot-links ui" aria-label="Elsewhere">
+<a href="#">LinkedIn</a>
+<a href="#">GitHub</a>
+<a href="#">Email</a>
+</nav>
+</div>
+<p class="foot-c ui">&copy; 2026 Chinomso Okere</p>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":3000}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const theme = st.theme || (this.props.theme === 'dark' ? 'dark' : 'light');
+const dark = theme === 'dark';
+return {
+theme: theme,
+isDark: dark,
+switchOn: dark ? 'on' : 'off',
+themeLabel: dark ? 'Dark' : 'Light',
+toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' })
+};
+}
+}
+</script>
+</body>
+</html>

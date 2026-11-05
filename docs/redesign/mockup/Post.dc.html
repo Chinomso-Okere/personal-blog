@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Post</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.root{--bg:#F5F1E8;--paper:#FBF8F1;--fg:#211B12;--muted:#6F6553;--line:#E4DBCB;--accent:#9C3B1B;--code:#2A2317;--codefg:#EADFC9;--codeline:#3D3322;--tint:#EDE5D3;background:var(--bg);color:var(--fg);font-family:"Newsreader",Georgia,serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;min-height:100%}
+.root[data-theme="dark"]{--bg:#191510;--paper:#221C14;--fg:#ECE3D2;--muted:#A79B84;--line:#332A1E;--accent:#E59A5E;--code:#120E09;--codefg:#E7DDC8;--codeline:#2A2318;--tint:#2A2318}
+.root *{box-sizing:border-box}
+.root a{color:inherit;text-decoration:none}
+.ui{font-family:"Inter",system-ui,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+.wrap-w{max-width:1320px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+
+.mast{position:sticky;top:0;z-index:5;background:var(--bg)}
+.mast-in{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.brand{font-size:25px;font-weight:500;letter-spacing:-.015em}
+.nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.nl{position:relative;display:inline-block;padding:13px 0;font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nl::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.nl:hover{color:var(--fg)}
+.nl:hover::after{transform:scaleX(1)}
+.toggle{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:500 12px "Inter",sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.toggle .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.prog{height:3px;background:var(--line)}
+.prog i{display:block;width:38%;height:100%;background:var(--accent)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,680px) minmax(0,1fr);column-gap:56px}
+.head{grid-column:2 / 4;max-width:900px;padding:clamp(48px,7vw,88px) 0 0}
+.kicker{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 26px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.k-tag{font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.k-dot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.title{margin:0 0 26px;font-size:clamp(40px,6vw,78px);line-height:1;letter-spacing:-.032em;font-weight:400;font-variation-settings:"opsz" 72}
+.dek{margin:0 0 34px;font-size:clamp(21px,2.2vw,27px);line-height:1.45;color:var(--muted);max-width:32em;font-style:italic}
+.by{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;letter-spacing:.04em}
+.by strong{color:var(--fg);font-weight:600}
+.by .sep{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+
+.cover{margin:clamp(36px,5vw,56px) auto 0;max-width:1100px;padding:0 clamp(20px,5vw,56px)}
+.cover-in{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--paper)}
+.cover-in img{display:block;width:100%;height:auto}
+.cap{margin:14px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.cap b{font-weight:600;color:var(--fg)}
+
+.body-grid{padding-top:clamp(40px,5vw,64px)}
+.toc{grid-column:1;grid-row:1;justify-self:end;width:190px;align-self:start;position:sticky;top:96px}
+.toc-l{margin:0 0 16px;font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:block;padding:9px 0 9px 16px;margin-left:-1px;border-left:2px solid var(--line);font-size:14px;line-height:1.4;color:var(--muted);transition:color .2s ease,border-color .2s ease}
+.toc a:hover{color:var(--fg)}
+.toc a.on{border-color:var(--accent);color:var(--fg);font-weight:600}
+.article{grid-column:2;grid-row:1;min-width:0;font-size:20.5px;line-height:1.72}
+.article p{margin:0 0 1.35em}
+.article p.lead{font-size:27px;line-height:1.5;letter-spacing:-.008em;margin-bottom:1.2em}
+.article p.lead::first-letter{float:left;font-size:4.7em;line-height:.8;padding:.06em .1em 0 0;font-weight:500;color:var(--accent)}
+.article a.in{border-bottom:1.5px solid var(--accent)}
+.article :not(pre) > code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.82em;padding:.12em .4em;border-radius:5px;background:var(--tint)}
+.h2{margin:2.2em 0 .7em}
+.h2 .num{display:block;margin-bottom:12px;font-size:12.5px;font-weight:600;letter-spacing:.16em;color:var(--accent)}
+.h2 h2{margin:0;font-size:clamp(30px,3.2vw,40px);line-height:1.15;letter-spacing:-.022em;font-weight:500}
+.pull{margin:2em -176px 2em 0;padding:8px 0 8px 32px;border-left:3px solid var(--accent)}
+.pull p{margin:0;font-size:clamp(28px,3.1vw,42px);line-height:1.2;letter-spacing:-.02em;font-style:italic;font-weight:400}
+.codeblock{margin:1.8em 0;border-radius:12px;overflow:hidden;background:var(--code);color:var(--codefg)}
+.codebar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 18px;border-bottom:1px solid var(--codeline);font:500 12.5px "JetBrains Mono",ui-monospace,monospace;color:#A79B84}
+.copy{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--codeline);border-radius:8px;background:transparent;color:var(--codefg);font:500 12px "Inter",sans-serif;cursor:pointer}
+.copy:hover{border-color:#A79B84}
+.codeblock pre{margin:0;padding:20px 22px;overflow-x:auto;font:400 15.5px/1.7 "JetBrains Mono",ui-monospace,monospace}
+.codeblock .cl{display:block;white-space:pre;min-height:1.7em}
+.codeblock .k{color:#E59A5E}
+.codeblock .t{color:#E3C58A}
+.codeblock .f{color:#F4EAD5;font-weight:500}
+.fig{margin:2em -176px 2em 0}
+.fig-in{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
+.fig-in img{display:block;width:100%;height:auto}
+.endmark{margin:2.4em 0 0;text-align:center;letter-spacing:.7em;color:var(--accent);font-size:18px}
+
+.author{margin-top:clamp(56px,7vw,88px);padding:32px;border:1px solid var(--line);border-radius:16px;background:var(--paper);display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.author .av{width:56px;height:56px;font-size:18px;flex:none}
+.author h3{margin:0 0 6px;font-size:22px;font-weight:500;letter-spacing:-.012em}
+.author p{margin:0 0 14px;font-size:16.5px;line-height:1.6;color:var(--muted);max-width:46ch}
+.author a{font-size:13.5px;font-weight:600;color:var(--accent)}
+
+.series{margin-top:clamp(56px,7vw,88px)}
+.sec-head{display:flex;align-items:center;gap:20px;margin-bottom:28px}
+.sec-label{font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.rule{flex:1;height:1px;background:var(--line)}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.card{display:block;padding:28px;border:1px solid var(--line);border-radius:16px;background:var(--paper);transition:transform .3s ease,border-color .3s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--muted)}
+.card.ghost{background:transparent;border:1.5px dashed var(--line)}
+.card .lab{margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.card.ghost .lab{color:var(--muted)}
+.card .ct{margin:0;font-size:26px;line-height:1.2;letter-spacing:-.016em;font-weight:500}
+.card.ghost .ct{color:var(--muted);font-style:italic;font-weight:400}
+
+.foot{margin-top:clamp(72px,9vw,120px);border-top:1px solid var(--line);padding:44px 0 56px}
+.foot-in{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.foot p{margin:0;max-width:44ch;font-size:15px;line-height:1.6;color:var(--muted)}
+.foot p strong{color:var(--fg);font-weight:600}
+.foot-links{display:flex;gap:26px;flex-wrap:wrap;font-size:14px;font-weight:500}
+.foot-links a{padding:10px 0;border-bottom:1.5px solid transparent}
+.foot-links a:hover{color:var(--accent);border-color:var(--accent)}
+.foot-c{margin-top:28px;font-size:12.5px;color:var(--muted)}
+
+@media (max-width:1100px){
+.grid{grid-template-columns:minmax(0,1fr)}
+.head{grid-column:1}
+.toc{display:none}
+.article{grid-column:1}
+.pull{margin-right:0}
+.fig{margin-right:0}
+.pair{grid-template-columns:minmax(0,1fr)}
+}
+:where(.root *){transition-property:background-color,border-color,color;transition-duration:.45s;transition-timing-function:ease}
+.root{font-feature-settings:"kern","liga","calt"}
+.root ::selection{background:color-mix(in srgb,var(--accent) 24%,transparent)}
+.root :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:16px;top:-64px;z-index:20;padding:12px 18px;border-radius:999px;background:var(--fg);color:var(--bg) !important;font:600 13px "Inter",sans-serif;transition:top .2s ease}
+.skip:focus{top:12px}
+.mast{background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}
+.toggle{gap:12px;padding:0 16px 0 10px;transition:border-color .25s ease,color .25s ease}
+.toggle:hover{border-color:var(--muted);color:var(--fg)}
+.toggle .dot{display:none}
+.track{position:relative;flex:none;width:38px;height:22px;border-radius:999px;border:1px solid var(--line);background:var(--tint)}
+.knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.toggle[data-on="on"] .knob{transform:translateX(16px)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+.d1{animation-delay:.05s}
+.d2{animation-delay:.18s}
+.d3{animation-delay:.34s}
+.d4{animation-delay:.48s}
+.d5{animation-delay:.62s}
+.prog i{transition:width .3s ease}
+.nl,.article a.in{transition:color .2s ease}
+.h2 h2{position:relative}
+.anchor{position:absolute;left:-1.2em;top:.05em;opacity:0;font:500 .62em "Inter",sans-serif;color:var(--accent);transition:opacity .2s ease}
+.h2 h2:hover .anchor,.anchor:focus-visible{opacity:1}
+.copy{transition:border-color .2s ease,color .2s ease}
+.copy[data-done="yes"]{border-color:#E59A5E;color:#E59A5E}
+.card:hover{box-shadow:0 18px 40px -22px rgba(33,27,18,.3)}
+.cover-in,.fig-in{transition:border-color .4s ease}
+.cover-in:hover,.fig-in:hover{border-color:var(--muted)}
+.title,.dek,.h2 h2,.pull p,.card .ct{text-wrap:balance}
+.article p,.author p,.foot p{text-wrap:pretty}
+.by,.k-tag,.toc a{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){
+.rise{animation:none !important}
+.root *,.root *::after{transition-duration:.01ms !important}
+}
+</style>
+</helmet>
+<div class="root" data-theme="{{theme}}">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="mast">
+<div class="wrap mast-in">
+<a class="brand" href="#">Chinomso Okere</a>
+<nav class="nav ui" aria-label="Main">
+<a class="nl" href="#">Blog</a>
+<a class="nl" href="#">Writing</a>
+<a class="nl" href="#">About</a>
+<button class="toggle" type="button" role="switch" aria-checked="{{isDark}}" aria-label="Dark mode" data-on="{{switchOn}}" onClick="{{toggleTheme}}"><span class="track"><span class="knob"></span></span><span>{{themeLabel}}</span></button>
+</nav>
+</div>
+<div class="prog" aria-hidden="true"><i></i></div>
+</header>
+
+<main id="main">
+<div class="wrap-w">
+<div class="grid">
+<div class="head">
+<p class="kicker ui rise d1"><span class="k-tag">AI Implementation</span><span class="k-dot"></span><span>Series &middot; The AI build playbook, part 1</span></p>
+<h1 class="title rise d2">My AI build playbook, part 1: the model is the easy part</h1>
+<p class="dek rise d3">Part one of the playbook I use to build AI systems: the principles behind reliable outputs, and a stack you add to only when a build needs it.</p>
+<div class="by ui rise d4">
+<span class="av">CO</span>
+<span><strong>Chinomso Okere</strong></span>
+<span class="sep"></span>
+<span>November 2026</span>
+<span class="sep"></span>
+<span>6 min read</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="cover rise d5">
+<div class="cover-in"><img src="/_blob/6d00051800cf8bcc457783330a447034" alt="The five layers of an AI build: AI layer, backend, storage, optional frontend and infrastructure, with the AI layer marked as the easy part"></div>
+</div>
+
+<div class="wrap-w body-grid">
+<div class="grid">
+<aside class="toc ui" aria-label="On this page">
+<p class="toc-l">On this page</p>
+<a class="on" href="#">Five layers, and the discipline of using few</a>
+<a href="#">The principles that make outputs reliable</a>
+<a href="#">A stack you add to, not start with</a>
+</aside>
+
+<article class="article">
+<p class="lead">The hardest part of building an AI system is almost never the AI. The model call is usually a single API request, and the work that decides whether the system holds up is everything around it.</p>
+<p>This is the first part of a series on the playbook I use to build AI systems, and it starts with the shape of the thing: the layers a build can have, and the discipline of using only the ones it needs.</p>
+<p>I keep this playbook so that no build has to re-argue the same basic decisions, and so that a coding agent can be pointed at it and stay inside choices I already trust. It is less a tutorial than a set of defaults with reasons attached.</p>
+
+<div class="h2"><span class="num ui">01</span><h2><a class="anchor" href="#" aria-label="Link to this section">#</a>Five layers, and the discipline of using few</h2></div>
+<p>Any system I build can be read as up to five layers. The AI layer is the model calls, the intelligence, and in practice it is the easiest of the five: often one API call. The backend is the engine that ties everything together and runs the logic. Storage is where data persists. The frontend is the visual layer, and it exists only when a person needs to click something. Infrastructure is where it all runs and how it ships.</p>
+<p>The point of naming them is to stand up only the ones a given build actually needs. A classification script is the AI layer in a single Python file, with no backend, no storage and no screen. A client-facing assistant might genuinely need all five. Most early builds use two or three.</p>
+
+<blockquote class="pull"><p>A good answer from the model is cheap to produce and expensive to trust.</p></blockquote>
+
+<p>Calling the model layer the easy one is not a dismissal of the model. It is a statement about where the difficulty actually lives. Trust is built in the layers around it.</p>
+
+<div class="h2"><span class="num ui">02</span><h2><a class="anchor" href="#" aria-label="Link to this section">#</a>The principles that make outputs reliable</h2></div>
+<p>A model that returns free text is hard to build on, because the next step has to guess at what it got. So I force the model to return data in a fixed, typed shape rather than prose. In Python that means Pydantic, and it is the backbone of the whole method: predictable outputs, a next step that can rely on them, and a shape you can evaluate against.</p>
+
+<div class="codeblock">
+<div class="codebar"><span>structured_output.py</span><button class="copy" type="button" aria-label="Copy code" data-done="{{copyDone}}" onClick="{{copyCode}}">{{copyLabel}}</button></div>
+<pre><span class="cl"><span class="k">from</span> pydantic <span class="k">import</span> <span class="t">BaseModel</span></span><span class="cl">&nbsp;</span><span class="cl"><span class="k">class</span> <span class="f">Classification</span>(<span class="t">BaseModel</span>):</span><span class="cl">&nbsp;&nbsp;&nbsp;&nbsp;label: <span class="t">str</span></span><span class="cl">&nbsp;&nbsp;&nbsp;&nbsp;confidence: <span class="t">float</span></span><span class="cl">&nbsp;&nbsp;&nbsp;&nbsp;reason: <span class="t">str</span></span></pre>
+</div>
+
+<p>The second principle is to use deterministic code wherever it will do the job, and reserve the model for genuine language or judgement tasks. A model call is powerful, but it is non-deterministic and it costs money. A lookup, a rule or a calculation is none of those things, so it stays in plain code.</p>
+<p>Third, I store facts and compute what is derived. I persist the inputs and the snapshots: what the model returned, and which settings were in force when it did. Anything derived from those, a flag or a score or a status, is computed when it is read, not written to the record.</p>
+
+<div class="h2"><span class="num ui">03</span><h2><a class="anchor" href="#" aria-label="Link to this section">#</a>A stack you add to, not start with</h2></div>
+<p>The tools matter less than the order in which you reach for them. I keep a default choice for each layer, and a note on when to add it and when to leave it alone. Grouped by that question, the stack looks like this.</p>
+
+<figure class="fig" style="margin-top: 2em; margin-bottom: 2em">
+<div class="fig-in"><img src="/_blob/505ab64a1d326877de120403eb376077" alt="The reference stack grouped into three columns: from day one, add when it is needed, and defer until you feel the need"></div>
+<figcaption class="cap ui"><b>Figure 2.</b> The reference stack, grouped by when each tool earns its place.</figcaption>
+</figure>
+
+<p>From day one, every build gets Python as the single backend language, <code>uv</code> to manage the version, packages and virtual environment in one tool, and Pydantic the moment there is any structured data. These are cheap to add and expensive to retrofit, so they go in at the start.</p>
+<p>None of this is exotic, and that is the point. The reliability of an AI system comes from unglamorous decisions made early: a typed output instead of a string, a rule instead of a model call, a stored fact instead of a stored guess.</p>
+<p class="endmark" aria-hidden="true">&#8226; &#8226; &#8226;</p>
+
+<div class="author">
+<span class="av ui">CO</span>
+<div>
+<h3>Chinomso Okere</h3>
+<p>Business analyst and applied AI researcher based in Scotland. I write about evaluating AI agents and putting AI into real work.</p>
+<a class="ui" href="#">More about me &rarr;</a>
+</div>
+</div>
+</article>
+</div>
+</div>
+
+<div class="wrap">
+<section class="series">
+<div class="sec-head ui"><span class="sec-label">The AI build playbook</span><span class="rule"></span></div>
+<div class="pair">
+<a class="card" href="#"><p class="lab ui">Part 1 &middot; You are here</p><p class="ct">The model is the easy part</p></a>
+<a class="card ghost" href="#"><p class="lab ui">Next &middot; Part 2</p><p class="ct">[title to come]</p></a>
+</div>
+</section>
+</div>
+</main>
+
+<footer class="foot">
+<div class="wrap">
+<div class="foot-in">
+<p><strong>Chinomso Okere</strong> &mdash; applied AI researcher and business analyst, writing about evaluating AI agents and putting AI into real work.</p>
+<nav class="foot-links ui" aria-label="Elsewhere">
+<a href="#">LinkedIn</a>
+<a href="#">GitHub</a>
+<a href="#">Email</a>
+</nav>
+</div>
+<p class="foot-c ui">&copy; 2026 Chinomso Okere</p>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":6200}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const theme = st.theme || (this.props.theme === 'dark' ? 'dark' : 'light');
+const dark = theme === 'dark';
+const copied = Boolean(st.copied);
+return {
+theme: theme,
+isDark: dark,
+switchOn: dark ? 'on' : 'off',
+themeLabel: dark ? 'Dark' : 'Light',
+toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' }),
+copyDone: copied ? 'yes' : 'no',
+copyLabel: copied ? 'Copied' : 'Copy',
+copyCode: () => {
+try { navigator.clipboard.writeText('from pydantic import BaseModel\n\nclass Classification(BaseModel):\n    label: str\n    confidence: float\n    reason: str\n'); } catch (e) {}
+this.setState({ copied: true });
+setTimeout(() => this.setState({ copied: false }), 1800);
+}
+};
+}
+}
+</script>
+</body>
+</html>
