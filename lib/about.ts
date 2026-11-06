@@ -13,7 +13,8 @@ const EMPHASIS = "show the answer is right";
  */
 export interface About {
   intro?: string;
-  atAGlance?: string[];
+  /** One entry per cell; each cell is one or more lines. */
+  atAGlance?: string[][];
   thinkingLead?: string;
   thinkingQuote?: string;
   writeAbout?: string[];
@@ -30,6 +31,15 @@ export interface AboutStatement {
 
 function text(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+// Each fact is a string (one line) or a list of strings (one per line).
+function facts(value: unknown): string[][] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const cells = value
+    .map((cell) => (Array.isArray(cell) ? list(cell) : text(cell) && [text(cell)!]))
+    .filter((cell): cell is string[] => Boolean(cell));
+  return cells.length > 0 ? cells : undefined;
 }
 
 function list(value: unknown): string[] | undefined {
@@ -55,7 +65,7 @@ export function getAbout(): About {
 
   return {
     intro: text(data.intro),
-    atAGlance: list(data.atAGlance),
+    atAGlance: facts(data.atAGlance),
     thinkingLead: text(data.thinkingLead),
     thinkingQuote: text(data.thinkingQuote),
     writeAbout: list(data.writeAbout),

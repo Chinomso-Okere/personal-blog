@@ -122,8 +122,14 @@ export default function AboutPage() {
         <section className="about-sec" aria-labelledby="glance-heading">
           <SectionHead id="glance-heading">At a glance</SectionHead>
           <ul className="facts">
-            {about.atAGlance.map((fact) => (
-              <li key={fact}>{fact}</li>
+            {about.atAGlance.map((lines) => (
+              <li key={lines.join(" ")}>
+                {lines.map((line) => (
+                  <span key={line} className="facts__line">
+                    {line}
+                  </span>
+                ))}
+              </li>
             ))}
           </ul>
         </section>

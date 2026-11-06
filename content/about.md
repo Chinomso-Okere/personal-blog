@@ -4,14 +4,14 @@
 
 intro: "I'm Chinomso Okere, an applied AI researcher, business analyst and founder of Silverpath AI, based in Scotland. I spent six-plus years in digital transformation and requirements engineering in the UK and Nigeria, working out what organisations actually need before anyone writes a line of code."
 
+# One fact per cell. A cell given as a list shows each item on its own line.
 atAGlance:
   - "Founder, Silverpath AI"
   - "MBCS: Professional Member of BCS, The Chartered Institute for IT"
-  - "Co-author of three research papers: one published by IEEE, two accepted at ICSRS 2026"
+  - "Co-author of three papers, IEEE AAIML and ICSRS 2026"
   - "Microsoft Certified: AI Business Professional"
   - "Microsoft Certified: AI Transformation Leader"
-  - "MSc Business Project Management"
-  - "Member of APM and PMI"
+  - ["MSc Business Project Management", "Member of APM and PMI"]
 
 thinkingLead: "My background shapes how I look at AI."
 thinkingQuote: "I care less about whether a system produces an impressive answer and more about whether anyone can show the answer is right."

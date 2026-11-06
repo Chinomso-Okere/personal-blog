@@ -2134,13 +2134,18 @@ html:has(.post) {
     text-wrap: pretty;
   }
 
-  @media (min-width: 640px) {
+  .facts__line {
+    display: block;
+  }
+
+  /* Breakpoints set by measurement so no fact cell exceeds two lines. */
+  @media (min-width: 680px) {
     .facts {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1000px) {
+  @media (min-width: 1020px) {
     .facts {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
