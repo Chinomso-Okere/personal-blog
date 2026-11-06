@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
-import { pageMetadata } from "@/lib/seo";
+import { brandedImage, pageMetadata } from "@/lib/seo";
+import { HOME_EYEBROW } from "@/lib/pages";
 import { getRecentPosts } from "@/lib/posts";
 import { getWritingEntries, isArticle } from "@/lib/writing";
 import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
@@ -16,6 +17,7 @@ import { Sep } from "@/components/Sep";
 export const metadata: Metadata = pageMetadata({
   description: siteConfig.description,
   path: "/",
+  image: brandedImage("home", siteConfig.tagline),
 });
 
 // "Applied AI, evidence first." -> ["Applied AI,", "evidence first."]
@@ -49,7 +51,7 @@ export default function HomePage() {
           <div className="hero__grid">
             <div>
               <p className="hero__eyebrow rise d1">
-                Applied AI researcher · Business analyst · Scotland
+                {HOME_EYEBROW}
               </p>
               <h1 className="hero__display">
                 <span className="ln">

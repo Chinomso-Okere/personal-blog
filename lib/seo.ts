@@ -1,16 +1,32 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
 
+export interface SocialImage {
+  /** Site path or absolute URL. */
+  url: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
 interface PageMetadataInput {
   title?: string;
+  /** og:title / twitter:title when it should differ from the page title. */
+  socialTitle?: string;
   description: string;
   /** Site path such as "/blog", or an absolute URL (a post's originalUrl). */
   path: string;
-  /** Site path or absolute URL of a preview image. */
-  image?: string;
-  imageAlt?: string;
+  /** A post's cover, or the branded card from brandedImage(). */
+  image: SocialImage;
   article?: { publishedTime: string };
 }
+
+export const OG_SIZE = { width: 1200, height: 630 } as const;
+
+/** RSS discovery link; part of every page's alternates. */
+export const FEED_ALTERNATE = {
+  "application/rss+xml": [{ url: "/feed.xml", title: siteConfig.name }],
+};
 
 /** Absolute URL on this site for a path; absolute URLs pass through. */
 export function absoluteUrl(pathOrUrl: string): string {
@@ -20,29 +36,46 @@ export function absoluteUrl(pathOrUrl: string): string {
 }
 
 /**
+ * The branded 1200x630 card served by app/og/[...path]/route.tsx, for pages
+ * without a cover image. `key` is "home", "blog", "writing", "about" or
+ * "post/<slug>".
+ */
+export function brandedImage(key: string, title: string): SocialImage {
+  return {
+    url: `/og/${key}.png`,
+    alt: `${siteConfig.name}: ${title}`,
+    ...OG_SIZE,
+  };
+}
+
+/**
  * Canonical, Open Graph and Twitter metadata for a public page, built the same
  * way everywhere so og:url always matches the canonical.
  */
 export function pageMetadata({
   title,
+  socialTitle,
   description,
   path,
   image,
-  imageAlt,
   article,
 }: PageMetadataInput): Metadata {
   const url = absoluteUrl(path);
-  const socialTitle = title ?? siteConfig.title;
-  const images = image
-    ? [{ url: absoluteUrl(image), ...(imageAlt ? { alt: imageAlt } : {}) }]
-    : undefined;
+  const shareTitle = socialTitle ?? title ?? siteConfig.title;
+  const ogImage = {
+    url: absoluteUrl(image.url),
+    alt: image.alt,
+    ...(image.width && image.height
+      ? { width: image.width, height: image.height }
+      : {}),
+  };
 
   return {
     ...(title ? { title } : {}),
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, types: FEED_ALTERNATE },
     openGraph: {
-      title: socialTitle,
+      title: shareTitle,
       description,
       url,
       siteName: siteConfig.name,
@@ -54,13 +87,13 @@ export function pageMetadata({
             authors: [siteConfig.name],
           }
         : { type: "website" }),
-      ...(images ? { images } : {}),
+      images: [ogImage],
     },
     twitter: {
-      card: images ? "summary_large_image" : "summary",
-      title: socialTitle,
+      card: "summary_large_image",
+      title: shareTitle,
       description,
-      ...(images ? { images: images.map((i) => i.url) } : {}),
+      images: [{ url: ogImage.url, alt: ogImage.alt }],
     },
   };
 }

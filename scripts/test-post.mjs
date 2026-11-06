@@ -12,6 +12,9 @@ import {
   isArticle,
   sortArticlesNewestFirst,
 } from "../lib/writing.ts";
+import { parsePublishedPost, getAllPosts } from "../lib/posts.ts";
+import { buildRssFeed } from "../lib/feed.ts";
+import { XMLValidator, XMLParser } from "fast-xml-parser";
 
 async function runTests() {
   console.log("=== RUNNING POST INPUT, VALIDATION & FRONTMATTER TESTS ===\n");
@@ -318,6 +321,58 @@ Line 4`;
   assert(rejects({ ...article, year: 2025 }), "Year that does not match the date is rejected");
   assert(rejects({ ...article, url: "http://example.com/article" }), "Non-https url is rejected");
   assert(rejects({ ...article, url: "" }), "Published entry without url is rejected");
+
+  // RSS feed: drafts excluded, fields escaped, XML well-formed
+  const site = {
+    url: "https://chinomsookere.co.uk",
+    name: "Chinomso Okere",
+    description: "Writing on AI & evaluation",
+  };
+  const fixture = (published, title) => `---
+title: ${JSON.stringify(title)}
+date: "2026-11-01"
+description: "A <b>test</b> post & more"
+tags: ["AI Evaluation"]
+published: ${published}
+---
+
+Body text.
+`;
+  const fixtures = [
+    ["published-post.md", fixture(true, `Tom & Jerry's "<script>" guide`)],
+    ["draft-post.md", fixture(false, "Secret draft title")],
+  ];
+  const feedPosts = fixtures
+    .map(([name, raw]) => parsePublishedPost(name, raw))
+    .filter(Boolean);
+  const feedXml = buildRssFeed(feedPosts, site);
+
+  assert(feedPosts.length === 1 && feedPosts[0].slug === "published-post", "parsePublishedPost drops the draft fixture");
+  assert(!feedXml.includes("draft-post") && !feedXml.includes("Secret draft title"), "Feed excludes the draft");
+  assert(feedXml.includes("https://chinomsookere.co.uk/blog/published-post"), "Feed links the published post with an absolute URL");
+  assert(XMLValidator.validate(feedXml) === true, "Feed XML is well-formed (fast-xml-parser XMLValidator)");
+  const parsedFeed = new XMLParser({ ignoreAttributes: false }).parse(feedXml);
+  const channel = parsedFeed?.rss?.channel;
+  const item = channel?.item;
+  assert(parsedFeed?.rss?.["@_version"] === "2.0", "Feed is RSS 2.0");
+  assert(
+    channel?.["atom:link"]?.["@_href"] === "https://chinomsookere.co.uk/feed.xml" &&
+      channel?.["atom:link"]?.["@_rel"] === "self",
+    "Feed has atom:link rel=self to /feed.xml"
+  );
+  assert(item && !Array.isArray(item), "Feed has exactly one item");
+  assert(
+    feedXml.includes("Tom &amp; Jerry&apos;s &quot;&lt;script&gt;&quot; guide") && !feedXml.includes("<script>"),
+    "Item title is escaped"
+  );
+  assert(feedXml.includes("A &lt;b&gt;test&lt;/b&gt; post &amp; more"), "Item description is escaped");
+  assert(item?.pubDate === "Sun, 01 Nov 2026 00:00:00 GMT", "pubDate is RFC 822");
+  const realFeed = buildRssFeed(getAllPosts(), site);
+  assert(
+    XMLValidator.validate(realFeed) === true &&
+      (realFeed.match(/<item>/g) || []).length === getAllPosts().length,
+    "Feed from the real published posts is well-formed with one item per post"
+  );
 
   if (failed) {
     console.error("\nONE OR MORE POST TESTS FAILED!");

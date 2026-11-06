@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Newsreader, Inter, JetBrains_Mono } from "next/font/google";
 import { siteConfig } from "@/lib/site";
+import { FEED_ALTERNATE } from "@/lib/seo";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -32,6 +33,9 @@ export const metadata: Metadata = {
     template: "%s | Chinomso Okere",
   },
   description: siteConfig.description,
+  // Pages built with pageMetadata() repeat this, because a page's alternates
+  // replace the layout's.
+  alternates: { types: FEED_ALTERNATE },
 };
 
 const themeBootstrapScript = `(function(){try{var t=localStorage.getItem('blogTheme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;

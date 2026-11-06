@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
 import { PostRow } from "@/components/PostRow";
-import { pageMetadata } from "@/lib/seo";
+import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionPages } from "@/lib/pages";
+import { siteConfig } from "@/lib/site";
+
+const page = sectionPages.blog;
 
 export const metadata: Metadata = pageMetadata({
-  title: "Blog",
-  description:
-    "Long-form articles on evaluating AI agents, voice systems, and production engineering.",
-  path: "/blog",
+  title: page.title,
+  socialTitle: `${page.title} | ${siteConfig.name}`,
+  description: page.description,
+  path: page.path,
+  image: brandedImage("blog", page.title),
 });
 
 export default function BlogPage() {

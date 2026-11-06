@@ -12,7 +12,8 @@ import { CoverImage } from "@/components/CoverImage";
 import { Sep } from "@/components/Sep";
 import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/lib/site";
-import { absoluteUrl, pageMetadata } from "@/lib/seo";
+import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
+import { getLocalImageSize } from "@/lib/image-size";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -43,8 +44,14 @@ export async function generateMetadata({
     title: post.title,
     description: post.description,
     path: postCanonical(post),
-    image: post.coverImage,
-    imageAlt: post.coverImageAlt,
+    // A cover always wins; posts without one get the branded card.
+    image: post.coverImage
+      ? {
+          url: post.coverImage,
+          alt: post.coverImageAlt || post.title,
+          ...(getLocalImageSize(post.coverImage) ?? {}),
+        }
+      : brandedImage(`post/${post.slug}`, post.title),
     article: { publishedTime: post.date },
   });
 }

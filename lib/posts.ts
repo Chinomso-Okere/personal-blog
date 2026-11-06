@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { parseFrontmatter } from "./frontmatter";
-import { calculateReadingTime } from "./reading-time";
+import { parseFrontmatter } from "./frontmatter.ts";
+import { calculateReadingTime } from "./reading-time.ts";
 import { isValidCalendarDate } from "./post-input.ts";
 
 export { calculateReadingTime };
@@ -97,6 +97,50 @@ function validateFrontmatter(
 }
 
 /**
+ * Turns one post file into a summary, or null if it is not published.
+ * Throws on an invalid filename or front matter. Pure (no file access) so the
+ * "drafts are never public" rule can be tested with fixture text.
+ */
+export function parsePublishedPost(
+  filename: string,
+  rawContent: string
+): PostSummary | null {
+  const slug = path.basename(filename, ".md");
+  if (!SLUG_REGEX.test(slug)) {
+    throw new Error(
+      `Invalid filename slug in "${filename}": slug "${slug}" does not match pattern /^[a-z0-9]+(?:-[a-z0-9]+)*$/.`
+    );
+  }
+  const parsed = parseFrontmatter(rawContent);
+
+  validateFrontmatter(parsed.data, filename);
+
+  // Fail if frontmatter slug is provided and conflicts with filename
+  if (parsed.data.slug && parsed.data.slug !== slug) {
+    throw new Error(
+      `Frontmatter error in "${filename}": frontmatter slug "${parsed.data.slug}" does not match filename "${slug}".`
+    );
+  }
+
+  // Only posts with explicit published: true are public
+  if (parsed.data.published !== true) {
+    return null;
+  }
+
+  return {
+    slug,
+    title: parsed.data.title,
+    date: parsed.data.date,
+    description: parsed.data.description,
+    tags: parsed.data.tags || [],
+    coverImage: parsed.data.coverImage,
+    coverImageAlt: parsed.data.coverImageAlt,
+    originalUrl: parsed.data.originalUrl,
+    readingTime: calculateReadingTime(parsed.content),
+  };
+}
+
+/**
  * Reads all published posts from content/posts.
  * Posts are strictly discovered from filesystem filenames.
  * Unpublished posts (published !== true) are excluded.
@@ -106,49 +150,14 @@ export function getAllPosts(): PostSummary[] {
     return [];
   }
 
-  const entries = fs.readdirSync(POSTS_DIR);
   const posts: PostSummary[] = [];
-
-  for (const filename of entries) {
+  for (const filename of fs.readdirSync(POSTS_DIR)) {
     if (!filename.endsWith(".md")) {
       continue;
     }
-
-    const slug = path.basename(filename, ".md");
-    if (!SLUG_REGEX.test(slug)) {
-      throw new Error(
-        `Invalid filename slug in "${filename}": slug "${slug}" does not match pattern /^[a-z0-9]+(?:-[a-z0-9]+)*$/.`
-      );
-    }
-    const filePath = path.join(POSTS_DIR, filename);
-    const rawContent = fs.readFileSync(filePath, "utf-8");
-    const parsed = parseFrontmatter(rawContent);
-
-    validateFrontmatter(parsed.data, filename);
-
-    // Fail if frontmatter slug is provided and conflicts with filename
-    if (parsed.data.slug && parsed.data.slug !== slug) {
-      throw new Error(
-        `Frontmatter error in "${filename}": frontmatter slug "${parsed.data.slug}" does not match filename "${slug}".`
-      );
-    }
-
-    // Only posts with explicit published: true are public
-    if (parsed.data.published !== true) {
-      continue;
-    }
-
-    posts.push({
-      slug,
-      title: parsed.data.title,
-      date: parsed.data.date,
-      description: parsed.data.description,
-      tags: parsed.data.tags || [],
-      coverImage: parsed.data.coverImage,
-      coverImageAlt: parsed.data.coverImageAlt,
-      originalUrl: parsed.data.originalUrl,
-      readingTime: calculateReadingTime(parsed.content),
-    });
+    const rawContent = fs.readFileSync(path.join(POSTS_DIR, filename), "utf-8");
+    const post = parsePublishedPost(filename, rawContent);
+    if (post) posts.push(post);
   }
 
   // Sort descending by date

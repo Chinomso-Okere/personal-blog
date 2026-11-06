@@ -8,15 +8,18 @@ import { formatDate } from "@/lib/format";
 import { ExternalArrow } from "@/components/ExternalArrow";
 import { Venue } from "@/components/Venue";
 import { Sep } from "@/components/Sep";
-import { pageMetadata } from "@/lib/seo";
+import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionPages } from "@/lib/pages";
+import { siteConfig } from "@/lib/site";
 
-const DESCRIPTION =
-  "Research papers co-authored by Chinomso Okere on multi-agent evaluation and causal reasoning, and articles written for publications.";
+const page = sectionPages.writing;
 
 export const metadata: Metadata = pageMetadata({
-  title: "Writing",
-  description: DESCRIPTION,
-  path: "/writing",
+  title: page.title,
+  socialTitle: `${page.title} | ${siteConfig.name}`,
+  description: page.description,
+  path: page.path,
+  image: brandedImage("writing", page.title),
 });
 
 export default function WritingPage() {

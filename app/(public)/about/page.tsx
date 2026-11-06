@@ -3,13 +3,18 @@ import path from "path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { renderMarkdown } from "@/lib/markdown";
-import { pageMetadata } from "@/lib/seo";
+import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionPages } from "@/lib/pages";
+import { siteConfig } from "@/lib/site";
+
+const page = sectionPages.about;
 
 export const metadata: Metadata = pageMetadata({
-  title: "About",
-  description:
-    "About Chinomso Okere: business analyst and applied AI researcher writing about evaluating AI agents and putting AI into real work.",
-  path: "/about",
+  title: page.title,
+  socialTitle: `${page.title} | ${siteConfig.name}`,
+  description: page.description,
+  path: page.path,
+  image: brandedImage("about", page.title),
 });
 
 export default async function AboutPage() {
