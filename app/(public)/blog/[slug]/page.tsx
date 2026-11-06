@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
@@ -14,6 +15,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/lib/site";
 import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
 import { getLocalImageSize } from "@/lib/image-size";
+import { AUTHOR_PHOTO } from "@/lib/pages";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -66,6 +68,8 @@ const AUTHOR_INITIALS = siteConfig.name
   .map((part) => part[0])
   .join("")
   .toUpperCase();
+
+const hasAuthorPhoto = getLocalImageSize(AUTHOR_PHOTO) !== null;
 
 const authorBio = siteConfig.bio.charAt(0).toUpperCase() + siteConfig.bio.slice(1);
 
@@ -207,9 +211,20 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
 
             <aside className="author" aria-label="About the author">
-              <span className="avatar avatar--lg" aria-hidden="true">
-                {AUTHOR_INITIALS}
-              </span>
+              {hasAuthorPhoto ? (
+                // Decorative: the name is right beside it.
+                <Image
+                  className="avatar avatar--lg avatar--photo"
+                  src={AUTHOR_PHOTO}
+                  alt=""
+                  width={56}
+                  height={56}
+                />
+              ) : (
+                <span className="avatar avatar--lg" aria-hidden="true">
+                  {AUTHOR_INITIALS}
+                </span>
+              )}
               <div>
                 <h2 className="author__name">{siteConfig.name}</h2>
                 <p className="author__bio">{authorBio}</p>

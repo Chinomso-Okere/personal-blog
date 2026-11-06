@@ -1,10 +1,26 @@
 import fs from "fs";
 import path from "path";
+import { parseFrontmatter } from "@/lib/frontmatter";
 
 const ABOUT_FILE = path.join(process.cwd(), "content", "about.md");
 
-// Phrase from about.md that the home About strip sets in italic accent.
+// Phrase of thinkingQuote that the home About strip sets in italic accent.
 const EMPHASIS = "show the answer is right";
+
+/**
+ * Content of content/about.md (front matter). Every field is optional: a
+ * missing or malformed one is left out, so its section is simply not shown.
+ */
+export interface About {
+  intro?: string;
+  atAGlance?: string[];
+  thinkingLead?: string;
+  thinkingQuote?: string;
+  writeAbout?: string[];
+  audience?: string;
+  workWithMe?: string;
+  homeStatement?: string;
+}
 
 export interface AboutStatement {
   intro: string;
@@ -12,51 +28,60 @@ export interface AboutStatement {
   emphasis: string;
 }
 
-function readAbout(): string {
+function text(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function list(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const items = value.map(text).filter((item): item is string => Boolean(item));
+  return items.length > 0 ? items : undefined;
+}
+
+export function getAbout(): About {
+  let raw: string;
   try {
-    return fs.readFileSync(ABOUT_FILE, "utf-8").replace(/\r\n/g, "\n");
+    raw = fs.readFileSync(ABOUT_FILE, "utf-8");
   } catch {
-    return "";
+    return {};
   }
+
+  let data: Record<string, unknown>;
+  try {
+    data = parseFrontmatter(raw).data;
+  } catch {
+    return {};
+  }
+
+  return {
+    intro: text(data.intro),
+    atAGlance: list(data.atAGlance),
+    thinkingLead: text(data.thinkingLead),
+    thinkingQuote: text(data.thinkingQuote),
+    writeAbout: list(data.writeAbout),
+    audience: text(data.audience),
+    workWithMe: text(data.workWithMe),
+    homeStatement: text(data.homeStatement),
+  };
 }
 
-function stripInlineMarkdown(text: string): string {
-  return text.replace(/[*_`]/g, "").trim();
-}
-
-/** Items of the "What I write about" list in about.md; [] if not found. */
+/** The "What I write about" topics; [] if not set. */
 export function getWriteAboutTopics(): string[] {
-  const lines = readAbout().split("\n");
-  const start = lines.findIndex((l) => /^##\s+What I write about\s*$/i.test(l.trim()));
-  if (start === -1) return [];
-
-  const topics: string[] = [];
-  for (const line of lines.slice(start + 1)) {
-    if (/^#{1,6}\s/.test(line)) break;
-    const item = line.match(/^\s*[-*]\s+(.+)$/);
-    if (item) topics.push(stripInlineMarkdown(item[1]));
-    else if (topics.length > 0 && line.trim() !== "") break;
-  }
-  return topics;
+  return getAbout().writeAbout ?? [];
 }
 
 /**
- * The home About strip: the first sentence of about.md, then the sentence
- * that begins "I care less about", with the closing phrase emphasised.
- * Returns null if either sentence cannot be found, so the strip is omitted.
+ * The home About strip: homeStatement, then thinkingQuote with its closing
+ * phrase emphasised. Returns null if either is missing, so the strip is omitted.
  */
 export function getAboutStatement(): AboutStatement | null {
-  const text = readAbout();
-  const firstParagraph = text.split(/\n\s*\n/)[0]?.trim() ?? "";
-  const intro = firstParagraph.match(/^[^\n]*?[.!?](?=\s|$)/)?.[0];
-  const sentence = text.match(/I care less about[^.!?]*[.!?]/)?.[0];
-  if (!intro || !sentence) return null;
+  const { homeStatement, thinkingQuote } = getAbout();
+  if (!homeStatement || !thinkingQuote) return null;
 
-  const plain = stripInlineMarkdown(sentence);
-  const at = plain.lastIndexOf(EMPHASIS);
+  const at = thinkingQuote.lastIndexOf(EMPHASIS);
   return {
-    intro: stripInlineMarkdown(intro),
-    body: at === -1 ? plain : plain.slice(0, at),
-    emphasis: at === -1 ? "" : plain.slice(at),
+    intro: homeStatement,
+    body: at === -1 ? thinkingQuote : thinkingQuote.slice(0, at),
+    emphasis: at === -1 ? "" : thinkingQuote.slice(at),
   };
 }

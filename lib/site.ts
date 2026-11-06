@@ -4,7 +4,7 @@ export const siteConfig = {
   tagline: "Applied AI, evidence first.",
   description:
     "Writing by Chinomso Okere on evaluating AI agents and putting AI into real work.",
-  bio: "applied AI researcher and business analyst, writing about evaluating AI agents and putting AI into real work.",
+  bio: "applied AI researcher, business analyst and founder of Silverpath AI, writing about evaluating AI agents and putting AI into real work.",
   // No trailing slash, so `${url}/blog` never becomes "//blog".
   url: (
     process.env.NEXT_PUBLIC_SITE_URL ||

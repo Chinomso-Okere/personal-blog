@@ -17,7 +17,7 @@ export const sectionPages = {
     path: "/about",
     title: "About",
     description:
-      "About Chinomso Okere: business analyst and applied AI researcher writing about evaluating AI agents and putting AI into real work.",
+      "About Chinomso Okere: applied AI researcher, business analyst and founder of Silverpath AI, writing about evaluating AI agents and putting AI into real work.",
   },
 } as const;
 
@@ -25,3 +25,6 @@ export type SectionPage = keyof typeof sectionPages;
 
 /** The home hero eyebrow, reused as the label on the home card. */
 export const HOME_EYEBROW = "Applied AI researcher · Business analyst · Scotland";
+
+/** Portrait used on About, in the post author card and in the Person JSON-LD. */
+export const AUTHOR_PHOTO = "/images/chinomso-okere.jpg";

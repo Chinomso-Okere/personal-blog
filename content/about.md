@@ -1,18 +1,33 @@
-I'm a business analyst, applied AI researcher and builder, based in Scotland. I spent six-plus years in digital transformation and requirements engineering in the UK and Nigeria, working out what organisations actually need before anyone writes a line of code.
+---
+# The About page and the home page's About strip read these fields
+# (lib/about.ts). A missing or malformed field hides its section.
 
-That habit shapes how I look at AI: I care less about whether a system produces an impressive answer and more about whether anyone can show the answer is right.
+intro: "I'm Chinomso Okere, an applied AI researcher, business analyst and founder of Silverpath AI, based in Scotland. I spent six-plus years in digital transformation and requirements engineering in the UK and Nigeria, working out what organisations actually need before anyone writes a line of code."
 
-I'm a co-author of three papers on multi-agent evaluation and causal reasoning. One is published by IEEE (AAIML 2026); two have been accepted at ICSRS 2026 and are awaiting publication. I'm a Professional Member of BCS, The Chartered Institute for IT.
+atAGlance:
+  - "Founder, Silverpath AI"
+  - "MBCS: Professional Member of BCS, The Chartered Institute for IT"
+  - "Co-author of three research papers: one published by IEEE, two accepted at ICSRS 2026"
+  - "Microsoft Certified: AI Business Professional"
+  - "Microsoft Certified: AI Transformation Leader"
+  - "MSc Business Project Management"
+  - "Member of APM and PMI"
 
-## What I write about
+thinkingLead: "My background shapes how I look at AI."
+thinkingQuote: "I care less about whether a system produces an impressive answer and more about whether anyone can show the answer is right."
 
-- Evaluating AI agents
-- Multi-agent systems and causal reasoning
-- Building voice agents: design, guardrails and failure modes
-- AI implementation in real organisations, through the business-analysis lens
-- UK and Scottish AI: policy, ecosystem and what it means in practice
+writeAbout:
+  - "Evaluating AI agents"
+  - "Multi-agent systems and causal reasoning"
+  - "Building voice agents: design, guardrails and failure modes"
+  - "AI implementation in real organisations, through the business-analysis lens"
+  - "UK and Scottish AI: policy, ecosystem and what it means in practice"
 
-## Who it's for
+audience: "Practitioners and decision-makers who have to put AI into real work: engineers, delivery teams, business analysts, and the leaders asked to sign off AI output."
 
-Practitioners and decision-makers who have to put AI into real work: AI engineers, product and delivery teams, business analysts, and technology leaders who are asked to sign off AI output. I aim to be technical enough to be credible to engineers and plain enough for a semi-technical reader.
+workWithMe: "I'm open to research collaboration and to working with organisations that want AI they can trust in real operations. The best way to reach me is LinkedIn or email."
 
+# Home page About strip only, kept separate from `intro` so editing one never
+# changes the other. The strip adds thinkingQuote after it.
+homeStatement: "I'm an applied AI researcher, business analyst and founder of Silverpath AI, based in Scotland."
+---

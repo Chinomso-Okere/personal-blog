@@ -24,7 +24,9 @@ export function CoverImage({ src, alt, sizes }: CoverImageProps) {
         // Covers here are diagrams with small text, which softens at the
         // default quality of 75.
         quality={90}
+        // preload adds the <link rel="preload">; fetchPriority marks it high.
         preload
+        fetchPriority="high"
       />
     );
   }

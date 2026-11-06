@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
-import { brandedImage, pageMetadata } from "@/lib/seo";
-import { HOME_EYEBROW } from "@/lib/pages";
+import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
+import { HOME_EYEBROW, AUTHOR_PHOTO } from "@/lib/pages";
+import { getLocalImageSize } from "@/lib/image-size";
 import { getRecentPosts } from "@/lib/posts";
 import { getWritingEntries, isArticle } from "@/lib/writing";
 import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
@@ -41,6 +42,7 @@ export default function HomePage() {
     name: siteConfig.name,
     url: siteConfig.url,
     sameAs: [siteConfig.links.linkedin, siteConfig.links.github].filter(Boolean),
+    ...(getLocalImageSize(AUTHOR_PHOTO) ? { image: absoluteUrl(AUTHOR_PHOTO) } : {}),
   };
 
   return (
