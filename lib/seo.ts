@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
+import { cardVersion, type CardContent } from "@/lib/og-cards";
 
 export interface SocialImage {
   /** Site path or absolute URL. */
@@ -38,11 +39,14 @@ export function absoluteUrl(pathOrUrl: string): string {
 /**
  * The branded 1200x630 card served by app/og/[...path]/route.tsx, for pages
  * without a cover image. `key` is "home", "blog", "writing", "about" or
- * "post/<slug>".
+ * "post/<slug>"; `content` is what that card shows (lib/og-cards.ts). The
+ * ?v= hash changes whenever the card does, so social sites cannot keep
+ * serving a stale cached copy under the same URL.
  */
-export function brandedImage(key: string, title: string): SocialImage {
+export function brandedImage(key: string, content: CardContent): SocialImage {
+  const title = [content.title, content.titleAccent].filter(Boolean).join(" ");
   return {
-    url: `/og/${key}.png`,
+    url: `/og/${key}.png?v=${cardVersion(content)}`,
     alt: `${siteConfig.name}: ${title}`,
     ...OG_SIZE,
   };

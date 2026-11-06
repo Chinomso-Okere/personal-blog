@@ -14,6 +14,7 @@ import {
 } from "../lib/writing.ts";
 import { parsePublishedPost, getAllPosts } from "../lib/posts.ts";
 import { buildRssFeed } from "../lib/feed.ts";
+import { cardVersion, homeCard, sectionCard, postCard } from "../lib/og-cards.ts";
 import { XMLValidator, XMLParser } from "fast-xml-parser";
 
 async function runTests() {
@@ -372,6 +373,30 @@ Body text.
     XMLValidator.validate(realFeed) === true &&
       (realFeed.match(/<item>/g) || []).length === getAllPosts().length,
     "Feed from the real published posts is well-formed with one item per post"
+  );
+
+  // Branded OG card versions (?v=): change exactly when a card's content does
+  const cards = {
+    home: homeCard(),
+    blog: sectionCard("blog"),
+    writing: sectionCard("writing"),
+    about: sectionCard("about"),
+  };
+  const versions = Object.fromEntries(Object.entries(cards).map(([k, c]) => [k, cardVersion(c)]));
+  assert(Object.values(versions).every((v) => /^[0-9a-f]{10}$/.test(v)), "Card versions are 10 hex characters");
+  assert(new Set(Object.values(versions)).size === 4, "Each page's card has its own version");
+  assert(cardVersion(sectionCard("writing")) === versions.writing, "Card version is stable for unchanged content");
+  const editedWriting = { ...cards.writing, description: cards.writing.description + " Edited." };
+  const afterEdit = { ...versions, writing: cardVersion(editedWriting) };
+  assert(
+    afterEdit.writing !== versions.writing &&
+      ["home", "blog", "about"].every((k) => afterEdit[k] === versions[k]),
+    "Changing one page's description changes only that page's version"
+  );
+  assert(cardVersion({ ...cards.home, label: "Other label" }) !== versions.home, "Changing a card's label changes its version");
+  assert(
+    cardVersion(postCard({ title: "A", tags: ["AI Evaluation"] })) !== cardVersion(postCard({ title: "A", tags: ["UK AI"] })),
+    "Post card version follows its tag label"
   );
 
   if (failed) {

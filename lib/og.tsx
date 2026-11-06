@@ -3,6 +3,7 @@ import path from "path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/site";
 import { OG_SIZE } from "@/lib/seo";
+import type { CardContent } from "@/lib/og-cards";
 
 // Light-theme tokens (social cards have no dark mode). Kept in step with
 // app/globals.css :root.
@@ -30,16 +31,6 @@ const fonts = [
     style: "italic" as const,
   },
 ];
-
-export interface CardContent {
-  /** Small uppercase label above the title; omitted on section cards, where
-   *  it would only repeat the name in the bottom row. */
-  label?: string;
-  title: string;
-  /** Optional second part of the title, set in italic clay (home tagline). */
-  titleAccent?: string;
-  description?: string;
-}
 
 // Long post titles step down so they stay within three lines.
 function titleSize(text: string): number {

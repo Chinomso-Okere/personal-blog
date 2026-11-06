@@ -9,6 +9,7 @@ import { ExternalArrow } from "@/components/ExternalArrow";
 import { Venue } from "@/components/Venue";
 import { Sep } from "@/components/Sep";
 import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionCard } from "@/lib/og-cards";
 import { sectionPages } from "@/lib/pages";
 import { siteConfig } from "@/lib/site";
 
@@ -19,7 +20,7 @@ export const metadata: Metadata = pageMetadata({
   socialTitle: `${page.title} | ${siteConfig.name}`,
   description: page.description,
   path: page.path,
-  image: brandedImage("writing", page.title),
+  image: brandedImage("writing", sectionCard("writing")),
 });
 
 export default function WritingPage() {

@@ -14,6 +14,7 @@ import { Sep } from "@/components/Sep";
 import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/lib/site";
 import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
+import { postCard } from "@/lib/og-cards";
 import { getLocalImageSize } from "@/lib/image-size";
 import { AUTHOR_PHOTO } from "@/lib/pages";
 
@@ -53,7 +54,7 @@ export async function generateMetadata({
           alt: post.coverImageAlt || post.title,
           ...(getLocalImageSize(post.coverImage) ?? {}),
         }
-      : brandedImage(`post/${post.slug}`, post.title),
+      : brandedImage(`post/${post.slug}`, postCard(post)),
     article: { publishedTime: post.date },
   });
 }

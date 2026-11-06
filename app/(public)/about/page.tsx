@@ -11,6 +11,7 @@ import {
 import { getLocalImageSize } from "@/lib/image-size";
 import { formatDate } from "@/lib/format";
 import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionCard } from "@/lib/og-cards";
 import { sectionPages, AUTHOR_PHOTO } from "@/lib/pages";
 import { siteConfig } from "@/lib/site";
 import { ExternalArrow } from "@/components/ExternalArrow";
@@ -22,7 +23,7 @@ export const metadata: Metadata = pageMetadata({
   socialTitle: `${page.title} | ${siteConfig.name}`,
   description: page.description,
   path: page.path,
-  image: brandedImage("about", page.title),
+  image: brandedImage("about", sectionCard("about")),
 });
 
 interface WorkItem {

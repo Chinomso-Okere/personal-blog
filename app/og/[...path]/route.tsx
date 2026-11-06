@@ -1,11 +1,13 @@
 import { getAllPosts } from "@/lib/posts";
-import { sectionPages, HOME_EYEBROW, type SectionPage } from "@/lib/pages";
-import { siteConfig } from "@/lib/site";
-import { renderCard, type CardContent } from "@/lib/og";
+import { sectionPages, type SectionPage } from "@/lib/pages";
+import { renderCard } from "@/lib/og";
+import { homeCard, sectionCard, postCard, type CardContent } from "@/lib/og-cards";
 
 // Branded social cards, rendered once at build time:
 //   /og/home.png, /og/blog.png, /og/writing.png, /og/about.png
 //   /og/post/<slug>.png  (only for posts without a cover)
+// Pages link them with ?v=<hash> (lib/seo.ts brandedImage) to bust social
+// caches; the query string plays no part in which card is served.
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
@@ -22,26 +24,18 @@ export function generateStaticParams(): Params[] {
 
 function cardFor(segments: string[]): CardContent | null {
   if (segments.length === 1 && segments[0] === "home.png") {
-    const at = siteConfig.tagline.indexOf(",");
-    return {
-      label: HOME_EYEBROW,
-      title: at === -1 ? siteConfig.tagline : siteConfig.tagline.slice(0, at + 1),
-      titleAccent: at === -1 ? undefined : siteConfig.tagline.slice(at + 1).trim(),
-    };
+    return homeCard();
   }
 
   if (segments.length === 1) {
     const key = segments[0].replace(/\.png$/, "");
-    if (key in sectionPages) {
-      const page = sectionPages[key as SectionPage];
-      return { title: page.title, description: page.description };
-    }
+    if (key in sectionPages) return sectionCard(key as SectionPage);
   }
 
   if (segments.length === 2 && segments[0] === "post") {
     const slug = segments[1].replace(/\.png$/, "");
     const post = getAllPosts().find((p) => p.slug === slug && !p.coverImage);
-    if (post) return { label: post.tags?.[0] ?? "Blog", title: post.title };
+    if (post) return postCard(post);
   }
 
   return null;

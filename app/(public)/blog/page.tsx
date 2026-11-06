@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
 import { PostRow } from "@/components/PostRow";
 import { brandedImage, pageMetadata } from "@/lib/seo";
+import { sectionCard } from "@/lib/og-cards";
 import { sectionPages } from "@/lib/pages";
 import { siteConfig } from "@/lib/site";
 
@@ -12,7 +13,7 @@ export const metadata: Metadata = pageMetadata({
   socialTitle: `${page.title} | ${siteConfig.name}`,
   description: page.description,
   path: page.path,
-  image: brandedImage("blog", page.title),
+  image: brandedImage("blog", sectionCard("blog")),
 });
 
 export default function BlogPage() {

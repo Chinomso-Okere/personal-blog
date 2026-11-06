@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
+import { homeCard } from "@/lib/og-cards";
 import { HOME_EYEBROW, AUTHOR_PHOTO } from "@/lib/pages";
 import { getLocalImageSize } from "@/lib/image-size";
 import { getRecentPosts } from "@/lib/posts";
@@ -18,7 +19,7 @@ import { Sep } from "@/components/Sep";
 export const metadata: Metadata = pageMetadata({
   description: siteConfig.description,
   path: "/",
-  image: brandedImage("home", siteConfig.tagline),
+  image: brandedImage("home", homeCard()),
 });
 
 // "Applied AI, evidence first." -> ["Applied AI,", "evidence first."]
