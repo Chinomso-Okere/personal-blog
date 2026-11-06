@@ -22,6 +22,9 @@ professional visibility push.
 
 Redesign in progress: read `docs/redesign/PLAN.md`; mockups in `docs/redesign/mockup/`.
 
+Portfolio and CV in progress: read `docs/portfolio/PRODUCT.md` and `docs/portfolio/TECHNICAL.md`
+(§6 phased plan, §4b motion spec, §7 decided items); draft content in `docs/portfolio/drafts/`.
+
 > If you place these in a `/docs` folder instead of the repo root, update the
 > paths above to match.
 
@@ -70,6 +73,7 @@ update to the "Current status" section below.
 ## Current status
 
 - **Phase:** Phases 0 to 5 complete and live.
+- **Portfolio (`docs/portfolio/`):** Phase 0 done (6 Nov 2026): full-history secrets scan (gitleaks 8.30.1 plus a `git grep` pass over every commit, all refs including GitHub's) found no secrets; awaiting approval. Phases 1 to 5 not started.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
