@@ -14,6 +14,8 @@ export const siteConfig = {
     github: "https://github.com/Chinomso-Okere",
     linkedin: "https://www.linkedin.com/in/chinomso-okere-silverpathai",
     email: "mailto:niqquk@gmail.com",
-    portfolio: "", // Empty: Portfolio nav item renders only when non-empty
+    // A "/" path renders as an internal link (same tab, no arrow); a full URL
+    // as an external one. Empty hides the Portfolio nav item.
+    portfolio: "/portfolio",
   },
 };

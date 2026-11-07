@@ -73,7 +73,7 @@ update to the "Current status" section below.
 ## Current status
 
 - **Phase:** Phases 0 to 5 complete and live.
-- **Portfolio (`docs/portfolio/`):** Phase 0 done (6 Nov 2026): full-history secrets scan (gitleaks 8.30.1 plus a `git grep` pass over every commit, all refs including GitHub's) found no secrets. Phase 1 (content model) built 7 Nov 2026, awaiting approval: `lib/projects.ts`, `lib/cv.ts`, five entries in `content/projects/`, `content/cv.md` (name, headline, location only; email, LinkedIn and website come from `siteConfig`), `test:projects` suite. A dead internal `links.post` is dropped with a build warning, never a build failure. Phase 2 (case study page, on the `portfolio` branch) built 7 Nov 2026, awaiting approval: `/portfolio/[slug]` (static), `components/Reveal.tsx` (one-time IntersectionObserver reveals, reusable by Phase 3 cards), case-study render option in `lib/markdown.ts` (post output unchanged, fingerprinted in `test:safety`), `/og/project/<slug>.png` cards, CreativeWork JSON-LD, sitemap entries; view-transition names `project-title-<slug>` / `project-cover-<slug>` from `lib/project-types.ts`. "Back to portfolio" 404s until Phase 3 adds `/portfolio`. Phases 3 to 5 not started.
+- **Portfolio (`docs/portfolio/`):** Phase 0 done (6 Nov 2026): full-history secrets scan (gitleaks 8.30.1 plus a `git grep` pass over every commit, all refs including GitHub's) found no secrets. Phase 1 (content model) built 7 Nov 2026, awaiting approval: `lib/projects.ts`, `lib/cv.ts`, five entries in `content/projects/`, `content/cv.md` (name, headline, location only; email, LinkedIn and website come from `siteConfig`), `test:projects` suite. A dead internal `links.post` is dropped with a build warning, never a build failure. Phase 2 (case study page, on the `portfolio` branch) built 7 Nov 2026, awaiting approval: `/portfolio/[slug]` (static), `components/Reveal.tsx` (one-time IntersectionObserver reveals, reusable by Phase 3 cards), case-study render option in `lib/markdown.ts` (post output unchanged, fingerprinted in `test:safety`), `/og/project/<slug>.png` cards, CreativeWork JSON-LD, sitemap entries; view-transition names `project-title-<slug>` / `project-cover-<slug>` from `lib/project-types.ts`. Phase 3 (index and navigation) built 7 Nov 2026, awaiting approval: `/portfolio` (stacked hero "Work that shows / the answer is right.", two lines at every width, lede below; cards from `components/ProjectCard.tsx`, filters in `components/PortfolioFilters.tsx` shown only above 6 entries, capabilities parsed from the CV's Skills, Hiring / Work with me routes), header and About link internally to `/portfolio`, About section `#work-with-me`, `/og/portfolio.png`, CollectionPage JSON-LD, sitemap. `CV_PATH` in `lib/pages.ts` stays null until Phase 4. The card-to-header title morph runs only when the clicked card is on the first screen, and browser Back runs no view transition (Next 16.4); both accepted, no popstate workaround. Phone nav links now have `min-height: 44px` (header 104.75 → 105px at 390, all pages). The branch merges to main after Phase 4. Phases 4 and 5 not started.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
@@ -120,7 +120,7 @@ Everything that must change before the site goes public:
 - [x] Change `app/robots.ts` to allow search indexing and add the sitemap line (allows `/`, disallows `/admin` and `/api`)
 - [x] Delete both [Sample post] files in `content/posts/`
 - [x] Set `NEXT_PUBLIC_SITE_URL` to the real production custom domain in Vercel project environment variables (`https://chinomsookere.co.uk`, confirmed by Nonso; vercel.app redirects to it)
-- [ ] Add the Portfolio URL to lib/site.ts (the nav link then appears automatically)
+- [x] Add the Portfolio URL to lib/site.ts (now the internal `/portfolio`, on the `portfolio` branch)
 - [ ] Add the About photo at public/images/chinomso-okere.jpg
 - [ ] Add the ICSRS paper URLs to content/writing.json when proceedings are published
 - [ ] Confirm the CausalAgentBench title matches the camera-ready version
@@ -151,6 +151,10 @@ The publish route must REFUSE to publish if the body contains the text [CHECK: (
 - **Never create scratch copies that link (junction/symlink) to the repo's node_modules,
   and never rm -rf a folder that might contain such a link; copy only lib/ and content/
   or install separately.**
+- **`.next/` itself contains a Turbopack junction** (`.next/node_modules/shiki-<hash>`
+  → `node_modules/shiki`), so never `rm -rf .next` blindly: remove junctions first
+  (`cmd /c rmdir <link>`, which removes the link without following it) or let
+  `next build` overwrite `.next`.
 
 ## Decisions log
 

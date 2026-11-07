@@ -19,7 +19,27 @@ export const sectionPages = {
     description:
       "About Chinomso Okere: applied AI researcher, business analyst and founder of Silverpath AI, writing about evaluating AI agents and putting AI into real work.",
   },
+  portfolio: {
+    path: "/portfolio",
+    title: "Portfolio",
+    description:
+      "Case studies by Chinomso Okere: research, builds and proofs of concept, each with its evidence and what it doesn't show.",
+  },
 } as const;
+
+/** The /portfolio hero: two display lines (the second in italic clay) and a lede. */
+export const PORTFOLIO_HERO = {
+  eyebrow: "Portfolio",
+  line1: "Work that shows",
+  line2: "the answer is right.",
+  lede: "I focus on making digital and AI services trustworthy, measurable and useful to the people who rely on them.",
+} as const;
+
+/**
+ * The web CV's path, or null while the page does not exist yet. Links to the
+ * CV render only when this is set (Phase 4 sets it to "/cv").
+ */
+export const CV_PATH: string | null = null;
 
 export type SectionPage = keyof typeof sectionPages;
 

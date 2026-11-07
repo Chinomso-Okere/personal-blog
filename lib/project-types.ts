@@ -27,3 +27,11 @@ export const TYPE_LABELS: Record<ProjectType, string> = {
   build: "Build",
   "proof-of-concept": "Proof of concept",
 };
+
+/**
+ * The status to show beside the type in a kicker, or null when it would only
+ * repeat the type ("Proof of concept · Proof of concept").
+ */
+export function kickerStatus(type: ProjectType, status: string): string | null {
+  return status.trim().toLowerCase() === TYPE_LABELS[type].toLowerCase() ? null : status;
+}

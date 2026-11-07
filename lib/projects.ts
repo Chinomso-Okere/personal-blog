@@ -425,6 +425,28 @@ export function getProjectBySlug(slug: string): Project | null {
   return getAllProjects().find((project) => project.slug === slug) ?? null;
 }
 
+/** A project without its body, for cards and client components. Pure. */
+export function toSummary(project: Project): ProjectSummary {
+  const summary: ProjectSummary & { content?: string } = { ...project };
+  delete summary.content;
+  return summary;
+}
+
+/** Type filters on /portfolio appear only above this many published entries. */
+export const FILTER_THRESHOLD = 6;
+
+export function showFilters(count: number): boolean {
+  return count > FILTER_THRESHOLD;
+}
+
+/** Projects of one type, keeping display order; "all" returns them all. */
+export function filterProjects<T extends { type: ProjectType }>(
+  projects: T[],
+  type: ProjectType | "all"
+): T[] {
+  return type === "all" ? projects : projects.filter((project) => project.type === type);
+}
+
 /**
  * The projects either side of `slug` in display order. No wrap-around: the
  * first has no previous and the last no next. Pure.

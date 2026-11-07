@@ -6,10 +6,21 @@ import {
   getAllProjects,
   getProjectBySlug,
   adjacentProjects,
+  filterProjects,
+  showFilters,
+  toSummary,
+  FILTER_THRESHOLD,
   LIMITATIONS_SECTION,
   TYPE_LABELS,
 } from "../lib/projects.ts";
-import { projectTitleTransition, projectCoverTransition } from "../lib/project-types.ts";
+import { parseCvSkills, getCvSkills } from "../lib/cv.ts";
+import { sectionPages, PORTFOLIO_HERO, CV_PATH } from "../lib/pages.ts";
+import { sectionCard } from "../lib/og-cards.ts";
+import {
+  kickerStatus,
+  projectTitleTransition,
+  projectCoverTransition,
+} from "../lib/project-types.ts";
 import { formatProjectDate } from "../lib/format.ts";
 import { projectCard, cardVersion } from "../lib/og-cards.ts";
 import { renderMarkdown } from "../lib/markdown.ts";
@@ -452,6 +463,13 @@ async function runTests() {
   );
   assert(Object.keys(TYPE_LABELS).length === 3, "Every type has a label");
   assert(
+    kickerStatus("proof-of-concept", "Proof of concept") === null &&
+      kickerStatus("research", "Published") === "Published" &&
+      kickerStatus("build", "Live") === "Live" &&
+      kickerStatus("research", "Accepted") === "Accepted",
+    "Kicker hides the status only when it repeats the type label"
+  );
+  assert(
     projectTitleTransition("x") === "project-title-x" && projectCoverTransition("x") === "project-cover-x",
     "View-transition names are stable per slug"
   );
@@ -483,6 +501,56 @@ async function runTests() {
     /^<p>Intro before any heading.<\/p>/.test(preamble.trim()) && /<section class="cs-sec"/.test(preamble),
     "Content before the first H2 stays outside any section, and is not a lead"
   );
+
+  // 10. Portfolio index helpers (Phase 3)
+  assert(FILTER_THRESHOLD === 6, "Filter threshold is 6");
+  assert(!showFilters(5) && !showFilters(6) && showFilters(7), "Filters show only above 6 entries (5 and 6 hidden, 7 shown)");
+  assert(!showFilters(projects.length), `Filters hidden for the real ${projects.length} entries`);
+  const mixed = [
+    { slug: "r1", type: "research" },
+    { slug: "b1", type: "build" },
+    { slug: "r2", type: "research" },
+    { slug: "p1", type: "proof-of-concept" },
+  ];
+  assert(filterProjects(mixed, "all").length === 4, 'filterProjects "all" keeps everything');
+  assert(
+    JSON.stringify(filterProjects(mixed, "research").map((x) => x.slug)) === '["r1","r2"]',
+    "filterProjects keeps one type, in display order"
+  );
+  assert(filterProjects(mixed, "build").length === 1 && filterProjects([], "build").length === 0, "filterProjects: one build, empty list stays empty");
+
+  const summary = toSummary(projects[0]);
+  assert(!("content" in summary) && summary.slug === projects[0].slug && "content" in projects[0], "toSummary drops the body without touching the project");
+
+  const skills = getCvSkills();
+  assert(
+    JSON.stringify(skills.map((g) => g.heading)) === '["Business and delivery","AI and research","Tools"]',
+    `Capabilities come from the CV Skills section (${skills.map((g) => g.heading).join(", ")})`
+  );
+  assert(skills[2]?.text === "Python, APIs, n8n, Make.com.", "Skills text is verbatim from the CV");
+  assert(
+    parseCvSkills("## Skills\n\n**A:** x, y.\nnot a skill line\n\n## Other\n\n**B:** z.").length === 1,
+    "Skills parser stops at the next H2 and skips other lines"
+  );
+  assert(parseCvSkills("## Profile\n\n**A:** x.").length === 0, "No Skills section gives no groups");
+
+  assert(
+    PORTFOLIO_HERO.eyebrow === "Portfolio" &&
+      PORTFOLIO_HERO.line1 === "Work that shows" &&
+      PORTFOLIO_HERO.line2 === "the answer is right." &&
+      PORTFOLIO_HERO.lede ===
+        "I focus on making digital and AI services trustworthy, measurable and useful to the people who rely on them.",
+    "Portfolio hero copy is exactly the approved wording"
+  );
+  assert(
+    sectionPages.portfolio.path === "/portfolio" &&
+      sectionPages.portfolio.description ===
+        "Case studies by Chinomso Okere: research, builds and proofs of concept, each with its evidence and what it doesn't show.",
+    "Portfolio page metadata is the approved description"
+  );
+  assert(sectionCard("portfolio").title === "Portfolio", "Portfolio gets a branded section card");
+  assert(CV_PATH === null || CV_PATH === "/cv", `CV_PATH is null until the CV page exists (now ${CV_PATH})`);
+  assert(siteConfig.links.portfolio === "/portfolio", "Header Portfolio link is internal (/portfolio)");
 
   console.log("");
   if (failed) {

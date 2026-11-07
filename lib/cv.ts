@@ -112,3 +112,34 @@ export function parseCvFile(rawContent: string): Cv {
 export function getCv(): Cv {
   return parseCvFile(fs.readFileSync(CV_FILE, "utf-8"));
 }
+
+export interface SkillGroup {
+  heading: string;
+  /** The line as written in the CV, e.g. "Python, APIs, n8n, Make.com." */
+  text: string;
+}
+
+/**
+ * The "## Skills" section of a CV body as groups, from lines written
+ * "**Heading:** item, item, item." Lines in any other form are skipped, and
+ * the section ends at the next H2. Pure.
+ */
+export function parseCvSkills(content: string): SkillGroup[] {
+  const groups: SkillGroup[] = [];
+  let inSkills = false;
+  for (const line of content.split("\n")) {
+    if (/^##\s/.test(line)) {
+      inSkills = /^##\s+Skills\s*$/i.test(line);
+      continue;
+    }
+    if (!inSkills) continue;
+    const match = line.match(/^\*\*(.+?):\*\*\s+(.+?)\s*$/);
+    if (match) groups.push({ heading: match[1].trim(), text: match[2] });
+  }
+  return groups;
+}
+
+/** The CV's skills, for the portfolio capabilities strip. */
+export function getCvSkills(): SkillGroup[] {
+  return parseCvSkills(getCv().content);
+}

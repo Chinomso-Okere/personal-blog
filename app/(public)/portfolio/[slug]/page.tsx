@@ -10,7 +10,11 @@ import {
   TYPE_LABELS,
   type Project,
 } from "@/lib/projects";
-import { projectTitleTransition, projectCoverTransition } from "@/lib/project-types";
+import {
+  kickerStatus,
+  projectTitleTransition,
+  projectCoverTransition,
+} from "@/lib/project-types";
 import { renderMarkdown } from "@/lib/markdown";
 import { formatProjectDate } from "@/lib/format";
 import { CoverImage } from "@/components/CoverImage";
@@ -115,6 +119,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const linkComing = project.type === "research" && project.status === "Accepted" && !project.links.paper;
   const { prev, next } = adjacentProjects(projects, project.slug);
   const typeLabel = TYPE_LABELS[project.type];
+  const status = kickerStatus(project.type, project.status);
   const metaItems = [
     <time key="date" dateTime={project.date}>
       {formatProjectDate(project.date)}
@@ -148,13 +153,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <header className="post__head">
             <p className="kicker rise d1">
               <span className="kicker__tag">{typeLabel}</span>
-              <span className="kicker__more">
-                <Sep className="kicker__dot" />
-                {project.status}
-              </span>
+              {status && (
+                <span className="kicker__more">
+                  <Sep className="kicker__dot" />
+                  {status}
+                </span>
+              )}
             </p>
+            {/* No page-load rise on the title or cover: they are the targets of
+                the card morph, and a fade from 0 inside it looks broken. */}
             <ViewTransition name={projectTitleTransition(project.slug)}>
-              <h1 className="post__title rise d2">{project.title}</h1>
+              <h1 className="post__title">{project.title}</h1>
             </ViewTransition>
             <p className="post__dek rise d3">{project.summary}</p>
 
@@ -191,7 +200,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       </div>
 
       {project.cover && (
-        <div className="post__cover rise d5">
+        <div className="post__cover">
           <ViewTransition name={projectCoverTransition(project.slug)}>
             <div className="post__cover-in">
               <CoverImage

@@ -204,7 +204,8 @@ export default function AboutPage() {
       )}
 
       {about.workWithMe && (
-        <section className="about-sec" aria-labelledby="contact-heading">
+        // id is the target of the portfolio page's "More about working with me".
+        <section id="work-with-me" className="about-sec" aria-labelledby="contact-heading">
           <SectionHead id="contact-heading">Work with me</SectionHead>
           <p className="about-text about-measure">{about.workWithMe}</p>
           <div className="about-cta">
@@ -222,20 +223,28 @@ export default function AboutPage() {
                 Email
               </a>
             )}
-            {portfolio && (
-              <a
-                className="btn btn--ghost"
-                href={portfolio}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View my portfolio
-                <span className="btn__arrow" aria-hidden="true">
-                  ↗
-                </span>
-                <span className="sr-only"> (opens in new tab)</span>
-              </a>
-            )}
+            {portfolio &&
+              (portfolio.startsWith("/") ? (
+                <Link className="btn btn--ghost" href={portfolio}>
+                  View my portfolio
+                  <span className="btn__arrow" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              ) : (
+                <a
+                  className="btn btn--ghost"
+                  href={portfolio}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View my portfolio
+                  <span className="btn__arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                  <span className="sr-only"> (opens in new tab)</span>
+                </a>
+              ))}
           </div>
         </section>
       )}

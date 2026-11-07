@@ -81,7 +81,7 @@ Nonso wants the portfolio to feel more alive than the blog. Every motion must st
 
 - **Index hero:** the home page's line reveal + staggered rise, reused.
 - **Cards enter on scroll:** each card rises and fades in as it enters the viewport, staggered by about 60ms per card within a row, once only. Prefer CSS scroll-driven animation (`animation-timeline: view()`) with an `IntersectionObserver` fallback; content must be visible without JS.
-- **Card hover/focus:** lift (−4px) with the soft shadow, cover image scale 1.03, title underline sweep, arrow nudge (the existing feature-card language).
+- **Card hover/focus:** lift (−3px, the site's existing card lift; changed from −4px on 7 Nov 2026 so all cards match) with the soft shadow, cover image scale 1.03, title underline sweep, arrow nudge (the existing feature-card language).
 - **Card → case study continuity:** a shared-element view transition so the clicked card's title (and cover, when present) morphs into the case study header, using React's `<ViewTransition name>` already in use for route cross-fades. Back navigation reverses it.
 - **Filter tabs (when shown):** a sliding active indicator, and cards reflow smoothly when the filter changes (view transition on the list), never a hard jump.
 - **Case study sections:** each H2 section fades up as it enters; the "What it doesn't show" panel draws its accent rule from top to bottom on entry; stack chips stagger in.
