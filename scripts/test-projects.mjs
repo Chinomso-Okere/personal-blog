@@ -13,7 +13,8 @@ import {
   LIMITATIONS_SECTION,
   TYPE_LABELS,
 } from "../lib/projects.ts";
-import { parseCvSkills, getCvSkills } from "../lib/cv.ts";
+import { parseCvSkills, getCvSkills, parseCvSections, parseExperience } from "../lib/cv.ts";
+import { cardLayout } from "../lib/project-types.ts";
 import { sectionPages, PORTFOLIO_HERO, CV_PATH } from "../lib/pages.ts";
 import { sectionCard } from "../lib/og-cards.ts";
 import {
@@ -549,7 +550,64 @@ async function runTests() {
     "Portfolio page metadata is the approved description"
   );
   assert(sectionCard("portfolio").title === "Portfolio", "Portfolio gets a branded section card");
-  assert(CV_PATH === null || CV_PATH === "/cv", `CV_PATH is null until the CV page exists (now ${CV_PATH})`);
+  assert(CV_PATH === "/cv" && sectionPages.cv.path === "/cv", `CV_PATH is "/cv" now the page exists (${CV_PATH})`);
+  assert(
+    sectionPages.cv.description === "CV of Chinomso Okere: MBCS, business analyst and applied AI researcher in Scotland, UK." &&
+      sectionCard("cv").title === "CV",
+    "CV metadata is the approved description, with a branded card"
+  );
+
+  // 11. Lead card layout (Phase 4)
+  const layout = (count) =>
+    Array.from({ length: count }, (_, i) => {
+      const { lead, secondInRow } = cardLayout(count, i);
+      return lead ? "L" : secondInRow ? "2" : "1";
+    }).join("");
+  assert(layout(1) === "L", "1 card: a lone lead");
+  assert(layout(2) === "12", "2 cards: one pair");
+  assert(layout(5) === "L1212", "5 cards: lead, then two pairs");
+  assert(layout(6) === "121212", "6 cards: three pairs, no lead");
+  assert(layout(7) === "L121212", "7 cards: lead, then three pairs");
+  const research = filterProjects(mixed, "research");
+  assert(layout(research.length) === "12" && layout(mixed.length) === "1212", "Filtered counts drive the layout (4 -> pairs, 2 research -> pair)");
+  assert(layout(filterProjects(mixed, "build").length) === "L", "A filter leaving 1 card makes it the lead");
+
+  // 12. CV sections and experience (Phase 4)
+  const cvSections = parseCvSections(getCv().content);
+  assert(
+    JSON.stringify(cvSections.map((s) => s.heading)) ===
+      JSON.stringify(["Profile", "Selected contributions", "Experience", "Research and publications", "Education", "Professional memberships and development", "Skills"]),
+    `CV sections in order (${cvSections.map((s) => s.heading).join(", ")})`
+  );
+  const roles = parseExperience(cvSections.find((s) => s.heading === "Experience").body);
+  assert(roles.length === 5, `5 roles parsed (${roles.length})`);
+  assert(
+    roles[0].role === "Review Officer (HEO)" && roles[0].org === "UK Civil Service" && roles[0].dates === "Jan 2026 – present",
+    "First role split into role, organisation and dates"
+  );
+  assert(roles.every((r) => r.body.startsWith("- ")), "Every role keeps its bullets");
+  for (const bad of ["### Analyst · Somewhere", "### Analyst · Org · 2020 · extra", "### Analyst ·  · 2020"]) {
+    let message = null;
+    try {
+      parseExperience(`${bad}\n- did things`);
+    } catch (err) {
+      message = err.message;
+    }
+    assert(message?.includes('"content/cv.md" (Experience)') && message.includes(bad.slice(4)), `Strict role heading rejects "${bad.slice(4)}"`);
+  }
+  const research2 = cvSections.find((s) => s.heading === "Research and publications").body;
+  assert(!/\.pdf/i.test(getCv().content), "CV links no PDF");
+  const pubHtml = await renderMarkdown(research2, { lead: false, externalLinksNewTab: true });
+  const pubLinks = pubHtml.match(/<a [^>]*>/g) || [];
+  assert(
+    pubLinks.length === 1 &&
+      /href="https:\/\/doi\.org\/10\.1109\/AAIML67890\.2026\.11498196"/.test(pubLinks[0]) &&
+      /target="_blank"/.test(pubLinks[0]) &&
+      /rel="noopener noreferrer"/.test(pubLinks[0]) &&
+      pubHtml.includes('<span class="sr-only"> (opens in new tab)</span>'),
+    "Publications: only the DOI is a link, opening in a new tab with hidden text"
+  );
+  assert(!/class="lead"|data-dropcap/.test(pubHtml), "CV sections render without lead or drop cap");
   assert(siteConfig.links.portfolio === "/portfolio", "Header Portfolio link is internal (/portfolio)");
 
   console.log("");

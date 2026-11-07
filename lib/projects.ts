@@ -9,7 +9,7 @@ import {
   type ProjectStatus,
 } from "./project-types.ts";
 
-export { PROJECT_TYPES, PROJECT_STATUSES, TYPE_LABELS } from "./project-types.ts";
+export { PROJECT_TYPES, PROJECT_STATUSES, TYPE_LABELS, cardLayout } from "./project-types.ts";
 export type { ProjectType, ProjectStatus } from "./project-types.ts";
 
 export interface ProjectLinks {

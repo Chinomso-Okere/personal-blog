@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ViewTransition } from "react";
 import type { ProjectSummary } from "@/lib/projects";
 import {
+  cardLayout,
   TYPE_LABELS,
   kickerStatus,
   projectCoverTransition,
@@ -26,6 +27,14 @@ function linkLabels(project: ProjectSummary): string[] {
   if (repo) labels.push("Code");
   if (post) labels.push("Post");
   return labels;
+}
+
+/** Class for card `index` of `count` in .pf-cards (lead / second-in-row). */
+export function cardClass(count: number, index: number): string | undefined {
+  const { lead, secondInRow } = cardLayout(count, index);
+  if (lead) return "pf-cards__lead";
+  if (secondInRow) return "pf-cards__second";
+  return undefined;
 }
 
 export function ProjectCard({ project }: { project: ProjectSummary }) {

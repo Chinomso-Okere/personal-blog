@@ -3,7 +3,7 @@
 import { startTransition, useLayoutEffect, useRef, useState, ViewTransition } from "react";
 import type { ProjectSummary } from "@/lib/projects";
 import { PROJECT_TYPES, TYPE_LABELS, type ProjectType } from "@/lib/project-types";
-import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectCard, cardClass } from "@/components/ProjectCard";
 
 type Filter = ProjectType | "all";
 
@@ -49,9 +49,10 @@ export function PortfolioFilters({ projects }: { projects: ProjectSummary[] }) {
         <span ref={marker} className="pf-filters__marker" aria-hidden="true" />
       </div>
       <ul className="pf-cards">
-        {shown.map((project) => (
+        {/* Lead/pair layout follows the filtered count. */}
+        {shown.map((project, i) => (
           <ViewTransition key={project.slug}>
-            <li data-reveal="">
+            <li data-reveal="" className={cardClass(shown.length, i)}>
               <ProjectCard project={project} />
             </li>
           </ViewTransition>

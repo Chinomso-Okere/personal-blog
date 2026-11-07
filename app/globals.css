@@ -2615,7 +2615,16 @@ html:has(.post) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .pf-cards > li:nth-child(2n).is-in {
+    /* Odd count: the first card leads across both columns (cardLayout). */
+    .pf-cards > li.pf-cards__lead {
+      grid-column: 1 / -1;
+    }
+
+    .pf-cards__lead .pf-card__summary {
+      max-width: 68ch;
+    }
+
+    .pf-cards > li.pf-cards__second.is-in {
       animation-delay: 0.06s;
     }
   }
@@ -2722,6 +2731,214 @@ html:has(.post) {
     }
   }
 
+  /* Web CV (/cv): About's type scale and tokens; experience as a timeline. */
+  .cv {
+    padding-top: clamp(48px, 7vw, 88px);
+  }
+
+  .cv__name {
+    margin: 0 0 14px;
+    font-family: var(--display);
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.032em;
+    font-weight: 400;
+    font-variation-settings: "opsz" 72;
+    text-wrap: balance;
+  }
+
+  .cv__headline {
+    margin: 0 0 22px;
+    font-size: clamp(20px, 2.2vw, 25px);
+    line-height: 1.45;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .cv__contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+    font: 400 14px/1.6 var(--ui);
+    color: var(--muted);
+  }
+
+  .cv__contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cv__contact a {
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .cv__contact a:hover,
+  .cv__contact a:focus-visible {
+    color: var(--accent-ink);
+    text-decoration-color: var(--accent);
+  }
+
+  .cv__actions {
+    margin-top: 28px;
+  }
+
+  .cv-sec {
+    padding-top: clamp(48px, 6vw, 80px);
+  }
+
+  .cv .article {
+    max-width: 760px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv .article p,
+  .cv .article ul,
+  .cv .article ol {
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  .cv .article > :last-child {
+    margin-bottom: 0;
+  }
+
+  .cv-roles {
+    max-width: 960px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cv-role {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 0 32px;
+  }
+
+  .cv-role__dates {
+    margin: 0;
+    padding-top: 5px;
+    font: 500 13.5px/1.5 var(--ui);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hairline with an accent dot per role. */
+  .cv-role__main {
+    position: relative;
+    padding: 0 0 40px 30px;
+    border-left: 1px solid var(--border);
+  }
+
+  .cv-role:last-child .cv-role__main {
+    padding-bottom: 0;
+  }
+
+  .cv-role__main::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 11px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .cv-role__title {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 23px;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  .cv-role__org {
+    margin: 4px 0 14px;
+    font: 500 14px/1.5 var(--ui);
+    color: var(--muted);
+  }
+
+  .cv-skills {
+    max-width: 760px;
+    margin: 0;
+  }
+
+  .cv-skills__row + .cv-skills__row {
+    margin-top: 18px;
+  }
+
+  .cv-skills dt {
+    margin: 0 0 6px;
+    font: 600 12.5px var(--ui);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .cv-skills dd {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  /* Contact links are stand-alone controls: 44px tall on touch screens. */
+  @media (pointer: coarse), (max-width: 759px) {
+    .cv__contact a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
+  /* Phones: contact details stack without dots; dates sit on the timeline
+     above each role. */
+  @media (max-width: 639px) {
+    /* "Professional memberships and development" is wider than a phone:
+       let CV section labels wrap and keep a stub of the rule. */
+    .cv .sec-head__label {
+      white-space: normal;
+    }
+
+    .cv .sec-head__rule {
+      min-width: 32px;
+    }
+
+    .cv__contact {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .cv__contact .kicker__dot {
+      display: none;
+    }
+
+    .cv-role {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cv-role__dates {
+      padding: 0 0 4px 30px;
+      border-left: 1px solid var(--border);
+    }
+
+    .cv-role__main::before {
+      top: -18px;
+    }
+  }
+
   /* About's "Work with me" is linked from /portfolio; keep it clear of the
      sticky header when jumped to. */
   #work-with-me {
@@ -2732,5 +2949,163 @@ html:has(.post) {
     .pf-filters__marker {
       transition: none;
     }
+  }
+}
+
+/* Print: the web CV on A4. Unlayered and last so it wins over the dark-theme
+   tokens (html:root:has(.cv) outranks :root[data-theme="dark"]). Scoped to
+   pages containing .cv, so printing any other page is unchanged. */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 16mm 16mm;
+  }
+
+  html:root:has(.cv) {
+    color-scheme: light;
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --tint: #EDE5D3;
+    --fg: #211B12;
+    --muted: #5E5545;
+    --border: #D9CFBD;
+    --accent: #9C3B1B;
+    --accent-ink: #9C3B1B;
+  }
+
+  html:has(.cv) body {
+    background: #FFFFFF;
+    color: var(--fg);
+  }
+
+  html:has(.cv) body::before,
+  html:has(.cv) .skip,
+  html:has(.cv) .masthead,
+  html:has(.cv) .foot,
+  html:has(.cv) .cv__actions {
+    display: none;
+  }
+
+  html:has(.cv) *,
+  html:has(.cv) *::before,
+  html:has(.cv) *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cv {
+    max-width: none;
+    padding: 0;
+  }
+
+  .cv__name {
+    margin-bottom: 4pt;
+    font-size: 26pt;
+  }
+
+  .cv__headline {
+    margin-bottom: 6pt;
+    font-size: 12pt;
+  }
+
+  .cv__contact {
+    font-size: 8.5pt;
+  }
+
+  /* No touch targets on paper: drop the 44px screen rule (the A4 width
+     counts as narrow) so the contact line stays one line of text. */
+  .cv__contact a {
+    display: inline;
+    min-height: 0;
+    text-decoration: none;
+  }
+
+  .cv-sec {
+    padding-top: 13pt;
+  }
+
+  .cv .sec-head {
+    margin-bottom: 7pt;
+    break-after: avoid;
+  }
+
+  .cv .sec-head__label {
+    font-size: 8pt;
+  }
+
+  .cv .article p,
+  .cv .article ul,
+  .cv .article ol,
+  .cv-skills dd {
+    font-size: 10pt;
+    line-height: 1.42;
+  }
+
+  .cv .article p {
+    margin-bottom: 4pt;
+  }
+
+  .cv .article ul,
+  .cv .article ol {
+    margin-bottom: 0;
+  }
+
+  .cv .article li {
+    margin-bottom: 1.5pt;
+    break-inside: avoid;
+  }
+
+  .cv .article a:not(.anchor):not(.fig__open) {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .cv-roles,
+  .cv-skills {
+    max-width: none;
+  }
+
+  .cv-role {
+    grid-template-columns: 92pt minmax(0, 1fr);
+    gap: 0 14pt;
+    break-inside: avoid;
+  }
+
+  .cv-role__dates {
+    padding-top: 2pt;
+    font-size: 8.5pt;
+  }
+
+  .cv-role__main {
+    padding: 0 0 9pt 14pt;
+  }
+
+  .cv-role__main::before {
+    top: 5pt;
+    width: 5px;
+    height: 5px;
+    left: -3px;
+  }
+
+  .cv-role__title {
+    font-size: 11.5pt;
+  }
+
+  .cv-role__org {
+    margin: 0 0 3pt;
+    font-size: 9pt;
+  }
+
+  .cv-skills__row {
+    break-inside: avoid;
+  }
+
+  .cv-skills__row + .cv-skills__row {
+    margin-top: 5pt;
+  }
+
+  .cv-skills dt {
+    margin-bottom: 1pt;
+    font-size: 7.5pt;
   }
 }

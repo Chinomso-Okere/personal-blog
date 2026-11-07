@@ -6,6 +6,7 @@ import {
   toSummary,
   type ProjectSummary,
 } from "@/lib/projects";
+import { cardClass } from "@/components/ProjectCard";
 import { getCvSkills } from "@/lib/cv";
 import { getAbout } from "@/lib/about";
 import { siteConfig } from "@/lib/site";
@@ -95,8 +96,12 @@ export default function PortfolioPage() {
               <PortfolioFilters projects={projects} />
             ) : (
               <ul className="pf-cards">
-                {projects.map((project) => (
-                  <li key={project.slug} data-reveal="">
+                {projects.map((project, i) => (
+                  <li
+                    key={project.slug}
+                    data-reveal=""
+                    className={cardClass(projects.length, i)}
+                  >
                     <ProjectCard project={project} />
                   </li>
                 ))}

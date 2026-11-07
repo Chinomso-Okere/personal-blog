@@ -412,6 +412,39 @@ export interface RenderOptions {
    * case and curly apostrophes) also gets "cs-sec--limits".
    */
   caseStudy?: { panelHeading: string };
+  /** false: no lead paragraph or drop cap (CV sections). Default true. */
+  lead?: boolean;
+  /**
+   * http(s) links open in a new tab (rel="noopener noreferrer") with a
+   * visually hidden "(opens in new tab)". Default false.
+   */
+  externalLinksNewTab?: boolean;
+}
+
+// Runs after sanitising, like rehypePostEnhance: the target, rel and hidden
+// text are generated here, so the sanitiser schema is unchanged.
+function rehypeExternalLinksNewTab() {
+  const visit = (node: HastNode) => {
+    const children = (node as { children?: HastNode[] }).children;
+    if (!children) return;
+    for (const child of children) {
+      if (child.type !== "element") continue;
+      const el = child as HastElement;
+      const href = String(el.properties?.href ?? "");
+      if (el.tagName === "a" && /^https?:\/\//.test(href)) {
+        el.properties = { ...el.properties, target: "_blank", rel: ["noopener", "noreferrer"] };
+        el.children.push({
+          type: "element",
+          tagName: "span",
+          properties: { className: ["sr-only"] },
+          children: [{ type: "text", value: " (opens in new tab)" }],
+        });
+      } else {
+        visit(el);
+      }
+    }
+  };
+  return (tree: HastRoot) => visit(tree);
 }
 
 function normaliseHeading(text: string): string {
@@ -460,13 +493,16 @@ export async function renderMarkdownWithHeadings(
 
   const processor = unified()
     .use(remarkParse)
-    .use(remarkEnhancements, { lead: !caseStudy })
+    .use(remarkEnhancements, { lead: !caseStudy && options.lead !== false })
     .use(remarkRehype)
     .use(rehypeShiki, highlighter)
     .use(rehypeSanitize, sanitizeSchema)
     .use(rehypePostEnhance, headings);
   if (caseStudy) {
     processor.use(rehypeCaseStudySections, headings, caseStudy.panelHeading);
+  }
+  if (options.externalLinksNewTab) {
+    processor.use(rehypeExternalLinksNewTab);
   }
   const file = await processor.use(rehypeStringify).process(content);
 

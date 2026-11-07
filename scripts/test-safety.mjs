@@ -253,6 +253,25 @@ print("secure")
     failed = true;
   }
 
+  // 9. CV render options: new-tab links generated after sanitising
+  const linkHtml = await renderMarkdown(
+    "See [a paper](https://doi.org/10.1/x), [a page](/about) and [js](javascript:alert(1)).",
+    { lead: false, externalLinksNewTab: true }
+  );
+  const externalNewTab =
+    /<a href="https:\/\/doi\.org\/10\.1\/x" target="_blank" rel="noopener noreferrer">a paper<span class="sr-only"> \(opens in new tab\)<\/span><\/a>/.test(linkHtml);
+  const internalUntouched = /<a href="\/about">a page<\/a>/.test(linkHtml);
+  const jsStillStripped = !/javascript:/i.test(linkHtml);
+  const noLead = !/class="lead"/.test(linkHtml);
+  console.log(`PASS: External links open in new tab safely:  ${externalNewTab}`);
+  console.log(`PASS: Internal links left as they are:        ${internalUntouched}`);
+  console.log(`PASS: javascript: links still stripped:       ${jsStillStripped}`);
+  console.log(`PASS: lead: false renders no lead paragraph:  ${noLead}`);
+  if (!externalNewTab || !internalUntouched || !jsStillStripped || !noLead) {
+    console.error("FAILED: CV render options wrong:\n" + linkHtml);
+    failed = true;
+  }
+
   if (failed) {
     console.error("\nONE OR MORE CHECKS FAILED!");
     process.exit(1);

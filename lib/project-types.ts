@@ -21,6 +21,18 @@ export function projectCoverTransition(slug: string): string {
   return `project-cover-${slug}`;
 }
 
+/**
+ * Grid placement of card `index` in a list of `count` (two columns from
+ * 760px). With an odd count the first card is a full-width lead and the rest
+ * pair up; with an even count every card is in a pair. `secondInRow` marks the
+ * right-hand card of a pair (its reveal starts 60ms later).
+ */
+export function cardLayout(count: number, index: number): { lead: boolean; secondInRow: boolean } {
+  const lead = count % 2 === 1 && index === 0;
+  const offset = count % 2 === 1 ? 1 : 0;
+  return { lead, secondInRow: !lead && (index - offset) % 2 === 1 };
+}
+
 /** Display label per type: kicker, social card label, JSON-LD genre. */
 export const TYPE_LABELS: Record<ProjectType, string> = {
   research: "Research",
