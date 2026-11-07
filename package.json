@@ -14,7 +14,8 @@
     "test:auth": "node scripts/test-auth.mjs",
     "test:post": "node scripts/test-post.mjs",
     "test:publish": "node scripts/test-publish.mjs",
-    "test:manage": "node scripts/test-manage.mjs"
+    "test:manage": "node scripts/test-manage.mjs",
+    "test:projects": "node scripts/test-projects.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",

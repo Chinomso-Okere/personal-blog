@@ -11,6 +11,7 @@ stack: ["CrewAI", "OpenAI o3-mini", "Pydantic", "Python"]
 links:
   paper: "https://doi.org/10.1109/AAIML67890.2026.11498196"
 featured: true
+order: 1
 published: true
 ---
 

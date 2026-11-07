@@ -12,6 +12,7 @@ links:
   repo: "https://github.com/Chinomso-Okere/personal-blog"
   post: "/blog/ai-build-playbook-part-1"
 featured: true
+order: 2
 published: true
 ---
 

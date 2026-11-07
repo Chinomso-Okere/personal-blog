@@ -2,9 +2,6 @@
 name: "Chinomso Okere"
 headline: "MBCS · Business Analyst · Applied AI Researcher"
 location: "Scotland, UK"
-email: "niqquk@gmail.com"   # same as the site's Email link; to be replaced by a company address later (change in one place: siteConfig)
-linkedin: "https://www.linkedin.com/in/chinomso-okere-silverpathai"
-website: "https://chinomsookere.co.uk"
 ---
 
 ## Profile

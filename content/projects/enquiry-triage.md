@@ -9,6 +9,7 @@ role: "Builder"
 stack: ["Python", "Claude API", "Pydantic", "FastAPI", "SQLite", "Slack webhooks", "pytest"]
 links: {}
 featured: true
+order: 3
 published: true
 ---
 
