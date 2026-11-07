@@ -2265,4 +2265,231 @@ html:has(.post) {
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
+
+  /* Portfolio case study (/portfolio/<slug>): the post header and .article
+     column, plus a meta strip, link buttons, the limitations panel and
+     prev/next navigation. */
+  .case__meta {
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .case__facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font: 400 14px var(--ui);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .case__fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .case__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip--stack {
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* Stack chips rise in turn after the facts line (.d4 = .48s). */
+  .case__stack .chip {
+    animation: rise 0.6s var(--ease-out) both;
+  }
+
+  .case__stack .chip:nth-child(1) { animation-delay: 0.54s; }
+  .case__stack .chip:nth-child(2) { animation-delay: 0.6s; }
+  .case__stack .chip:nth-child(3) { animation-delay: 0.66s; }
+  .case__stack .chip:nth-child(4) { animation-delay: 0.72s; }
+  .case__stack .chip:nth-child(5) { animation-delay: 0.78s; }
+  .case__stack .chip:nth-child(6) { animation-delay: 0.84s; }
+  .case__stack .chip:nth-child(7) { animation-delay: 0.9s; }
+  .case__stack .chip:nth-child(8) { animation-delay: 0.96s; }
+
+  .case__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .case__note {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    margin: 0;
+    font: 500 14px var(--ui);
+    color: var(--muted);
+  }
+
+  .case__body > .cs-sec:first-child > h2 {
+    margin-top: 0;
+  }
+
+  /* "What it doesn't show": a quiet panel with an accent rule on the left. */
+  .cs-sec--limits {
+    position: relative;
+    margin-top: 45px;
+    padding: clamp(24px, 4vw, 40px) clamp(22px, 4vw, 44px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+  }
+
+  .cs-sec--limits::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 24px;
+    bottom: 24px;
+    width: 3px;
+    background: var(--accent);
+    transform-origin: top;
+  }
+
+  .cs-sec--limits > h2 {
+    margin-top: 0;
+  }
+
+  .cs-sec--limits > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* One-time reveal (components/Reveal.tsx). Only off-screen elements are
+     ever .is-pending, and only with JavaScript and motion allowed. */
+  [data-reveal].is-pending {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  [data-reveal].is-in {
+    animation: rise 0.8s var(--ease-out) both;
+  }
+
+  .cs-sec--limits.is-pending::before {
+    transform: scaleY(0);
+  }
+
+  .cs-sec--limits.is-in::before {
+    animation: draw-rule 0.9s var(--ease-out) 0.3s both;
+  }
+
+  @keyframes draw-rule {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  .case__pager {
+    margin-top: clamp(56px, 7vw, 88px);
+  }
+
+  .case__pager-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+
+  .case__step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px 0;
+    text-decoration: none;
+  }
+
+  .case__step--next {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .case__step-label {
+    font: 600 12.5px var(--ui);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .case__step-title {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    color: var(--fg);
+    transition: color 0.15s ease;
+  }
+
+  .case__step:hover .case__step-title,
+  .case__step:focus-visible .case__step-title {
+    color: var(--accent-ink);
+  }
+
+  .case__back {
+    margin-top: 28px;
+  }
+
+  /* Phones: facts stack without dots (none left dangling at a line end), and
+     prev/next stack. */
+  @media (max-width: 639px) {
+    .case__facts {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .case__fact .byline__sep {
+      display: none;
+    }
+
+    .case__pager-row {
+      grid-template-columns: 1fr;
+    }
+
+    .case__step--next {
+      grid-column: auto;
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case__stack .chip,
+    [data-reveal].is-in,
+    .cs-sec--limits.is-in::before {
+      animation: none;
+    }
+
+    [data-reveal].is-pending {
+      opacity: 1;
+      transform: none;
+    }
+
+    .cs-sec--limits.is-pending::before {
+      transform: none;
+    }
+  }
 }

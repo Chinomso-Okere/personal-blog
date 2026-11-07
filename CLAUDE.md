@@ -73,7 +73,7 @@ update to the "Current status" section below.
 ## Current status
 
 - **Phase:** Phases 0 to 5 complete and live.
-- **Portfolio (`docs/portfolio/`):** Phase 0 done (6 Nov 2026): full-history secrets scan (gitleaks 8.30.1 plus a `git grep` pass over every commit, all refs including GitHub's) found no secrets. Phase 1 (content model) built 7 Nov 2026, awaiting approval: `lib/projects.ts`, `lib/cv.ts`, five entries in `content/projects/`, `content/cv.md` (name, headline, location only; email, LinkedIn and website come from `siteConfig`), `test:projects` suite. A dead internal `links.post` is dropped with a build warning, never a build failure. Phases 2 to 5 not started.
+- **Portfolio (`docs/portfolio/`):** Phase 0 done (6 Nov 2026): full-history secrets scan (gitleaks 8.30.1 plus a `git grep` pass over every commit, all refs including GitHub's) found no secrets. Phase 1 (content model) built 7 Nov 2026, awaiting approval: `lib/projects.ts`, `lib/cv.ts`, five entries in `content/projects/`, `content/cv.md` (name, headline, location only; email, LinkedIn and website come from `siteConfig`), `test:projects` suite. A dead internal `links.post` is dropped with a build warning, never a build failure. Phase 2 (case study page, on the `portfolio` branch) built 7 Nov 2026, awaiting approval: `/portfolio/[slug]` (static), `components/Reveal.tsx` (one-time IntersectionObserver reveals, reusable by Phase 3 cards), case-study render option in `lib/markdown.ts` (post output unchanged, fingerprinted in `test:safety`), `/og/project/<slug>.png` cards, CreativeWork JSON-LD, sitemap entries; view-transition names `project-title-<slug>` / `project-cover-<slug>` from `lib/project-types.ts`. "Back to portfolio" 404s until Phase 3 adds `/portfolio`. Phases 3 to 5 not started.
 - **Done:**
   - Phase 0: scaffold, initial folder structure with .gitkeep placeholders, production build & lint verified, remote GitHub repo linked, live deployment verified on Vercel over HTTPS (https://personal-blog-omega-flax.vercel.app/).
   - Phase 1 (committed as 4245122): design tokens, fonts, header/footer/theme toggle, markdown pipeline with Shiki + rehype-sanitize, blog listing + post pages with SSG, custom 404, Writing page backed by content/writing.json, About page backed by content/about.md, SEO basics (title template, per-page canonicals, OpenGraph, sitemap.ts), site-wide noindex + robots disallow-all.
@@ -147,6 +147,10 @@ The publish route must REFUSE to publish if the body contains the text [CHECK: (
   (`node process exited before we could connect to it with exit code: 0`). Use
   standard `@tailwindcss/postcss` with `postcss.config.mjs` and
   `experimental: { turbopackPluginRuntimeStrategy: "forceWorkerThreads" }`.
+
+- **Never create scratch copies that link (junction/symlink) to the repo's node_modules,
+  and never rm -rf a folder that might contain such a link; copy only lib/ and content/
+  or install separately.**
 
 ## Decisions log
 

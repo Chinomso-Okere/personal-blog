@@ -88,9 +88,11 @@ function getHighlighter(): Promise<Highlighter> {
   return highlighterPromise;
 }
 
-function remarkEnhancements() {
+// Options are an object, not a bare boolean: unified treats `.use(p, true)`
+// as "no options" and `.use(p, false)` as "plugin off".
+function remarkEnhancements({ lead }: { lead: boolean }) {
   return (tree: MdastRoot) => {
-    let firstP = true;
+    let firstP = lead;
     for (const node of tree.children) {
       if (node.type === "paragraph" && firstP) {
         firstP = false;
@@ -402,26 +404,79 @@ export const sanitizeSchema: SanitizeOptions = {
   },
 };
 
+export interface RenderOptions {
+  /**
+   * Portfolio case study: no lead paragraph or drop cap, and each H2 with
+   * the content up to the next H2 wrapped in <section class="cs-sec"
+   * data-reveal>. The section whose heading matches `panelHeading` (ignoring
+   * case and curly apostrophes) also gets "cs-sec--limits".
+   */
+  caseStudy?: { panelHeading: string };
+}
+
+function normaliseHeading(text: string): string {
+  return text.replace(/[‘’]/g, "'").trim().toLowerCase();
+}
+
+// Runs after rehypePostEnhance, so it only regroups already-sanitised nodes
+// into generated <section> wrappers; the sanitiser schema is unchanged.
+function rehypeCaseStudySections(headings: Heading[], panelHeading: string) {
+  return (tree: HastRoot) => {
+    const panel = normaliseHeading(panelHeading);
+    const children: HastRoot["children"] = [];
+    let section: HastElement | null = null;
+    let h2Index = 0;
+
+    for (const node of tree.children) {
+      if (node.type === "element" && (node as HastElement).tagName === "h2") {
+        const heading = headings[h2Index++];
+        const className = ["cs-sec"];
+        if (heading && normaliseHeading(heading.text) === panel) {
+          className.push("cs-sec--limits");
+        }
+        section = {
+          type: "element",
+          tagName: "section",
+          properties: { className, dataReveal: "" },
+          children: [],
+        };
+        children.push(section);
+      }
+      if (section) section.children.push(node as HastElement);
+      else children.push(node);
+    }
+
+    tree.children = children;
+  };
+}
+
 export async function renderMarkdownWithHeadings(
-  content: string
+  content: string,
+  options: RenderOptions = {}
 ): Promise<{ html: string; headings: Heading[] }> {
   const highlighter = await getHighlighter();
   const headings: Heading[] = [];
+  const caseStudy = options.caseStudy;
 
-  const file = await unified()
+  const processor = unified()
     .use(remarkParse)
-    .use(remarkEnhancements)
+    .use(remarkEnhancements, { lead: !caseStudy })
     .use(remarkRehype)
     .use(rehypeShiki, highlighter)
     .use(rehypeSanitize, sanitizeSchema)
-    .use(rehypePostEnhance, headings)
-    .use(rehypeStringify)
-    .process(content);
+    .use(rehypePostEnhance, headings);
+  if (caseStudy) {
+    processor.use(rehypeCaseStudySections, headings, caseStudy.panelHeading);
+  }
+  const file = await processor.use(rehypeStringify).process(content);
 
   return { html: String(file), headings };
 }
 
-export async function renderMarkdown(content: string): Promise<string> {
-  const { html } = await renderMarkdownWithHeadings(content);
+export async function renderMarkdown(
+  content: string,
+  options: RenderOptions = {}
+): Promise<string> {
+  const { html } = await renderMarkdownWithHeadings(content, options);
   return html;
 }

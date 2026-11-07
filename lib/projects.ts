@@ -2,17 +2,15 @@ import fs from "fs";
 import path from "path";
 import { parseFrontmatter } from "./frontmatter.ts";
 import { getAllPosts } from "./posts.ts";
+import {
+  PROJECT_TYPES,
+  PROJECT_STATUSES,
+  type ProjectType,
+  type ProjectStatus,
+} from "./project-types.ts";
 
-export const PROJECT_TYPES = ["research", "build", "proof-of-concept"] as const;
-export const PROJECT_STATUSES = [
-  "Published",
-  "Accepted",
-  "Live",
-  "Proof of concept",
-] as const;
-
-export type ProjectType = (typeof PROJECT_TYPES)[number];
-export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
+export { PROJECT_TYPES, PROJECT_STATUSES, TYPE_LABELS } from "./project-types.ts";
+export type { ProjectType, ProjectStatus } from "./project-types.ts";
 
 export interface ProjectLinks {
   paper?: string;
@@ -74,7 +72,8 @@ const ALLOWED_KEYS = new Set([
 const LINK_KEYS = ["paper", "repo", "live", "post"] as const;
 
 const REQUIRED_SECTIONS = ["Problem", "Approach", "Evidence"];
-const LIMITATIONS_SECTION = "What it doesn't show";
+/** Heading of the limitations section; the case study renders it as a panel. */
+export const LIMITATIONS_SECTION = "What it doesn't show";
 const TYPES_NEEDING_LIMITATIONS = new Set<ProjectType>(["research", "proof-of-concept"]);
 
 const MAX_TITLE = 120;
@@ -424,4 +423,20 @@ export function getAllProjects(): Project[] {
  */
 export function getProjectBySlug(slug: string): Project | null {
   return getAllProjects().find((project) => project.slug === slug) ?? null;
+}
+
+/**
+ * The projects either side of `slug` in display order. No wrap-around: the
+ * first has no previous and the last no next. Pure.
+ */
+export function adjacentProjects<T extends { slug: string }>(
+  projects: T[],
+  slug: string
+): { prev: T | null; next: T | null } {
+  const at = projects.findIndex((project) => project.slug === slug);
+  if (at === -1) return { prev: null, next: null };
+  return {
+    prev: at > 0 ? projects[at - 1] : null,
+    next: at < projects.length - 1 ? projects[at + 1] : null,
+  };
 }

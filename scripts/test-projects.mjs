@@ -5,7 +5,14 @@ import {
   dropDeadPostLinks,
   getAllProjects,
   getProjectBySlug,
+  adjacentProjects,
+  LIMITATIONS_SECTION,
+  TYPE_LABELS,
 } from "../lib/projects.ts";
+import { projectTitleTransition, projectCoverTransition } from "../lib/project-types.ts";
+import { formatProjectDate } from "../lib/format.ts";
+import { projectCard, cardVersion } from "../lib/og-cards.ts";
+import { renderMarkdown } from "../lib/markdown.ts";
 import { validateCv, parseCvFile, getCv } from "../lib/cv.ts";
 import { siteConfig } from "../lib/site.ts";
 import { getAllPosts } from "../lib/posts.ts";
@@ -411,6 +418,71 @@ async function runTests() {
   for (const safe of ["150+ requirements", "pp. 367–372", "Aug 2018 – Aug 2020", "doi.org/10.1109/AAIML67890.2026.11498196", "2011 – 2016"]) {
     assert(validateCv({ name: "N", headline: "H", location: "L" }, safe).success, `CV check does not flag "${safe}"`);
   }
+
+  // 8. Case-study page helpers (Phase 2)
+  const three = [{ slug: "a" }, { slug: "b" }, { slug: "c" }];
+  const first = adjacentProjects(three, "a");
+  const middle = adjacentProjects(three, "b");
+  const last = adjacentProjects(three, "c");
+  assert(first.prev === null && first.next?.slug === "b", "adjacentProjects: first has no previous (no wrap-around)");
+  assert(middle.prev?.slug === "a" && middle.next?.slug === "c", "adjacentProjects: middle has both");
+  assert(last.prev?.slug === "b" && last.next === null, "adjacentProjects: last has no next (no wrap-around)");
+  const unknown = adjacentProjects(three, "zz");
+  assert(unknown.prev === null && unknown.next === null, "adjacentProjects: unknown slug has neither");
+  const realPager = adjacentProjects(projects, "blog-platform");
+  assert(
+    realPager.prev?.slug === "gtv-feedback-agents" && realPager.next?.slug === "enquiry-triage",
+    "adjacentProjects follows the real display order"
+  );
+
+  assert(formatProjectDate("2026") === "2026", 'formatProjectDate("2026") is "2026"');
+  assert(formatProjectDate("2026-11") === "November 2026", 'formatProjectDate("2026-11") is "November 2026"');
+  assert(formatProjectDate("2026-01") === "January 2026", 'formatProjectDate("2026-01") is "January 2026"');
+
+  assert(
+    projectCard({ type: "research", title: "T" }).label === "Research" &&
+      projectCard({ type: "build", title: "T" }).label === "Build" &&
+      projectCard({ type: "proof-of-concept", title: "T" }).label === "Proof of concept",
+    "Project social card label is the type label"
+  );
+  assert(
+    cardVersion(projectCard({ type: "research", title: "T" })) !==
+      cardVersion(projectCard({ type: "build", title: "T" })),
+    "Changing a project's type changes its card version"
+  );
+  assert(Object.keys(TYPE_LABELS).length === 3, "Every type has a label");
+  assert(
+    projectTitleTransition("x") === "project-title-x" && projectCoverTransition("x") === "project-cover-x",
+    "View-transition names are stable per slug"
+  );
+
+  // 9. Case-study rendering of the real entries
+  for (const project of projects) {
+    const html = await renderMarkdown(project.content, {
+      caseStudy: { panelHeading: LIMITATIONS_SECTION },
+    });
+    const sections = (html.match(/<section class="cs-sec[^"]*" data-reveal="">/g) || []).length;
+    const panels = (html.match(/class="cs-sec cs-sec--limits"/g) || []).length;
+    const panelIsLimits = /<section class="cs-sec cs-sec--limits"[^>]*><h2 id="what-it-doesn-t-show"/.test(html);
+    assert(
+      sections === 4 && panels === 1 && panelIsLimits,
+      `${project.slug}: 4 sections, the limitations one rendered as the panel`
+    );
+    assert(!/class="lead"|data-dropcap/.test(html), `${project.slug}: no lead paragraph or drop cap`);
+    assert(!/href="[^"]*\.pdf(?:[?#][^"]*)?"/i.test(html), `${project.slug}: no PDF linked in the body`);
+  }
+
+  const panelOnly = await renderMarkdown("## Problem\n\nP.\n\n## Evidence\n\nE.\n", {
+    caseStudy: { panelHeading: LIMITATIONS_SECTION },
+  });
+  assert(!/cs-sec--limits/.test(panelOnly), "No panel class when there is no limitations section");
+  const preamble = await renderMarkdown("Intro before any heading.\n\n## Problem\n\nP.\n", {
+    caseStudy: { panelHeading: LIMITATIONS_SECTION },
+  });
+  assert(
+    /^<p>Intro before any heading.<\/p>/.test(preamble.trim()) && /<section class="cs-sec"/.test(preamble),
+    "Content before the first H2 stays outside any section, and is not a lead"
+  );
 
   console.log("");
   if (failed) {

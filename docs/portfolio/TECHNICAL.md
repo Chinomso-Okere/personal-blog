@@ -63,7 +63,7 @@ published: true                     # required; false hides the entry everywhere
 - Closing block with two routes: "Hiring? See my CV" (→ `/cv`) + LinkedIn; "Work with me" (→ About's work-with-me section or email).
 
 **Case study (`/portfolio/<slug>`)**
-- Reuses the post page's header pattern and `.article` typography (single column, no drop cap, no TOC unless ≥ 4 H2s).
+- Reuses the post page's header pattern and `.article` typography (single column, no drop cap, no TOC unless ≥ 5 H2s). *Changed from ≥ 4 on 7 Nov 2026: every case study has exactly the four template sections, which need no table of contents; a TOC appears only when an entry goes beyond the template.*
 - Meta strip: type · status · date · venue · role · stack chips.
 - Link buttons: Read the paper ↗ / View code ↗ / Live site ↗ / Related post. External links open in a new tab with hidden "(opens in new tab)". Accepted papers without a link show "Accepted, link coming".
 - "What it doesn't show" section styled as a distinct, quiet panel (it's the differentiator).

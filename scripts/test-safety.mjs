@@ -177,6 +177,82 @@ print("secure")
     failed = true;
   }
 
+  // 7. Post rendering unchanged by the case-study option (7 Nov 2026). The hash
+  // covers the html and the heading list of a body that exercises the lead,
+  // drop cap, h2 numbering and anchors, duplicate ids, pull quote, both fence
+  // kinds and an image figure. Update it only on purpose.
+  const POST_RENDER_FINGERPRINT =
+    "4858d41c4d8ac133c93353f2a991bdbc1e46c61e1300f4828f487c7518c9b1b9";
+  const postFixture = [
+    "Opening paragraph with **bold**, _emphasis_, `inline code` and a [link](https://example.com).",
+    "",
+    "## First section",
+    "",
+    "A paragraph after a heading.",
+    "",
+    "> A pull quote.",
+    "",
+    '```ts title="example.ts"',
+    "const x: number = 1;",
+    "```",
+    "",
+    "```",
+    "untitled fence",
+    "```",
+    "",
+    "![A diagram](/images/example.png)",
+    "",
+    "## First section",
+    "",
+    "- one",
+    "- two",
+    "",
+    "### A sub-heading",
+    "",
+    "1. first",
+    "2. second",
+    "",
+  ].join("\n");
+  const postRender = await renderMarkdownWithHeadings(postFixture);
+  const postRenderHash = createHash("sha256").update(JSON.stringify(postRender)).digest("hex");
+  const postRenderUnchanged = postRenderHash === POST_RENDER_FINGERPRINT;
+  const defaultIsPost =
+    (await renderMarkdown(postFixture)) === postRender.html &&
+    (await renderMarkdown(postFixture, {})) === postRender.html;
+  console.log(`PASS: Post rendering fingerprint unchanged:    ${postRenderUnchanged}`);
+  console.log(`PASS: Default options render as a post:        ${defaultIsPost}`);
+  if (!postRenderUnchanged || !defaultIsPost) {
+    console.error("FAILED: Post rendering changed, fingerprint " + postRenderHash);
+    failed = true;
+  }
+
+  // 8. Case-study render: same sanitiser, sections generated after it
+  const caseHtml = await renderMarkdown(
+    [
+      "## Problem",
+      "",
+      'First <script>alert("x")</script> paragraph <img src=x onerror="alert(1)">.',
+      "",
+      "## What it doesn’t show",
+      "",
+      "Limits.",
+    ].join("\n"),
+    { caseStudy: { panelHeading: "What it doesn't show" } }
+  );
+  const caseSafe =
+    !/<script/i.test(caseHtml) && !/onerror/i.test(caseHtml) && !/<img[^>]*src="x"/.test(caseHtml);
+  const caseNoLead = !/class="lead"/.test(caseHtml) && !/data-dropcap/.test(caseHtml);
+  const caseSections =
+    (caseHtml.match(/<section class="cs-sec[^"]*" data-reveal="">/g) || []).length === 2 &&
+    (caseHtml.match(/cs-sec--limits/g) || []).length === 1;
+  console.log(`PASS: Case-study render still sanitised:       ${caseSafe}`);
+  console.log(`PASS: Case-study render has no lead/drop cap:  ${caseNoLead}`);
+  console.log(`PASS: Case-study sections wrapped, one panel:  ${caseSections}`);
+  if (!caseSafe || !caseNoLead || !caseSections) {
+    console.error("FAILED: Case-study render wrong:\n" + caseHtml);
+    failed = true;
+  }
+
   if (failed) {
     console.error("\nONE OR MORE CHECKS FAILED!");
     process.exit(1);
