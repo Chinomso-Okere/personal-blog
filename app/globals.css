@@ -420,6 +420,7 @@ html:has(.post) {
     }
 
     .nav > a {
+      min-height: 44px;
       padding: 12.5px 0;
     }
 
@@ -1209,7 +1210,8 @@ html:has(.post) {
   }
 
   .keep .card,
-  .work-card {
+  .work-card,
+  .pf-card {
     padding: 28px;
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -1218,7 +1220,8 @@ html:has(.post) {
   }
 
   .keep .card:hover,
-  .work-card:hover {
+  .work-card:hover,
+  .pf-card:hover {
     transform: translateY(-3px);
     border-color: var(--muted);
     box-shadow: 0 18px 40px -22px var(--shadow-soft);
@@ -1371,7 +1374,8 @@ html:has(.post) {
     }
 
     .keep .card:hover,
-    .work-card:hover {
+    .work-card:hover,
+    .pf-card:hover {
       transform: none;
     }
   }
@@ -1445,6 +1449,13 @@ html:has(.post) {
     grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
     gap: clamp(32px, 6vw, 88px);
     align-items: end;
+  }
+
+  /* /portfolio: display and lede stacked, so the display spans the container. */
+  .hero__grid--stack {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(24px, 3vw, 36px);
+    align-items: start;
   }
 
   .hero__eyebrow {
@@ -1585,7 +1596,8 @@ html:has(.post) {
   }
 
   .feature__title a,
-  .post-row__title a {
+  .post-row__title a,
+  .pf-card__title span {
     background-image: linear-gradient(var(--accent), var(--accent));
     background-size: 0 1.5px;
     background-repeat: no-repeat;
@@ -1596,7 +1608,9 @@ html:has(.post) {
   .feature:hover .feature__title a,
   .feature__title a:focus-visible,
   .post-row__title a:hover,
-  .post-row__title a:focus-visible {
+  .post-row__title a:focus-visible,
+  .pf-card:hover .pf-card__title span,
+  .pf-card:focus-visible .pf-card__title span {
     background-size: 100% 1.5px;
   }
 
@@ -1629,7 +1643,9 @@ html:has(.post) {
     transition: transform 0.25s ease;
   }
 
-  .feature:hover .feature__arrow {
+  .feature:hover .feature__arrow,
+  .pf-card:hover .feature__arrow,
+  .pf-card:focus-visible .feature__arrow {
     transform: translateX(5px);
   }
 
@@ -1967,7 +1983,10 @@ html:has(.post) {
     .btn:active,
     .btn:hover .btn__arrow,
     .feature:hover .feature__img img,
-    .feature:hover .feature__arrow {
+    .feature:hover .feature__arrow,
+    .pf-card:hover .feature__arrow,
+    .pf-card:focus-visible .feature__arrow,
+    .pf-card:hover .pf-card__img img {
       transform: none;
     }
   }
@@ -2264,5 +2283,829 @@ html:has(.post) {
     font-size: 12.5px;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Portfolio case study (/portfolio/<slug>): the post header and .article
+     column, plus a meta strip, link buttons, the limitations panel and
+     prev/next navigation. */
+  .case__meta {
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .case__facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font: 400 14px var(--ui);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .case__fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .case__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip--stack {
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* Stack chips rise in turn after the facts line (.d4 = .48s). */
+  .case__stack .chip {
+    animation: rise 0.6s var(--ease-out) both;
+  }
+
+  .case__stack .chip:nth-child(1) { animation-delay: 0.54s; }
+  .case__stack .chip:nth-child(2) { animation-delay: 0.6s; }
+  .case__stack .chip:nth-child(3) { animation-delay: 0.66s; }
+  .case__stack .chip:nth-child(4) { animation-delay: 0.72s; }
+  .case__stack .chip:nth-child(5) { animation-delay: 0.78s; }
+  .case__stack .chip:nth-child(6) { animation-delay: 0.84s; }
+  .case__stack .chip:nth-child(7) { animation-delay: 0.9s; }
+  .case__stack .chip:nth-child(8) { animation-delay: 0.96s; }
+
+  .case__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .case__note {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    margin: 0;
+    font: 500 14px var(--ui);
+    color: var(--muted);
+  }
+
+  .case__body > .cs-sec:first-child > h2 {
+    margin-top: 0;
+  }
+
+  /* "What it doesn't show": a quiet panel with an accent rule on the left. */
+  .cs-sec--limits {
+    position: relative;
+    margin-top: 45px;
+    padding: clamp(24px, 4vw, 40px) clamp(22px, 4vw, 44px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+  }
+
+  .cs-sec--limits::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 24px;
+    bottom: 24px;
+    width: 3px;
+    background: var(--accent);
+    transform-origin: top;
+  }
+
+  .cs-sec--limits > h2 {
+    margin-top: 0;
+  }
+
+  .cs-sec--limits > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* One-time reveal (components/Reveal.tsx). Only off-screen elements are
+     ever .is-pending, and only with JavaScript and motion allowed. */
+  [data-reveal].is-pending {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  [data-reveal].is-in {
+    animation: rise 0.8s var(--ease-out) both;
+  }
+
+  .cs-sec--limits.is-pending::before {
+    transform: scaleY(0);
+  }
+
+  .cs-sec--limits.is-in::before {
+    animation: draw-rule 0.9s var(--ease-out) 0.3s both;
+  }
+
+  @keyframes draw-rule {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  .case__pager {
+    margin-top: clamp(56px, 7vw, 88px);
+  }
+
+  .case__pager-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+
+  .case__step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px 0;
+    text-decoration: none;
+  }
+
+  .case__step--next {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .case__step-label {
+    font: 600 12.5px var(--ui);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .case__step-title {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    color: var(--fg);
+    transition: color 0.15s ease;
+  }
+
+  .case__step:hover .case__step-title,
+  .case__step:focus-visible .case__step-title {
+    color: var(--accent-ink);
+  }
+
+  .case__back {
+    margin-top: 28px;
+  }
+
+  /* Phones: facts stack without dots (none left dangling at a line end), and
+     prev/next stack. */
+  @media (max-width: 639px) {
+    .case__facts {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .case__fact .byline__sep {
+      display: none;
+    }
+
+    .case__pager-row {
+      grid-template-columns: 1fr;
+    }
+
+    .case__step--next {
+      grid-column: auto;
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case__stack .chip,
+    [data-reveal].is-in,
+    .cs-sec--limits.is-in::before {
+      animation: none;
+    }
+
+    [data-reveal].is-pending {
+      opacity: 1;
+      transform: none;
+    }
+
+    .cs-sec--limits.is-pending::before {
+      transform: none;
+    }
+  }
+
+  /* Portfolio index (/portfolio): cards in the site card style, the CV
+     capabilities, and the two closing routes. */
+  .pf-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pf-cards > li {
+    display: flex;
+  }
+
+  .pf-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pf-card__img {
+    display: block;
+    margin: -28px -28px 24px;
+    border-bottom: 1px solid var(--border);
+    border-radius: 15px 15px 0 0;
+    overflow: hidden;
+  }
+
+  .pf-card__img img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 1.1s var(--ease-out);
+  }
+
+  .pf-card:hover .pf-card__img img {
+    transform: scale(1.03);
+  }
+
+  .pf-card__kicker {
+    margin-bottom: 16px;
+  }
+
+  .pf-card__title {
+    margin: 0 0 12px;
+    font-family: var(--display);
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    text-wrap: balance;
+    color: var(--fg);
+  }
+
+  .pf-card__summary {
+    display: block;
+    margin: 0 0 18px;
+    font: 400 15px/1.55 var(--ui);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  /* Plain wrapping text, not flex: a long role then breaks inside its own
+     words and no separator dot is ever left at the end of a line. */
+  .pf-card__meta,
+  .pf-card__links {
+    display: block;
+    font: 400 13px/1.6 var(--ui);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pf-card__meta .kicker__dot,
+  .pf-card__links .kicker__dot {
+    display: inline-block;
+    margin: 0 8px;
+    vertical-align: middle;
+  }
+
+  .pf-card__links {
+    margin-top: 6px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .pf-card__read {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+    font: 600 14px var(--ui);
+    color: var(--accent-ink);
+  }
+
+  /* Cards rise in once (components/Reveal.tsx); the second card of a row
+     follows 60ms after the first. */
+  @media (min-width: 760px) {
+    .pf-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Odd count: the first card leads across both columns (cardLayout). */
+    .pf-cards > li.pf-cards__lead {
+      grid-column: 1 / -1;
+    }
+
+    .pf-cards__lead .pf-card__summary {
+      max-width: 68ch;
+    }
+
+    .pf-cards > li.pf-cards__second.is-in {
+      animation-delay: 0.06s;
+    }
+  }
+
+  .pf-filters {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: -8px 0 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pf-filters__btn {
+    min-height: 44px;
+    padding: 0;
+    background: none;
+    border: 0;
+    font: 500 13px var(--ui);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .pf-filters__btn:hover,
+  .pf-filters__btn[aria-pressed="true"] {
+    color: var(--fg);
+  }
+
+  .pf-filters__marker {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 1px;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .pf-skills {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pf-skills__heading {
+    margin: 0 0 10px;
+    font: 600 12.5px var(--ui);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .pf-skills__text {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .pf-routes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+  }
+
+  .pf-route__title {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(30px, 3.2vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.022em;
+    font-weight: 500;
+  }
+
+  .pf-route__text {
+    margin: 16px 0 0;
+    max-width: 34em;
+    font-size: 19px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .pf-route .about-cta {
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .pf-skills,
+    .pf-routes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .pf-routes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Web CV (/cv): About's type scale and tokens; experience as a timeline. */
+  .cv {
+    padding-top: clamp(48px, 7vw, 88px);
+  }
+
+  .cv__name {
+    margin: 0 0 14px;
+    font-family: var(--display);
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.032em;
+    font-weight: 400;
+    font-variation-settings: "opsz" 72;
+    text-wrap: balance;
+  }
+
+  .cv__headline {
+    margin: 0 0 22px;
+    font-size: clamp(20px, 2.2vw, 25px);
+    line-height: 1.45;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .cv__contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+    font: 400 14px/1.6 var(--ui);
+    color: var(--muted);
+  }
+
+  .cv__contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cv__contact a {
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .cv__contact a:hover,
+  .cv__contact a:focus-visible {
+    color: var(--accent-ink);
+    text-decoration-color: var(--accent);
+  }
+
+  .cv__actions {
+    margin-top: 28px;
+  }
+
+  .cv-sec {
+    padding-top: clamp(48px, 6vw, 80px);
+  }
+
+  .cv .article {
+    max-width: 760px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv .article p,
+  .cv .article ul,
+  .cv .article ol {
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  .cv .article > :last-child {
+    margin-bottom: 0;
+  }
+
+  .cv-roles {
+    max-width: 960px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cv-role {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 0 32px;
+  }
+
+  .cv-role__dates {
+    margin: 0;
+    padding-top: 5px;
+    font: 500 13.5px/1.5 var(--ui);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hairline with an accent dot per role. */
+  .cv-role__main {
+    position: relative;
+    padding: 0 0 40px 30px;
+    border-left: 1px solid var(--border);
+  }
+
+  .cv-role:last-child .cv-role__main {
+    padding-bottom: 0;
+  }
+
+  .cv-role__main::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 11px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .cv-role__title {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 23px;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  .cv-role__org {
+    margin: 4px 0 14px;
+    font: 500 14px/1.5 var(--ui);
+    color: var(--muted);
+  }
+
+  .cv-skills {
+    max-width: 760px;
+    margin: 0;
+  }
+
+  .cv-skills__row + .cv-skills__row {
+    margin-top: 18px;
+  }
+
+  .cv-skills dt {
+    margin: 0 0 6px;
+    font: 600 12.5px var(--ui);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .cv-skills dd {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  /* Contact links are stand-alone controls: 44px tall on touch screens. */
+  @media (pointer: coarse), (max-width: 759px) {
+    .cv__contact a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
+  /* Phones: contact details stack without dots; dates sit on the timeline
+     above each role. */
+  @media (max-width: 639px) {
+    /* "Professional memberships and development" is wider than a phone:
+       let CV section labels wrap and keep a stub of the rule. */
+    .cv .sec-head__label {
+      white-space: normal;
+    }
+
+    .cv .sec-head__rule {
+      min-width: 32px;
+    }
+
+    .cv__contact {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .cv__contact .kicker__dot {
+      display: none;
+    }
+
+    .cv-role {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cv-role__dates {
+      padding: 0 0 4px 30px;
+      border-left: 1px solid var(--border);
+    }
+
+    .cv-role__main::before {
+      top: -18px;
+    }
+  }
+
+  /* About's "Work with me" is linked from /portfolio; keep it clear of the
+     sticky header when jumped to. */
+  #work-with-me {
+    scroll-margin-top: var(--header-h);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pf-filters__marker {
+      transition: none;
+    }
+  }
+}
+
+/* Print: the web CV on A4. Unlayered and last so it wins over the dark-theme
+   tokens (html:root:has(.cv) outranks :root[data-theme="dark"]). Scoped to
+   pages containing .cv, so printing any other page is unchanged. */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 16mm 16mm;
+  }
+
+  html:root:has(.cv) {
+    color-scheme: light;
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --tint: #EDE5D3;
+    --fg: #211B12;
+    --muted: #5E5545;
+    --border: #D9CFBD;
+    --accent: #9C3B1B;
+    --accent-ink: #9C3B1B;
+  }
+
+  html:has(.cv) body {
+    background: #FFFFFF;
+    color: var(--fg);
+  }
+
+  html:has(.cv) body::before,
+  html:has(.cv) .skip,
+  html:has(.cv) .masthead,
+  html:has(.cv) .foot,
+  html:has(.cv) .cv__actions {
+    display: none;
+  }
+
+  html:has(.cv) *,
+  html:has(.cv) *::before,
+  html:has(.cv) *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cv {
+    max-width: none;
+    padding: 0;
+  }
+
+  .cv__name {
+    margin-bottom: 4pt;
+    font-size: 26pt;
+  }
+
+  .cv__headline {
+    margin-bottom: 6pt;
+    font-size: 12pt;
+  }
+
+  .cv__contact {
+    font-size: 8.5pt;
+  }
+
+  /* No touch targets on paper: drop the 44px screen rule (the A4 width
+     counts as narrow) so the contact line stays one line of text. */
+  .cv__contact a {
+    display: inline;
+    min-height: 0;
+    text-decoration: none;
+  }
+
+  .cv-sec {
+    padding-top: 13pt;
+  }
+
+  .cv .sec-head {
+    margin-bottom: 7pt;
+    break-after: avoid;
+  }
+
+  .cv .sec-head__label {
+    font-size: 8pt;
+  }
+
+  .cv .article p,
+  .cv .article ul,
+  .cv .article ol,
+  .cv-skills dd {
+    font-size: 10pt;
+    line-height: 1.42;
+  }
+
+  .cv .article p {
+    margin-bottom: 4pt;
+  }
+
+  .cv .article ul,
+  .cv .article ol {
+    margin-bottom: 0;
+  }
+
+  .cv .article li {
+    margin-bottom: 1.5pt;
+    break-inside: avoid;
+  }
+
+  .cv .article a:not(.anchor):not(.fig__open) {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .cv-roles,
+  .cv-skills {
+    max-width: none;
+  }
+
+  .cv-role {
+    grid-template-columns: 92pt minmax(0, 1fr);
+    gap: 0 14pt;
+    break-inside: avoid;
+  }
+
+  .cv-role__dates {
+    padding-top: 2pt;
+    font-size: 8.5pt;
+  }
+
+  .cv-role__main {
+    padding: 0 0 9pt 14pt;
+  }
+
+  .cv-role__main::before {
+    top: 5pt;
+    width: 5px;
+    height: 5px;
+    left: -3px;
+  }
+
+  .cv-role__title {
+    font-size: 11.5pt;
+  }
+
+  .cv-role__org {
+    margin: 0 0 3pt;
+    font-size: 9pt;
+  }
+
+  .cv-skills__row {
+    break-inside: avoid;
+  }
+
+  .cv-skills__row + .cv-skills__row {
+    margin-top: 5pt;
+  }
+
+  .cv-skills dt {
+    margin-bottom: 1pt;
+    font-size: 7.5pt;
   }
 }

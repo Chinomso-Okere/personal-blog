@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
-import { absoluteUrl, brandedImage, pageMetadata } from "@/lib/seo";
+import { brandedImage, pageMetadata } from "@/lib/seo";
 import { homeCard } from "@/lib/og-cards";
-import { HOME_EYEBROW, AUTHOR_PHOTO } from "@/lib/pages";
-import { getLocalImageSize } from "@/lib/image-size";
+import { HOME_EYEBROW } from "@/lib/pages";
+import { personJsonLd } from "@/lib/person";
 import { getRecentPosts } from "@/lib/posts";
 import { getWritingEntries, isArticle } from "@/lib/writing";
 import { getAboutStatement, getWriteAboutTopics } from "@/lib/about";
@@ -37,14 +37,7 @@ export default function HomePage() {
   const statement = getAboutStatement();
   const [line1, line2] = splitTagline(siteConfig.tagline);
 
-  const person = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: siteConfig.name,
-    url: siteConfig.url,
-    sameAs: [siteConfig.links.linkedin, siteConfig.links.github].filter(Boolean),
-    ...(getLocalImageSize(AUTHOR_PHOTO) ? { image: absoluteUrl(AUTHOR_PHOTO) } : {}),
-  };
+  const person = { "@context": "https://schema.org", ...personJsonLd() };
 
   return (
     <div className="home">

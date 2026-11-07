@@ -112,3 +112,90 @@ export function parseCvFile(rawContent: string): Cv {
 export function getCv(): Cv {
   return parseCvFile(fs.readFileSync(CV_FILE, "utf-8"));
 }
+
+export interface CvSection {
+  heading: string;
+  /** Markdown between this H2 and the next. */
+  body: string;
+}
+
+export interface CvRole {
+  role: string;
+  org: string;
+  dates: string;
+  /** Markdown under the role heading (its bullets). */
+  body: string;
+}
+
+/** The CV body split at its H2 headings, in order; text before the first H2 is dropped. Pure. */
+export function parseCvSections(content: string): CvSection[] {
+  const sections: CvSection[] = [];
+  let current: CvSection | null = null;
+  for (const line of content.split("\n")) {
+    const h2 = line.match(/^##\s+(.+?)\s*$/);
+    if (h2) {
+      current = { heading: h2[1], body: "" };
+      sections.push(current);
+    } else if (current) {
+      current.body += `${line}\n`;
+    }
+  }
+  return sections.map((s) => ({ heading: s.heading, body: s.body.trim() }));
+}
+
+/**
+ * The roles in the Experience section, from headings written
+ * "### Role · Organisation · Dates". Throws, naming the heading, when a role
+ * heading does not have exactly those three parts. Pure.
+ */
+export function parseExperience(body: string): CvRole[] {
+  const roles: CvRole[] = [];
+  let current: CvRole | null = null;
+  for (const line of body.split("\n")) {
+    const h3 = line.match(/^###\s+(.+?)\s*$/);
+    if (h3) {
+      const parts = h3[1].split(" · ").map((part) => part.trim());
+      if (parts.length !== 3 || parts.some((part) => !part)) {
+        throw new Error(
+          `CV error in "content/cv.md" (Experience): role heading "${h3[1]}" must be "Role · Organisation · Dates".`
+        );
+      }
+      current = { role: parts[0], org: parts[1], dates: parts[2], body: "" };
+      roles.push(current);
+    } else if (current) {
+      current.body += `${line}\n`;
+    }
+  }
+  return roles.map((r) => ({ ...r, body: r.body.trim() }));
+}
+
+export interface SkillGroup {
+  heading: string;
+  /** The line as written in the CV, e.g. "Python, APIs, n8n, Make.com." */
+  text: string;
+}
+
+/**
+ * The "## Skills" section of a CV body as groups, from lines written
+ * "**Heading:** item, item, item." Lines in any other form are skipped, and
+ * the section ends at the next H2. Pure.
+ */
+export function parseCvSkills(content: string): SkillGroup[] {
+  const groups: SkillGroup[] = [];
+  let inSkills = false;
+  for (const line of content.split("\n")) {
+    if (/^##\s/.test(line)) {
+      inSkills = /^##\s+Skills\s*$/i.test(line);
+      continue;
+    }
+    if (!inSkills) continue;
+    const match = line.match(/^\*\*(.+?):\*\*\s+(.+?)\s*$/);
+    if (match) groups.push({ heading: match[1].trim(), text: match[2] });
+  }
+  return groups;
+}
+
+/** The CV's skills, for the portfolio capabilities strip. */
+export function getCvSkills(): SkillGroup[] {
+  return parseCvSkills(getCv().content);
+}

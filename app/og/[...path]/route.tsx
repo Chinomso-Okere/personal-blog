@@ -1,11 +1,19 @@
 import { getAllPosts } from "@/lib/posts";
+import { getAllProjects } from "@/lib/projects";
 import { sectionPages, type SectionPage } from "@/lib/pages";
 import { renderCard } from "@/lib/og";
-import { homeCard, sectionCard, postCard, type CardContent } from "@/lib/og-cards";
+import {
+  homeCard,
+  sectionCard,
+  postCard,
+  projectCard,
+  type CardContent,
+} from "@/lib/og-cards";
 
 // Branded social cards, rendered once at build time:
 //   /og/home.png, /og/blog.png, /og/writing.png, /og/about.png
-//   /og/post/<slug>.png  (only for posts without a cover)
+//   /og/post/<slug>.png     (only for posts without a cover)
+//   /og/project/<slug>.png  (only for projects without a cover)
 // Pages link them with ?v=<hash> (lib/seo.ts brandedImage) to bust social
 // caches; the query string plays no part in which card is served.
 export const dynamic = "force-static";
@@ -15,10 +23,12 @@ type Params = { path: string[] };
 
 export function generateStaticParams(): Params[] {
   const posts = getAllPosts().filter((post) => !post.coverImage);
+  const projects = getAllProjects().filter((project) => !project.cover);
   return [
     { path: ["home.png"] },
     ...Object.keys(sectionPages).map((key) => ({ path: [`${key}.png`] })),
     ...posts.map((post) => ({ path: ["post", `${post.slug}.png`] })),
+    ...projects.map((project) => ({ path: ["project", `${project.slug}.png`] })),
   ];
 }
 
@@ -36,6 +46,12 @@ function cardFor(segments: string[]): CardContent | null {
     const slug = segments[1].replace(/\.png$/, "");
     const post = getAllPosts().find((p) => p.slug === slug && !p.coverImage);
     if (post) return postCard(post);
+  }
+
+  if (segments.length === 2 && segments[0] === "project") {
+    const slug = segments[1].replace(/\.png$/, "");
+    const project = getAllProjects().find((p) => p.slug === slug && !p.cover);
+    if (project) return projectCard(project);
   }
 
   return null;

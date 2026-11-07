@@ -5,7 +5,26 @@ import {
   dropDeadPostLinks,
   getAllProjects,
   getProjectBySlug,
+  adjacentProjects,
+  filterProjects,
+  showFilters,
+  toSummary,
+  FILTER_THRESHOLD,
+  LIMITATIONS_SECTION,
+  TYPE_LABELS,
 } from "../lib/projects.ts";
+import { parseCvSkills, getCvSkills, parseCvSections, parseExperience } from "../lib/cv.ts";
+import { cardLayout } from "../lib/project-types.ts";
+import { sectionPages, PORTFOLIO_HERO, CV_PATH } from "../lib/pages.ts";
+import { sectionCard } from "../lib/og-cards.ts";
+import {
+  kickerStatus,
+  projectTitleTransition,
+  projectCoverTransition,
+} from "../lib/project-types.ts";
+import { formatProjectDate } from "../lib/format.ts";
+import { projectCard, cardVersion } from "../lib/og-cards.ts";
+import { renderMarkdown } from "../lib/markdown.ts";
 import { validateCv, parseCvFile, getCv } from "../lib/cv.ts";
 import { siteConfig } from "../lib/site.ts";
 import { getAllPosts } from "../lib/posts.ts";
@@ -411,6 +430,185 @@ async function runTests() {
   for (const safe of ["150+ requirements", "pp. 367–372", "Aug 2018 – Aug 2020", "doi.org/10.1109/AAIML67890.2026.11498196", "2011 – 2016"]) {
     assert(validateCv({ name: "N", headline: "H", location: "L" }, safe).success, `CV check does not flag "${safe}"`);
   }
+
+  // 8. Case-study page helpers (Phase 2)
+  const three = [{ slug: "a" }, { slug: "b" }, { slug: "c" }];
+  const first = adjacentProjects(three, "a");
+  const middle = adjacentProjects(three, "b");
+  const last = adjacentProjects(three, "c");
+  assert(first.prev === null && first.next?.slug === "b", "adjacentProjects: first has no previous (no wrap-around)");
+  assert(middle.prev?.slug === "a" && middle.next?.slug === "c", "adjacentProjects: middle has both");
+  assert(last.prev?.slug === "b" && last.next === null, "adjacentProjects: last has no next (no wrap-around)");
+  const unknown = adjacentProjects(three, "zz");
+  assert(unknown.prev === null && unknown.next === null, "adjacentProjects: unknown slug has neither");
+  const realPager = adjacentProjects(projects, "blog-platform");
+  assert(
+    realPager.prev?.slug === "gtv-feedback-agents" && realPager.next?.slug === "enquiry-triage",
+    "adjacentProjects follows the real display order"
+  );
+
+  assert(formatProjectDate("2026") === "2026", 'formatProjectDate("2026") is "2026"');
+  assert(formatProjectDate("2026-11") === "November 2026", 'formatProjectDate("2026-11") is "November 2026"');
+  assert(formatProjectDate("2026-01") === "January 2026", 'formatProjectDate("2026-01") is "January 2026"');
+
+  assert(
+    projectCard({ type: "research", title: "T" }).label === "Research" &&
+      projectCard({ type: "build", title: "T" }).label === "Build" &&
+      projectCard({ type: "proof-of-concept", title: "T" }).label === "Proof of concept",
+    "Project social card label is the type label"
+  );
+  assert(
+    cardVersion(projectCard({ type: "research", title: "T" })) !==
+      cardVersion(projectCard({ type: "build", title: "T" })),
+    "Changing a project's type changes its card version"
+  );
+  assert(Object.keys(TYPE_LABELS).length === 3, "Every type has a label");
+  assert(
+    kickerStatus("proof-of-concept", "Proof of concept") === null &&
+      kickerStatus("research", "Published") === "Published" &&
+      kickerStatus("build", "Live") === "Live" &&
+      kickerStatus("research", "Accepted") === "Accepted",
+    "Kicker hides the status only when it repeats the type label"
+  );
+  assert(
+    projectTitleTransition("x") === "project-title-x" && projectCoverTransition("x") === "project-cover-x",
+    "View-transition names are stable per slug"
+  );
+
+  // 9. Case-study rendering of the real entries
+  for (const project of projects) {
+    const html = await renderMarkdown(project.content, {
+      caseStudy: { panelHeading: LIMITATIONS_SECTION },
+    });
+    const sections = (html.match(/<section class="cs-sec[^"]*" data-reveal="">/g) || []).length;
+    const panels = (html.match(/class="cs-sec cs-sec--limits"/g) || []).length;
+    const panelIsLimits = /<section class="cs-sec cs-sec--limits"[^>]*><h2 id="what-it-doesn-t-show"/.test(html);
+    assert(
+      sections === 4 && panels === 1 && panelIsLimits,
+      `${project.slug}: 4 sections, the limitations one rendered as the panel`
+    );
+    assert(!/class="lead"|data-dropcap/.test(html), `${project.slug}: no lead paragraph or drop cap`);
+    assert(!/href="[^"]*\.pdf(?:[?#][^"]*)?"/i.test(html), `${project.slug}: no PDF linked in the body`);
+  }
+
+  const panelOnly = await renderMarkdown("## Problem\n\nP.\n\n## Evidence\n\nE.\n", {
+    caseStudy: { panelHeading: LIMITATIONS_SECTION },
+  });
+  assert(!/cs-sec--limits/.test(panelOnly), "No panel class when there is no limitations section");
+  const preamble = await renderMarkdown("Intro before any heading.\n\n## Problem\n\nP.\n", {
+    caseStudy: { panelHeading: LIMITATIONS_SECTION },
+  });
+  assert(
+    /^<p>Intro before any heading.<\/p>/.test(preamble.trim()) && /<section class="cs-sec"/.test(preamble),
+    "Content before the first H2 stays outside any section, and is not a lead"
+  );
+
+  // 10. Portfolio index helpers (Phase 3)
+  assert(FILTER_THRESHOLD === 6, "Filter threshold is 6");
+  assert(!showFilters(5) && !showFilters(6) && showFilters(7), "Filters show only above 6 entries (5 and 6 hidden, 7 shown)");
+  assert(!showFilters(projects.length), `Filters hidden for the real ${projects.length} entries`);
+  const mixed = [
+    { slug: "r1", type: "research" },
+    { slug: "b1", type: "build" },
+    { slug: "r2", type: "research" },
+    { slug: "p1", type: "proof-of-concept" },
+  ];
+  assert(filterProjects(mixed, "all").length === 4, 'filterProjects "all" keeps everything');
+  assert(
+    JSON.stringify(filterProjects(mixed, "research").map((x) => x.slug)) === '["r1","r2"]',
+    "filterProjects keeps one type, in display order"
+  );
+  assert(filterProjects(mixed, "build").length === 1 && filterProjects([], "build").length === 0, "filterProjects: one build, empty list stays empty");
+
+  const summary = toSummary(projects[0]);
+  assert(!("content" in summary) && summary.slug === projects[0].slug && "content" in projects[0], "toSummary drops the body without touching the project");
+
+  const skills = getCvSkills();
+  assert(
+    JSON.stringify(skills.map((g) => g.heading)) === '["Business and delivery","AI and research","Tools"]',
+    `Capabilities come from the CV Skills section (${skills.map((g) => g.heading).join(", ")})`
+  );
+  assert(skills[2]?.text === "Python, APIs, n8n, Make.com.", "Skills text is verbatim from the CV");
+  assert(
+    parseCvSkills("## Skills\n\n**A:** x, y.\nnot a skill line\n\n## Other\n\n**B:** z.").length === 1,
+    "Skills parser stops at the next H2 and skips other lines"
+  );
+  assert(parseCvSkills("## Profile\n\n**A:** x.").length === 0, "No Skills section gives no groups");
+
+  assert(
+    PORTFOLIO_HERO.eyebrow === "Portfolio" &&
+      PORTFOLIO_HERO.line1 === "Work that shows" &&
+      PORTFOLIO_HERO.line2 === "the answer is right." &&
+      PORTFOLIO_HERO.lede ===
+        "I focus on making digital and AI services trustworthy, measurable and useful to the people who rely on them.",
+    "Portfolio hero copy is exactly the approved wording"
+  );
+  assert(
+    sectionPages.portfolio.path === "/portfolio" &&
+      sectionPages.portfolio.description ===
+        "Case studies by Chinomso Okere: research, builds and proofs of concept, each with its evidence and what it doesn't show.",
+    "Portfolio page metadata is the approved description"
+  );
+  assert(sectionCard("portfolio").title === "Portfolio", "Portfolio gets a branded section card");
+  assert(CV_PATH === "/cv" && sectionPages.cv.path === "/cv", `CV_PATH is "/cv" now the page exists (${CV_PATH})`);
+  assert(
+    sectionPages.cv.description === "CV of Chinomso Okere: MBCS, business analyst and applied AI researcher in Scotland, UK." &&
+      sectionCard("cv").title === "CV",
+    "CV metadata is the approved description, with a branded card"
+  );
+
+  // 11. Lead card layout (Phase 4)
+  const layout = (count) =>
+    Array.from({ length: count }, (_, i) => {
+      const { lead, secondInRow } = cardLayout(count, i);
+      return lead ? "L" : secondInRow ? "2" : "1";
+    }).join("");
+  assert(layout(1) === "L", "1 card: a lone lead");
+  assert(layout(2) === "12", "2 cards: one pair");
+  assert(layout(5) === "L1212", "5 cards: lead, then two pairs");
+  assert(layout(6) === "121212", "6 cards: three pairs, no lead");
+  assert(layout(7) === "L121212", "7 cards: lead, then three pairs");
+  const research = filterProjects(mixed, "research");
+  assert(layout(research.length) === "12" && layout(mixed.length) === "1212", "Filtered counts drive the layout (4 -> pairs, 2 research -> pair)");
+  assert(layout(filterProjects(mixed, "build").length) === "L", "A filter leaving 1 card makes it the lead");
+
+  // 12. CV sections and experience (Phase 4)
+  const cvSections = parseCvSections(getCv().content);
+  assert(
+    JSON.stringify(cvSections.map((s) => s.heading)) ===
+      JSON.stringify(["Profile", "Selected contributions", "Experience", "Research and publications", "Education", "Professional memberships and development", "Skills"]),
+    `CV sections in order (${cvSections.map((s) => s.heading).join(", ")})`
+  );
+  const roles = parseExperience(cvSections.find((s) => s.heading === "Experience").body);
+  assert(roles.length === 5, `5 roles parsed (${roles.length})`);
+  assert(
+    roles[0].role === "Review Officer (HEO)" && roles[0].org === "UK Civil Service" && roles[0].dates === "Jan 2026 – present",
+    "First role split into role, organisation and dates"
+  );
+  assert(roles.every((r) => r.body.startsWith("- ")), "Every role keeps its bullets");
+  for (const bad of ["### Analyst · Somewhere", "### Analyst · Org · 2020 · extra", "### Analyst ·  · 2020"]) {
+    let message = null;
+    try {
+      parseExperience(`${bad}\n- did things`);
+    } catch (err) {
+      message = err.message;
+    }
+    assert(message?.includes('"content/cv.md" (Experience)') && message.includes(bad.slice(4)), `Strict role heading rejects "${bad.slice(4)}"`);
+  }
+  const research2 = cvSections.find((s) => s.heading === "Research and publications").body;
+  assert(!/\.pdf/i.test(getCv().content), "CV links no PDF");
+  const pubHtml = await renderMarkdown(research2, { lead: false, externalLinksNewTab: true });
+  const pubLinks = pubHtml.match(/<a [^>]*>/g) || [];
+  assert(
+    pubLinks.length === 1 &&
+      /href="https:\/\/doi\.org\/10\.1109\/AAIML67890\.2026\.11498196"/.test(pubLinks[0]) &&
+      /target="_blank"/.test(pubLinks[0]) &&
+      /rel="noopener noreferrer"/.test(pubLinks[0]) &&
+      pubHtml.includes('<span class="sr-only"> (opens in new tab)</span>'),
+    "Publications: only the DOI is a link, opening in a new tab with hidden text"
+  );
+  assert(!/class="lead"|data-dropcap/.test(pubHtml), "CV sections render without lead or drop cap");
+  assert(siteConfig.links.portfolio === "/portfolio", "Header Portfolio link is internal (/portfolio)");
 
   console.log("");
   if (failed) {

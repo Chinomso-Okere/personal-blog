@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { siteConfig } from "./site.ts";
 import { sectionPages, HOME_EYEBROW, type SectionPage } from "./pages.ts";
+import { TYPE_LABELS, type ProjectType } from "./project-types.ts";
 
 /**
  * Bump when the card layout, fonts or colours in lib/og.tsx change, so every
@@ -36,6 +37,10 @@ export function sectionCard(key: SectionPage): CardContent {
 
 export function postCard(post: { title: string; tags?: string[] }): CardContent {
   return { label: post.tags?.[0] ?? "Blog", title: post.title };
+}
+
+export function projectCard(project: { type: ProjectType; title: string }): CardContent {
+  return { label: TYPE_LABELS[project.type], title: project.title };
 }
 
 /**
